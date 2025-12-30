@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useScrollProgress } from '@/composables/useScrollAnimation'
+import { useEasterEgg } from '@/composables/useEasterEgg'
 import LoadingScreen from '@/components/LoadingScreen.vue'
 import Navigation from '@/components/Navigation.vue'
+import CustomCursor from '@/components/CustomCursor.vue'
+import SEOHead from '@/components/SEOHead.vue'
 import HeroSection from '@/components/Landing/HeroSection.vue'
 import ProjectsSection from '@/components/Projects/ProjectsSection.vue'
 import AboutSection from '@/components/About/AboutSection.vue'
@@ -14,6 +17,10 @@ const showContent = ref(false)
 // Theme management
 const isDark = ref(false)
 const { scrollProgress } = useScrollProgress()
+
+// Easter egg setup
+const logoRef = ref<HTMLElement | null>(null)
+const { triggerEasterEgg, notification } = useEasterEgg(logoRef)
 
 // Initialize theme from localStorage or system preference
 const initializeTheme = () => {
@@ -76,8 +83,46 @@ onMounted(() => {
 </script>
 
 <template>
+  <!-- SEO Meta Tags -->
+  <SEOHead
+    title="Your Name - Full Stack Developer & Designer"
+    description="Portfolio of Your Name - Full Stack Developer specializing in Vue.js, TypeScript, and modern web development. View my projects and get in touch."
+    :keywords="['web developer', 'full stack developer', 'vue.js', 'typescript', 'portfolio', 'software engineer']"
+    author="Your Name"
+    url="https://yourportfolio.com"
+    image="https://yourportfolio.com/og-image.jpg"
+    twitter-handle="@yourusername"
+  />
+
+  <!-- Custom Cursor -->
+  <CustomCursor />
+
   <!-- Loading Screen -->
   <LoadingScreen v-if="isLoading" :on-complete="handleLoadingComplete" />
+
+  <!-- Easter Egg Notification -->
+  <Transition
+    enter-active-class="transition-all duration-300 ease-out"
+    leave-active-class="transition-all duration-200 ease-in"
+    enter-from-class="opacity-0 translate-y-4"
+    leave-to-class="opacity-0 translate-y-4"
+  >
+    <div
+      v-if="notification"
+      class="fixed top-24 right-8 z-50 max-w-sm p-4 rounded-lg bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-2xl"
+      role="alert"
+      aria-live="polite"
+    >
+      <div class="flex items-start gap-3">
+        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <div>
+          <p class="font-semibold">{{ notification }}</p>
+        </div>
+      </div>
+    </div>
+  </Transition>
 
   <!-- Main App Content -->
   <Transition
@@ -101,7 +146,7 @@ onMounted(() => {
       </div>
 
       <!-- Navigation -->
-      <Navigation :is-dark="isDark" @toggle-theme="toggleTheme" />
+      <Navigation :is-dark="isDark" :on-logo-click="triggerEasterEgg" @toggle-theme="toggleTheme" />
 
       <!-- Skip to main content link (Accessibility) -->
       <a

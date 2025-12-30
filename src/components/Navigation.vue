@@ -9,6 +9,7 @@ interface NavItem {
 
 interface Props {
   isDark: boolean
+  onLogoClick?: () => void
 }
 
 const props = defineProps<Props>()
@@ -110,8 +111,8 @@ const toggleMobileMenu = () => {
         <!-- Logo/Brand -->
         <a
           href="#"
-          @click.prevent="scrollToSection('#', 'home')"
-          class="text-xl font-bold gradient-text focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-lg px-2"
+          @click.prevent="(e) => { scrollToSection('#', 'home'); props.onLogoClick?.() }"
+          class="text-xl font-bold gradient-text focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-lg px-2 cursor-pointer"
           aria-label="Go to homepage"
           tabindex="0"
         >

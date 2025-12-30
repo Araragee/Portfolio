@@ -14,11 +14,21 @@ const router = createRouter({
   routes,
   scrollBehavior(to, from, savedPosition) {
     if (to.hash) {
-      return {
-        el: to.hash,
-        behavior: 'smooth',
-        top: 0
-      }
+      // Wait for component to mount before scrolling
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const element = document.querySelector(to.hash)
+          if (element) {
+            resolve({
+              el: to.hash,
+              behavior: 'smooth',
+              top: 80 // Offset for fixed nav
+            })
+          } else {
+            resolve({ top: 0 })
+          }
+        }, 100)
+      })
     }
     if (savedPosition) {
       return savedPosition
