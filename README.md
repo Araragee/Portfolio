@@ -20,37 +20,36 @@ A modern, animated portfolio website built with Vue 3, TypeScript, and Tailwind 
 
 ## Project Structure
 
-```
 Portfolio/
 ├── src/
-│   ├── assets/
-│   │   └── main.css              # Global styles with Tailwind
-│   ├── components/
-│   │   ├── Landing/
-│   │   │   ├── HeroSection.vue   # Hero section with animations
-│   │   │   ├── FloatingShapes.vue # Animated background shapes
-│   │   │   └── ScrollIndicator.vue # Scroll indicator
-│   │   ├── Projects/
-│   │   │   ├── ProjectsSection.vue # Projects showcase
-│   │   │   └── ProjectCard.vue   # Individual project card
-│   │   └── About/
-│   │       └── AboutSection.vue  # About section with skills
-│   ├── composables/
-│   │   ├── useScrollAnimation.ts # Scroll animation utilities
-│   │   └── useParallax.ts       # Parallax effect utilities
-│   ├── router/
-│   │   └── index.ts             # Vue Router configuration
-│   ├── App.vue                  # Main app component
-│   ├── main.ts                  # App entry point
-│   └── vite-env.d.ts           # TypeScript declarations
+│ ├── assets/
+│ │ └── main.css # Global styles with Tailwind
+│ ├── components/
+│ │ ├── Landing/
+│ │ │ ├── HeroSection.vue # Hero section with animations
+│ │ │ ├── FloatingShapes.vue # Animated background shapes
+│ │ │ └── ScrollIndicator.vue # Scroll indicator
+│ │ ├── Projects/
+│ │ │ ├── ProjectsSection.vue # Projects showcase
+│ │ │ └── ProjectCard.vue # Individual project card
+│ │ └── About/
+│ │ └── AboutSection.vue # About section with skills
+│ ├── composables/
+│ │ ├── useScrollAnimation.ts # Scroll animation utilities
+│ │ └── useParallax.ts # Parallax effect utilities
+│ ├── router/
+│ │ └── index.ts # Vue Router configuration
+│ ├── App.vue # Main app component
+│ ├── main.ts # App entry point
+│ └── vite-env.d.ts # TypeScript declarations
 ├── index.html
 ├── package.json
 ├── tsconfig.json
 ├── tailwind.config.js
 ├── vite.config.ts
 └── README.md
-```
 
+<!--
 ## Getting Started
 
 ### Prerequisites
@@ -62,15 +61,13 @@ Portfolio/
 
 1. Install dependencies:
 
-```bash
 npm install
-```
 
 2. Start the development server:
 
 ```bash
 npm run dev
-```
+````
 
 3. Open your browser and navigate to `http://localhost:5173`
 
@@ -93,14 +90,17 @@ npm run preview
 ### Update Personal Information
 
 1. **Hero Section** - Edit [src/components/Landing/HeroSection.vue](src/components/Landing/HeroSection.vue):
+
    - Update your name (line 70)
    - Update your title (line 79)
    - Update your tagline (line 88)
 
 2. **Projects** - Edit [src/components/Projects/ProjectsSection.vue](src/components/Projects/ProjectsSection.vue):
+
    - Update the projects array with your own projects (lines 13-40)
 
 3. **About Section** - Edit [src/components/About/AboutSection.vue](src/components/About/AboutSection.vue):
+
    - Update the bio text (lines 45-60)
    - Update skills array (lines 9-16)
 
@@ -140,10 +140,10 @@ Create new components in the `src/components` directory and import them in [src/
 - Safari (latest)
 - Edge (latest)
 
-## License
-
-MIT
-
 ## Credits
 
-Built with Vue 3, TypeScript, and Tailwind CSS
+Built with Vue 3, TypeScript, and Tailwind CSS -->
+
+```
+
+```
