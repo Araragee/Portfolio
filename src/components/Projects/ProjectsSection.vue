@@ -123,43 +123,6 @@ const allProjects = ref<Project[]>([
   }
 ])
 
-// Filter categories
-const filters = ref<ProjectFilter[]>([
-  { category: 'all', label: 'All Projects' },
-  { category: 'web-app', label: 'Web Apps' },
-  { category: 'ui-ux', label: 'UI/UX' },
-  { category: 'api', label: 'APIs' },
-  { category: 'tool', label: 'Tools' }
-])
-
-// Active filter
-const activeFilter = ref<ProjectCategory>('all')
-
-// Filtered projects
-const filteredProjects = computed(() => {
-  if (activeFilter.value === 'all') {
-    return allProjects.value
-  }
-  return allProjects.value.filter(project => project.category === activeFilter.value)
-})
-
-// Update filter counts
-const updateFilterCounts = () => {
-  filters.value.forEach(filter => {
-    if (filter.category === 'all') {
-      filter.count = allProjects.value.length
-    } else {
-      filter.count = allProjects.value.filter(p => p.category === filter.category).length
-    }
-  })
-}
-
-updateFilterCounts()
-
-const setFilter = (category: ProjectCategory) => {
-  activeFilter.value = category
-}
-
 const { elementRef: sectionRef } = useScrollAnimation({ threshold: 0.1 })
 const { elementRef: decorRef1, transform: decorTransform1 } = useParallax({ speed: 0.3 })
 const { elementRef: decorRef2, transform: decorTransform2 } = useParallax({ speed: -0.2 })
@@ -182,59 +145,15 @@ const { elementRef: decorRef2, transform: decorTransform2 } = useParallax({ spee
         </p>
       </div>
 
-      <!-- Filter Buttons -->
-      <div class="flex flex-wrap justify-center gap-3 mb-12">
-        <button
-          v-for="filter in filters"
-          :key="filter.category"
-          @click="setFilter(filter.category)"
-          :class="[
-            'px-6 py-3 rounded-full font-medium transition-all duration-300',
-            'hover:scale-105 active:scale-95',
-            activeFilter === filter.category
-              ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg'
-              : 'glass-effect text-gray-700 dark:text-gray-300 hover:shadow-md'
-          ]"
-        >
-          {{ filter.label }}
-          <span
-            v-if="filter.count !== undefined"
-            :class="[
-              'ml-2 px-2 py-0.5 rounded-full text-xs',
-              activeFilter === filter.category
-                ? 'bg-white/20'
-                : 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
-            ]"
-          >
-            {{ filter.count }}
-          </span>
-        </button>
-      </div>
-
-      <!-- Projects Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <TransitionGroup
-          name="project-list"
-          tag="div"
-          class="contents"
-        >
-          <ProjectCard
-            v-for="(project, index) in filteredProjects"
-            :key="project.id"
-            :project="project"
-            :index="index"
-          />
-        </TransitionGroup>
-      </div>
-
-      <!-- Empty State -->
-      <div
-        v-if="filteredProjects.length === 0"
-        class="text-center py-20"
-      >
-        <p class="text-xl text-gray-500 dark:text-gray-400">
-          No projects found in this category.
-        </p>
+      <!-- Projects Carousel -->
+      <div class="flex overflow-x-auto gap-8 pb-8 snap-x snap-mandatory hide-scrollbar">
+        <ProjectCard
+          v-for="(project, index) in allProjects"
+          :key="project.id"
+          :project="project"
+          :index="index"
+          class="min-w-[320px] md:min-w-[400px] lg:min-w-[450px] max-w-[450px] snap-center shrink-0"
+        />
       </div>
     </div>
 
@@ -257,20 +176,11 @@ const { elementRef: decorRef2, transform: decorTransform2 } = useParallax({ spee
 </template>
 
 <style scoped>
-/* Transition animations for filter */
-.project-list-move,
-.project-list-enter-active,
-.project-list-leave-active {
-  transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
-
-.project-list-enter-from {
-  opacity: 0;
-  transform: scale(0.8) translateY(30px);
-}
-
-.project-list-leave-to {
-  opacity: 0;
-  transform: scale(0.8) translateY(-30px);
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 </style>

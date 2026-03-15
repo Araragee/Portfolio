@@ -1,38 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import anime from 'animejs'
 import { useIntersectionObserver } from '@/composables/useIntersectionObserver'
 import type { TimelineItem } from '@/types/about'
 
 interface Props {
   items: TimelineItem[]
-  showFilters?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  showFilters: true
-})
-
-const activeFilter = ref<'all' | 'experience' | 'education' | 'achievement'>('all')
-const itemRefs = ref<Array<HTMLElement | null>>([])
+const props = defineProps<Props>()
 
 const { elementRef: timelineRef, isVisible } = useIntersectionObserver({
   threshold: 0.1,
   once: true
 })
-
-const filteredItems = ref(
-  activeFilter.value === 'all'
-    ? props.items
-    : props.items.filter(item => item.type === activeFilter.value)
-)
-
-const filters = [
-  { key: 'all' as const, label: 'All', icon: '📚' },
-  { key: 'experience' as const, label: 'Experience', icon: '💼' },
-  { key: 'education' as const, label: 'Education', icon: '🎓' },
-  { key: 'achievement' as const, label: 'Achievements', icon: '🏆' }
-]
 
 const getTypeIcon = (type: TimelineItem['type']) => {
   switch (type) {
@@ -52,35 +31,10 @@ const getTypeColor = (type: TimelineItem['type']) => {
   }
 }
 
-const setFilter = (filter: typeof activeFilter.value) => {
-  activeFilter.value = filter
-  filteredItems.value = filter === 'all'
-    ? props.items
-    : props.items.filter(item => item.type === filter)
-}
 </script>
 
 <template>
   <div ref="timelineRef" class="w-full">
-    <!-- Filters -->
-    <div v-if="showFilters" class="flex flex-wrap justify-center gap-3 mb-12">
-      <button
-        v-for="filter in filters"
-        :key="filter.key"
-        @click="setFilter(filter.key)"
-        :class="[
-          'px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300',
-          'hover:scale-105 active:scale-95 flex items-center gap-2',
-          activeFilter === filter.key
-            ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg'
-            : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-md'
-        ]"
-      >
-        <span>{{ filter.icon }}</span>
-        <span>{{ filter.label }}</span>
-      </button>
-    </div>
-
     <!-- Timeline -->
     <div class="relative">
       <!-- Center Line -->
@@ -90,9 +44,8 @@ const setFilter = (filter: typeof activeFilter.value) => {
       <div class="space-y-12">
         <TransitionGroup name="timeline-list" tag="div" class="space-y-12">
           <div
-            v-for="(item, index) in filteredItems"
+            v-for="(item, index) in items"
             :key="item.id"
-            :ref="el => itemRefs[index] = el as HTMLElement"
             :class="[
               'relative grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 transition-all duration-700 ease-out',
               index % 2 === 0 ? 'lg:text-right' : 'lg:flex-row-reverse',
@@ -179,16 +132,6 @@ const setFilter = (filter: typeof activeFilter.value) => {
           </div>
         </TransitionGroup>
       </div>
-    </div>
-
-    <!-- Empty State -->
-    <div
-      v-if="filteredItems.length === 0"
-      class="text-center py-20"
-    >
-      <p class="text-xl text-gray-500 dark:text-gray-400">
-        No items found in this category.
-      </p>
     </div>
   </div>
 </template>

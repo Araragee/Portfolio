@@ -208,21 +208,20 @@ const handleMouseMove = (e: MouseEvent) => {
         </div>
       </div>
 
-      <!-- Category Badge -->
-      <div class="absolute bottom-4 left-4 z-10">
-        <span class="glass-effect px-3 py-1 rounded-full text-xs font-semibold text-white shadow-lg backdrop-blur-md">
-          {{ project.category.replace('-', ' ').toUpperCase() }}
-        </span>
-      </div>
     </div>
 
     <!-- Project Content -->
-    <div class="p-6 relative">
-      <!-- Year/Status -->
-      <div class="flex items-center gap-2 mb-3 text-xs text-gray-500 dark:text-gray-400">
-        <span v-if="project.year">{{ project.year }}</span>
-        <span v-if="project.year && project.status">•</span>
-        <span v-if="project.status" class="capitalize">{{ project.status }}</span>
+    <div class="p-6 relative flex flex-col h-[calc(100%-14rem)]">
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 mb-3 text-xs font-medium text-gray-500 dark:text-gray-400">
+        <span class="text-primary-600 dark:text-primary-400">Projects</span>
+        <span>/</span>
+        <span class="capitalize">{{ project.category.replace('-', ' ') }}</span>
+        <div class="flex items-center gap-2 ml-auto">
+          <span v-if="project.year">{{ project.year }}</span>
+          <span v-if="project.year && project.status">•</span>
+          <span v-if="project.status" class="capitalize">{{ project.status }}</span>
+        </div>
       </div>
 
       <!-- Title -->
@@ -231,12 +230,12 @@ const handleMouseMove = (e: MouseEvent) => {
       </h3>
 
       <!-- Description -->
-      <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed line-clamp-3">
+      <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed line-clamp-3 flex-grow">
         {{ project.description }}
       </p>
 
       <!-- Tech Stack Tags -->
-      <div class="flex flex-wrap gap-2 mb-6">
+      <div class="flex flex-wrap gap-2 mb-6 mt-auto">
         <span
           v-for="(tag, tagIndex) in project.tags.slice(0, 4)"
           :key="tag"
