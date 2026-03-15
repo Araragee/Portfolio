@@ -52,40 +52,11 @@ const getTypeColor = (type: TimelineItem['type']) => {
   }
 }
 
-const animateItems = () => {
-  itemRefs.value.forEach((ref, index) => {
-    if (ref) {
-      anime({
-        targets: ref,
-        opacity: [0, 1],
-        translateX: [index % 2 === 0 ? -50 : 50, 0],
-        translateY: [30, 0],
-        duration: 800,
-        delay: index * 150,
-        easing: 'easeOutCubic'
-      })
-    }
-  })
-}
-
-onMounted(() => {
-  const checkVisibility = setInterval(() => {
-    if (isVisible.value) {
-      animateItems()
-      clearInterval(checkVisibility)
-    }
-  }, 100)
-})
-
 const setFilter = (filter: typeof activeFilter.value) => {
   activeFilter.value = filter
   filteredItems.value = filter === 'all'
     ? props.items
     : props.items.filter(item => item.type === filter)
-
-  setTimeout(() => {
-    animateItems()
-  }, 50)
 }
 </script>
 
@@ -123,10 +94,11 @@ const setFilter = (filter: typeof activeFilter.value) => {
             :key="item.id"
             :ref="el => itemRefs[index] = el as HTMLElement"
             :class="[
-              'relative grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12',
-              index % 2 === 0 ? 'lg:text-right' : 'lg:flex-row-reverse'
+              'relative grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 transition-all duration-700 ease-out',
+              index % 2 === 0 ? 'lg:text-right' : 'lg:flex-row-reverse',
+              isVisible ? 'opacity-100 translate-y-0 translate-x-0' : 'opacity-0 translate-y-8 ' + (index % 2 === 0 ? '-translate-x-12' : 'translate-x-12')
             ]"
-            style="opacity: 0"
+            :style="{ transitionDelay: `${index * 150}ms` }"
           >
             <!-- Content -->
             <div :class="index % 2 === 0 ? 'lg:col-start-1' : 'lg:col-start-2'">
@@ -237,9 +209,5 @@ const setFilter = (filter: typeof activeFilter.value) => {
 .timeline-list-leave-to {
   opacity: 0;
   transform: translateY(-30px) scale(0.95);
-}
-
-.timeline-list-leave-active {
-  position: absolute;
 }
 </style>

@@ -4,7 +4,6 @@ import { useScrollProgress } from '@/composables/useScrollAnimation'
 import { useEasterEgg } from '@/composables/useEasterEgg'
 import LoadingScreen from '@/components/LoadingScreen.vue'
 import Navigation from '@/components/Navigation.vue'
-import CustomCursor from '@/components/CustomCursor.vue'
 import SEOHead from '@/components/SEOHead.vue'
 import HeroSection from '@/components/Landing/HeroSection.vue'
 import ProjectsSection from '@/components/Projects/ProjectsSection.vue'
@@ -20,7 +19,7 @@ const { scrollProgress } = useScrollProgress()
 
 // Easter egg setup
 const logoRef = ref<HTMLElement | null>(null)
-const { triggerEasterEgg, notification } = useEasterEgg(logoRef)
+const { triggerEasterEgg, notification } = useEasterEgg()
 
 // Initialize theme from localStorage or system preference
 const initializeTheme = () => {
@@ -70,15 +69,6 @@ const currentYear = computed(() => new Date().getFullYear())
 
 onMounted(() => {
   initializeTheme()
-
-  // Performance optimization: Add will-change to frequently animated elements
-  const style = document.createElement('style')
-  style.textContent = `
-    .parallax-element { will-change: transform; }
-    .animated-element { will-change: opacity, transform; }
-    .scroll-progress { will-change: width; }
-  `
-  document.head.appendChild(style)
 })
 </script>
 
@@ -93,9 +83,6 @@ onMounted(() => {
     image="https://yourportfolio.com/og-image.jpg"
     twitter-handle="@yourusername"
   />
-
-  <!-- Custom Cursor -->
-  <CustomCursor />
 
   <!-- Loading Screen -->
   <LoadingScreen v-if="isLoading" :on-complete="handleLoadingComplete" />
@@ -121,6 +108,23 @@ onMounted(() => {
           <p class="font-semibold">{{ notification }}</p>
         </div>
       </div>
+    </div>
+  </Transition>
+
+  <!-- Easter Egg Notification -->
+  <Transition
+    enter-active-class="transition-all duration-300 ease-out"
+    leave-active-class="transition-all duration-200 ease-in"
+    enter-from-class="opacity-0 translate-y-4"
+    leave-to-class="opacity-0 translate-y-4"
+  >
+    <div
+      v-if="notification"
+      class="fixed top-24 left-1/2 transform -translate-x-1/2 z-[9999] px-6 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-full shadow-2xl font-semibold text-lg"
+      role="alert"
+      aria-live="polite"
+    >
+      {{ notification }}
     </div>
   </Transition>
 

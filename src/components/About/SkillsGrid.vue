@@ -51,37 +51,8 @@ const categories = computed(() => {
   ].filter(cat => cat.count > 0)
 })
 
-// Animate progress bars when visible
-const animateProgressBars = () => {
-  filteredSkills.value.forEach((skill, index) => {
-    const progressBar = document.getElementById(`skill-progress-${skill.name.replace(/\s+/g, '-')}`)
-    if (progressBar) {
-      anime({
-        targets: progressBar,
-        width: `${skill.level}%`,
-        duration: 1500,
-        delay: index * 100,
-        easing: 'easeOutExpo'
-      })
-    }
-  })
-}
-
-// Watch for visibility and animate
-onMounted(() => {
-  const checkVisibility = setInterval(() => {
-    if (isVisible.value) {
-      animateProgressBars()
-      clearInterval(checkVisibility)
-    }
-  }, 100)
-})
-
 const setCategory = (category: string) => {
   activeCategory.value = category
-  setTimeout(() => {
-    animateProgressBars()
-  }, 50)
 }
 </script>
 
@@ -131,10 +102,10 @@ const setCategory = (category: string) => {
             <div
               :id="`skill-progress-${skill.name.replace(/\s+/g, '-')}`"
               :class="[
-                'absolute top-0 left-0 h-full bg-gradient-to-r rounded-full transition-all duration-300',
+                'absolute top-0 left-0 h-full bg-gradient-to-r rounded-full transition-all duration-1000 ease-out',
                 skill.color || 'from-primary-400 to-accent-400'
               ]"
-              style="width: 0%"
+              :style="{ width: isVisible ? `${skill.level}%` : '0%' }"
             >
               <!-- Shine effect -->
               <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shine"></div>
@@ -177,10 +148,6 @@ const setCategory = (category: string) => {
 .skill-list-leave-to {
   opacity: 0;
   transform: translateY(-20px) scale(0.95);
-}
-
-.skill-list-leave-active {
-  position: absolute;
 }
 
 /* Shine animation */

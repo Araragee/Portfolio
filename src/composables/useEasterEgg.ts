@@ -123,35 +123,15 @@ export function useEasterEgg() {
     }
   }
 
+  const notification = ref<string | null>(null)
+
   // Show notification
   const showEasterEggNotification = () => {
-    const notification = document.createElement('div')
-    notification.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 z-[9999] px-6 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-full shadow-2xl font-semibold text-lg'
-    notification.textContent = '🎉 You found the easter egg! 🎉'
-    notification.style.opacity = '0'
-    document.body.appendChild(notification)
+    notification.value = '🎉 You found the easter egg! 🎉'
 
-    anime({
-      targets: notification,
-      opacity: [0, 1],
-      translateY: ['-20px', '0px'],
-      duration: 400,
-      easing: 'easeOutCubic',
-      complete: () => {
-        setTimeout(() => {
-          anime({
-            targets: notification,
-            opacity: [1, 0],
-            translateY: ['0px', '-20px'],
-            duration: 400,
-            easing: 'easeInCubic',
-            complete: () => {
-              notification.remove()
-            }
-          })
-        }, 2000)
-      }
-    })
+    setTimeout(() => {
+      notification.value = null
+    }, 3000)
   }
 
   // Konami code easter egg
@@ -180,6 +160,7 @@ export function useEasterEgg() {
     checkKonamiCode,
     createConfetti,
     shakeElement,
-    spinElement
+    spinElement,
+    notification
   }
 }

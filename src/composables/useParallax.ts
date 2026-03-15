@@ -13,21 +13,28 @@ export function useParallax(options: ParallaxOptions = {}) {
   const transform = ref('')
 
   let ticking = false
+  let cachedAbsoluteTop = 0
+  let cachedHeight = 0
+  let cachedScrollY = -1
 
   const updateParallax = () => {
     if (!elementRef.value) return
 
     const scrollY = window.scrollY
-    const rect = elementRef.value.getBoundingClientRect()
-    const elementTop = rect.top + scrollY
-    const elementHeight = rect.height
+    // Only update if scrolled
+    if (scrollY === cachedScrollY) {
+      ticking = false
+      return
+    }
+    cachedScrollY = scrollY
+
     const viewportHeight = window.innerHeight
 
     // Calculate if element is in viewport
-    const isInViewport = scrollY + viewportHeight > elementTop && scrollY < elementTop + elementHeight
+    const isInViewport = scrollY + viewportHeight > cachedAbsoluteTop && scrollY < cachedAbsoluteTop + cachedHeight
 
     if (isInViewport) {
-      const scrolled = scrollY - elementTop + viewportHeight
+      const scrolled = scrollY - cachedAbsoluteTop + viewportHeight
       const parallaxValue = (scrolled - offset) * speed
 
       if (direction === 'vertical') {
@@ -42,6 +49,15 @@ export function useParallax(options: ParallaxOptions = {}) {
     ticking = false
   }
 
+  const updateCache = () => {
+    if (elementRef.value) {
+      const rect = elementRef.value.getBoundingClientRect()
+      // Absolute top of element relative to document
+      cachedAbsoluteTop = rect.top + window.scrollY
+      cachedHeight = rect.height
+    }
+  }
+
   const requestTick = () => {
     if (!ticking) {
       window.requestAnimationFrame(updateParallax)
@@ -50,12 +66,15 @@ export function useParallax(options: ParallaxOptions = {}) {
   }
 
   onMounted(() => {
+    updateCache()
     window.addEventListener('scroll', requestTick, { passive: true })
+    window.addEventListener('resize', updateCache, { passive: true })
     updateParallax()
   })
 
   onUnmounted(() => {
     window.removeEventListener('scroll', requestTick)
+    window.removeEventListener('resize', updateCache)
   })
 
   return {

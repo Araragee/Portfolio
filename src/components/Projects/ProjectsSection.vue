@@ -273,8 +273,4 @@ const { elementRef: decorRef2, transform: decorTransform2 } = useParallax({ spee
   opacity: 0;
   transform: scale(0.8) translateY(-30px);
 }
-
-.project-list-leave-active {
-  position: absolute;
-}
 </style>
