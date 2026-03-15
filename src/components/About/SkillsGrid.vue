@@ -63,15 +63,15 @@ const orderedCategories = computed(() => {
           :key="skill.name"
           class="flex flex-col items-center justify-center p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300 group"
         >
-          <!-- Generic Skill Icon Placeholder -->
+          <!-- Skill Icon -->
           <div class="w-12 h-12 mb-3 rounded-full flex items-center justify-center bg-gray-50 dark:bg-gray-800 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/30 transition-colors duration-300">
              <svg
               class="w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors duration-300"
-              fill="none"
-              stroke="currentColor"
+              fill="currentColor"
               viewBox="0 0 24 24"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              <path v-if="skill.icon" :d="skill.icon" />
+              <path v-else fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
           </div>
 

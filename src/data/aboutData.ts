@@ -23,30 +23,30 @@ export const personalInfo: PersonalInfo = {
 
 export const skills: Skill[] = [
   // Frontend
-  { name: 'Vue.js', level: 95, category: 'frontend', color: 'from-green-400 to-emerald-500' },
-  { name: 'React', level: 90, category: 'frontend', color: 'from-cyan-400 to-blue-500' },
-  { name: 'TypeScript', level: 92, category: 'frontend', color: 'from-blue-400 to-indigo-500' },
-  { name: 'JavaScript (ES6+)', level: 95, category: 'frontend', color: 'from-yellow-400 to-orange-500' },
-  { name: 'HTML5 & CSS3', level: 98, category: 'frontend', color: 'from-orange-400 to-red-500' },
-  { name: 'Tailwind CSS', level: 95, category: 'frontend', color: 'from-teal-400 to-cyan-500' },
+  { name: 'Vue.js', level: 95, category: 'frontend', color: 'from-green-400 to-emerald-500', icon: 'M19.344 6.304l-7.344 12.72-7.344-12.72h-4.656l12 20.784 12-20.784z' },
+  { name: 'React', level: 90, category: 'frontend', color: 'from-cyan-400 to-blue-500', icon: 'M12 4.4c2.8 0 5.4.8 7.4 2.2-1.9-2.3-4.8-3.8-8-3.8-3.2 0-6.1 1.5-8 3.8 2-1.4 4.6-2.2 7.4-2.2m7.4 2.2c1.9 2.3 3 5.4 3 8.8s-1.1 6.5-3 8.8c1.9-2.3 3-5.4 3-8.8s-1.1-6.5-3-8.8M4.6 6.6c-1.9 2.3-3 5.4-3 8.8s1.1 6.5 3 8.8c-1.9-2.3-3-5.4-3-8.8s1.1-6.5 3-8.8m7.4 17.6c-2.8 0-5.4-.8-7.4-2.2 1.9 2.3 4.8 3.8 8 3.8 3.2 0 6.1-1.5 8-3.8-2 1.4-4.6 2.2-7.4 2.2' },
+  { name: 'TypeScript', level: 92, category: 'frontend', color: 'from-blue-400 to-indigo-500', icon: 'M3 3h18v18H3V3zm10 12.5c-.8.8-1.8 1.2-3 1.2s-2.2-.4-3-1.2v-2l1.5-1.5v2c.4.4.9.6 1.5.6s1.1-.2 1.5-.6V11l-3.5-2v-1.5L13 9.5v6zm5-5.5v1.5h-2.5v4.5H14v-4.5h-2.5V10H18z' },
+  { name: 'JavaScript (ES6+)', level: 95, category: 'frontend', color: 'from-yellow-400 to-orange-500', icon: 'M3 3h18v18H3V3zm10.5 12.5c0 .8-.3 1.5-.8 2-.5.5-1.2.8-2 .8s-1.5-.3-2-.8v-2l1.5-1.5v2c.1.1.3.2.5.2s.4-.1.5-.2V11l-3.5-2v-1.5l5 2v6zm5-5.5v1.5h-2.5v4.5H14v-4.5h-2.5V10h6z' },
+  { name: 'HTML5 & CSS3', level: 98, category: 'frontend', color: 'from-orange-400 to-red-500', icon: 'M3 3h18l-1.6 18L12 24l-7.4-3L3 3zm9 18l5-2 1-11H6.5l.5 4h9l-.5 5-3.5 1.5L8.5 15l-.5-4H6l1 7 5 2z' },
+  { name: 'Tailwind CSS', level: 95, category: 'frontend', color: 'from-teal-400 to-cyan-500', icon: 'M12 6c-3.3 0-5.8 1.8-7.5 5.5 1.7-2.5 4.2-3.3 7.5-2.5 1.7.4 2.9 1.6 4.3 3.1C18.1 13.9 20.3 16 24 16c-3.3 0-5.8-1.8-7.5-5.5-1.7 2.5-4.2 3.3-7.5 2.5-1.7-.4-2.9-1.6-4.3-3.1C2.9 8.1.7 6 0 6c3.3 0 5.8 1.8 7.5 5.5 1.7-2.5 4.2-3.3 7.5-2.5 1.7.4 2.9 1.6 4.3 3.1C21.1 13.9 23.3 16 24 16' },
 
   // Backend
-  { name: 'Node.js', level: 85, category: 'backend', color: 'from-lime-400 to-green-500' },
-  { name: 'Express.js', level: 80, category: 'backend', color: 'from-gray-400 to-gray-600' },
-  { name: 'REST APIs', level: 88, category: 'backend', color: 'from-blue-400 to-purple-500' },
-  { name: 'GraphQL', level: 75, category: 'backend', color: 'from-pink-400 to-purple-500' },
+  { name: 'Node.js', level: 85, category: 'backend', color: 'from-lime-400 to-green-500', icon: 'M12 2.5l9.5 5.5v11l-9.5 5.5-9.5-5.5v-11l9.5-5.5zm0 1.5L3.5 9v9l8.5 5 8.5-5V9l-8.5-5zm-2 13v-8h1.5v6.5h3.5v1.5H10z' },
+  { name: 'Express.js', level: 80, category: 'backend', color: 'from-gray-400 to-gray-600', icon: 'M12 4L4 8v8l8 4 8-4V8l-8-4zm-4 7l2-1v4l-2-1v-2zm8 0l-2 1v-2l2-1v2z' },
+  { name: 'REST APIs', level: 88, category: 'backend', color: 'from-blue-400 to-purple-500', icon: 'M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm-2-11.5v7h1.5v-3h2c1.4 0 2.5-1.1 2.5-2.5S14.9 8.5 13.5 8.5H10zm1.5 1.5h2c.6 0 1 .4 1 1s-.4 1-1 1h-2v-2z' },
+  { name: 'GraphQL', level: 75, category: 'backend', color: 'from-pink-400 to-purple-500', icon: 'M17.5 4l4 7-4 7h-8l-4-7 4-7h8z' },
 
   // Tools & Others
-  { name: 'Git & GitHub', level: 92, category: 'tools', color: 'from-gray-700 to-gray-900' },
-  { name: 'Vite', level: 90, category: 'tools', color: 'from-purple-400 to-pink-500' },
-  { name: 'Webpack', level: 80, category: 'tools', color: 'from-blue-400 to-cyan-500' },
-  { name: 'Jest & Vitest', level: 82, category: 'tools', color: 'from-red-400 to-pink-500' },
+  { name: 'Git & GitHub', level: 92, category: 'tools', color: 'from-gray-700 to-gray-900', icon: 'M12 2C6.5 2 2 6.5 2 12c0 4.4 2.9 8.1 6.8 9.5.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.5-1.1-4.5-4.9 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1.1A9.8 9.8 0 0112 6.8c.9 0 1.7.1 2.5.3 1.9-1.3 2.8-1.1 2.8-1.1.5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.8-2.3 4.6-4.5 4.9.4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5 4-1.3 6.8-5.1 6.8-9.5 0-5.5-4.5-10-10-10z' },
+  { name: 'Vite', level: 90, category: 'tools', color: 'from-purple-400 to-pink-500', icon: 'M12 2L2 8v8l10 6 10-6V8l-10-6zm0 2.5l7.5 4.5v6l-7.5 4.5L4.5 15v-6L12 4.5z' },
+  { name: 'Webpack', level: 80, category: 'tools', color: 'from-blue-400 to-cyan-500', icon: 'M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zm0 2L5.5 8.5v7L12 19l6.5-3.5v-7L12 5z' },
+  { name: 'Jest & Vitest', level: 82, category: 'tools', color: 'from-red-400 to-pink-500', icon: 'M12 2L2 6l10 4 10-4-10-4zm0 6L3 11v6l9 5 9-5v-6l-9-3z' },
 
   // Design
-  { name: 'UI/UX Design', level: 85, category: 'design', color: 'from-purple-400 to-pink-500' },
-  { name: 'Figma', level: 88, category: 'design', color: 'from-purple-500 to-pink-500' },
-  { name: 'Responsive Design', level: 95, category: 'design', color: 'from-indigo-400 to-purple-500' },
-  { name: 'Accessibility (WCAG)', level: 85, category: 'design', color: 'from-green-400 to-teal-500' }
+  { name: 'UI/UX Design', level: 85, category: 'design', color: 'from-purple-400 to-pink-500', icon: 'M12 2l10 5v10l-10 5-10-5V7l10-5zm0 2L4 8l8 4 8-4-8-4zm-8 7.5v6l7 3.5v-6l-7-3.5zm16 0l-7 3.5v6l7-3.5v-6z' },
+  { name: 'Figma', level: 88, category: 'design', color: 'from-purple-500 to-pink-500', icon: 'M8 4c0-2.2 1.8-4 4-4h4c2.2 0 4 1.8 4 4s-1.8 4-4 4H8V4zm0 8c0-2.2 1.8-4 4-4h4c2.2 0 4 1.8 4 4s-1.8 4-4 4h-4v-4H8zm0 4c0-2.2 1.8-4 4-4s4 1.8 4 4-1.8 4-4 4-4-1.8-4-4zm4-4h-4c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4v4z' },
+  { name: 'Responsive Design', level: 95, category: 'design', color: 'from-indigo-400 to-purple-500', icon: 'M4 4h16v16H4V4zm2 2v12h12V6H6zm3 3h6v6H9V9z' },
+  { name: 'Accessibility (WCAG)', level: 85, category: 'design', color: 'from-green-400 to-teal-500', icon: 'M12 2c5.5 0 10 4.5 10 10s-4.5 10-10 10S2 17.5 2 12 6.5 2 12 2zm0 2C7.6 4 4 7.6 4 12s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm-3 5h6v1.5h-1.5V17h-3v-4.5H9V11z' }
 ]
 
 export const timeline: TimelineItem[] = [

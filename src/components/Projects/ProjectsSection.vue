@@ -123,6 +123,15 @@ const allProjects = ref<Project[]>([
   }
 ])
 
+const carouselRef = ref<HTMLElement | null>(null)
+
+const scrollCarousel = (direction: 'left' | 'right') => {
+  if (carouselRef.value) {
+    const scrollAmount = direction === 'left' ? -450 : 450
+    carouselRef.value.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+  }
+}
+
 const { elementRef: sectionRef } = useScrollAnimation({ threshold: 0.1 })
 const { elementRef: decorRef1, transform: decorTransform1 } = useParallax({ speed: 0.3 })
 const { elementRef: decorRef2, transform: decorTransform2 } = useParallax({ speed: -0.2 })
@@ -136,17 +145,41 @@ const { elementRef: decorRef2, transform: decorTransform2 } = useParallax({ spee
   >
     <div class="container-padding relative z-10">
       <!-- Section Header -->
-      <div class="text-center mb-12">
-        <h2 class="text-5xl md:text-6xl font-bold mb-4 gradient-text">
-          Featured Projects
-        </h2>
-        <p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          A collection of my recent work showcasing modern web development practices
-        </p>
+      <div class="text-center mb-12 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="text-left">
+          <h2 class="text-5xl md:text-6xl font-bold mb-4 gradient-text">
+            Featured Projects
+          </h2>
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto md:mx-0">
+            A collection of my recent work showcasing modern web development practices
+          </p>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex gap-4">
+          <button
+            @click="scrollCarousel('left')"
+            class="w-12 h-12 rounded-full glass-effect flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:scale-110 active:scale-95 transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            aria-label="Previous project"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            @click="scrollCarousel('right')"
+            class="w-12 h-12 rounded-full glass-effect flex items-center justify-center text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:scale-110 active:scale-95 transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            aria-label="Next project"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- Projects Carousel -->
-      <div class="flex overflow-x-auto gap-8 pb-8 snap-x snap-mandatory hide-scrollbar">
+      <div ref="carouselRef" class="flex overflow-x-auto gap-8 pb-8 snap-x snap-mandatory hide-scrollbar">
         <ProjectCard
           v-for="(project, index) in allProjects"
           :key="project.id"

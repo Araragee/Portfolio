@@ -96,15 +96,15 @@ const getTypeColor = (type: TimelineItem['type']) => {
                   <li
                     v-for="(highlight, hIndex) in item.highlights"
                     :key="hIndex"
-                    class="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400"
+                    :class="['flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400', index % 2 === 0 ? 'lg:flex-row-reverse text-right' : 'text-left']"
                   >
-                    <span class="text-primary-500 mt-0.5">▸</span>
+                    <span class="text-primary-500 mt-0.5" :class="index % 2 === 0 ? 'ml-2 rotate-180' : 'mr-2'">▸</span>
                     <span>{{ highlight }}</span>
                   </li>
                 </ul>
 
                 <!-- Tags -->
-                <div v-if="item.tags && item.tags.length" class="flex flex-wrap gap-2">
+                <div v-if="item.tags && item.tags.length" :class="['flex flex-wrap gap-2', index % 2 === 0 ? 'lg:justify-end' : 'lg:justify-start']">
                   <span
                     v-for="tag in item.tags"
                     :key="tag"
