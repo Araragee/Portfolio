@@ -9,10 +9,11 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "vue": "^3.4.21",
-    "vue-router": "^4.3.0",
+    "@unhead/vue": "^1.8.10",
     "animejs": "^3.2.2",
-    "@unhead/vue": "^1.8.10"
+    "gsap": "^3.14.2",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@types/animejs": "^3.1.12",
