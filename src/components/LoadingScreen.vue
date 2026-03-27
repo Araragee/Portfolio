@@ -12,39 +12,33 @@ const progress = ref(0)
 const isComplete = ref(false)
 
 onMounted(() => {
-  // Simulate loading progress
   anime({
     targets: progress,
     value: 100,
     duration: 2000,
     easing: 'easeInOutQuad',
-    update: () => {
-      // Update progress value
-    },
     complete: () => {
       isComplete.value = true
       setTimeout(() => {
         props.onComplete?.()
-      }, 500)
+      }, 400)
     }
   })
 
-  // Animate logo
   anime({
     targets: '.loading-logo',
-    scale: [0.8, 1],
+    scale: [0.7, 1],
     opacity: [0, 1],
-    duration: 800,
-    easing: 'easeOutCubic'
+    duration: 700,
+    easing: 'easeOutExpo'
   })
 
-  // Animate text
   anime({
     targets: '.loading-text',
     opacity: [0, 1],
-    translateY: [20, 0],
-    duration: 800,
-    delay: 200,
+    translateY: [16, 0],
+    duration: 600,
+    delay: 250,
     easing: 'easeOutCubic'
   })
 })
@@ -59,52 +53,54 @@ onMounted(() => {
   >
     <div
       v-if="!isComplete"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gray-900"
-      style="will-change: opacity"
+      class="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950"
     >
-      <div class="text-center">
-        <!-- Logo/Icon -->
-        <div class="loading-logo mb-8">
-          <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-2xl">
-            <svg
-              class="w-10 h-10 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-              ></path>
+      <!-- Dot pattern -->
+      <div class="absolute inset-0 pointer-events-none opacity-40"
+           style="background-image: radial-gradient(circle, rgba(255,107,43,0.15) 1px, transparent 1px); background-size: 32px 32px;"></div>
+
+      <div class="text-center relative z-10 scale-110">
+        <!-- Logo -->
+        <div class="loading-logo mb-12" style="opacity: 0;">
+          <div class="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center shadow-2xl relative overflow-hidden group"
+               style="background: linear-gradient(135deg, #ff6b2b, #0f766e); box-shadow: 0 10px 40px rgba(255,107,43,0.4);">
+            <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <svg class="w-10 h-10 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
           </div>
         </div>
 
-        <!-- Loading Text -->
-        <p class="loading-text text-xl font-semibold text-gray-700 dark:text-gray-300 mb-6">
-          Loading Portfolio
-        </p>
-
-        <!-- Progress Bar -->
-        <div class="w-64 h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden mx-auto">
-          <div
-            class="h-full bg-gradient-to-r from-primary-500 to-accent-500 rounded-full transition-all duration-300"
-            :style="{ width: `${progress.value}%` }"
-            style="will-change: width"
-          ></div>
+        <!-- Text -->
+        <div class="loading-text space-y-2 mb-10" style="opacity: 0;">
+          <p class="font-bold text-2xl text-white tracking-tight">
+            <span class="text-[#ff6b2b]">Dav</span><span class="text-[#0f766e]">x</span>loper
+          </p>
+          <div class="flex items-center justify-center gap-2">
+            <span class="w-8 h-[1px] bg-zinc-800"></span>
+            <p class="text-[10px] font-bold font-mono tracking-[0.3em] uppercase text-zinc-500">
+              Initializing Experience
+            </p>
+            <span class="w-8 h-[1px] bg-zinc-800"></span>
+          </div>
         </div>
 
-        <!-- Progress Percentage -->
-        <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
-          {{ Math.round(progress.value) }}%
-        </p>
+        <!-- Progress -->
+        <div class="w-64 mx-auto relative px-4">
+          <div class="h-1 rounded-full overflow-hidden bg-zinc-900 shadow-inner">
+            <div
+              class="h-full rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(255,107,43,0.6)]"
+              style="background: linear-gradient(90deg, #ff6b2b, #0f766e);"
+              :style="{ width: `${progress}%` }"
+            ></div>
+          </div>
+          <p class="mt-4 text-[10px] font-bold font-mono text-zinc-600 uppercase tracking-widest flex justify-between">
+            <span>Progress</span>
+            <span>{{ Math.round(progress) }}%</span>
+          </p>
+        </div>
       </div>
     </div>
   </Transition>
 </template>
-
-<style scoped>
-/* Additional loading animations */
-</style>

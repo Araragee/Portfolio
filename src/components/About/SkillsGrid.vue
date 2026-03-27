@@ -52,30 +52,26 @@ const orderedCategories = computed(() => {
       :class="[isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8']"
       :style="{ transitionDelay: `${catIndex * 150}ms` }"
     >
-      <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-200 dark:border-gray-800 pb-2">
-        {{ category.label }}
+      <h3 class="text-sm font-bold font-mono mb-6 pb-2 border-b border-zinc-200 dark:border-white/5 text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
+        // {{ category.label }}
       </h3>
 
       <!-- Skills Grid -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <div
           v-for="skill in skillsByCategory[category.key]"
           :key="skill.name"
-          class="flex flex-col items-center justify-center p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300 group"
+          class="flex flex-col items-center justify-center p-5 rounded-2xl glass-effect border dark:border-white/5 hover:scale-110 transition-all duration-300 group cursor-default shadow-sm hover:shadow-xl hover:border-primary-500/30"
         >
-          <!-- Skill Icon -->
-          <div class="w-12 h-12 mb-3 rounded-full flex items-center justify-center bg-gray-50 dark:bg-gray-800 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/30 transition-colors duration-300">
-             <svg
-              class="w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors duration-300"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
+          <div class="w-12 h-12 mb-4 rounded-xl flex items-center justify-center transition-all duration-300 bg-zinc-100 dark:bg-zinc-800 group-hover:bg-primary-500/10 shadow-inner">
+            <svg class="w-6 h-6 text-zinc-500 dark:text-zinc-400 group-hover:text-primary-500 transition-colors duration-300"
+                 fill="currentColor"
+                 viewBox="0 0 24 24">
               <path v-if="skill.icon" :d="skill.icon" />
               <path v-else fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
           </div>
-
-          <span class="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
+          <span class="text-xs font-bold text-center leading-tight text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 uppercase tracking-tighter">
             {{ skill.name }}
           </span>
         </div>

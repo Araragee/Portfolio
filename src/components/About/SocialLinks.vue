@@ -75,7 +75,7 @@ const handleMouseLeave = (index: number, event: MouseEvent) => {
 </script>
 
 <template>
-  <div class="flex flex-wrap items-center gap-4">
+  <div class="flex flex-wrap items-center gap-3">
     <a
       v-for="(link, index) in links"
       :key="link.platform"
@@ -86,11 +86,10 @@ const handleMouseLeave = (index: number, event: MouseEvent) => {
       @mouseleave="(e) => handleMouseLeave(index, e)"
       :class="[
         getSizeClasses(),
-        'relative flex items-center justify-center rounded-full',
-        'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400',
+        'relative flex items-center justify-center rounded-2xl glass-effect border dark:border-white/5 shadow-sm',
         'transition-all duration-300',
-        'hover:shadow-lg',
-        link.color || 'hover:text-primary-600 dark:hover:text-primary-400'
+        'hover:shadow-xl hover:border-primary-500/30',
+        link.color || 'text-zinc-500 dark:text-zinc-400 hover:text-primary-500'
       ]"
       :aria-label="link.platform"
     >
@@ -111,11 +110,11 @@ const handleMouseLeave = (index: number, event: MouseEvent) => {
       <!-- Tooltip on hover -->
       <div
         v-if="hoveredIndex === index && link.username"
-        class="absolute -top-12 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg whitespace-nowrap pointer-events-none"
+        class="absolute -top-14 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-zinc-900 dark:bg-zinc-800 text-white text-[10px] font-bold font-mono rounded-xl whitespace-nowrap pointer-events-none shadow-2xl uppercase tracking-widest z-50 animate-fade-in-up"
       >
         {{ link.username }}
-        <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-px">
-          <div class="border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+        <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+          <div class="border-[6px] border-transparent border-t-zinc-900 dark:border-t-zinc-800"></div>
         </div>
       </div>
     </a>

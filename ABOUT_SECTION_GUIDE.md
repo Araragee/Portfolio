@@ -11,6 +11,7 @@ A fully-featured About Me section with split layout, animated skills, profession
 **File:** [src/types/about.ts](src/types/about.ts)
 
 Complete type definitions:
+
 - `Skill`: Skill data with level, category, and color
 - `TimelineItem`: Experience/education/achievement entries
 - `SocialLink`: Social media links with icons
@@ -22,6 +23,7 @@ Complete type definitions:
 **File:** [src/data/aboutData.ts](src/data/aboutData.ts)
 
 Realistic placeholder data including:
+
 - Personal information with 3-paragraph bio
 - 18 skills across 4 categories (Frontend, Backend, Tools, Design)
 - 6 timeline items (3 jobs, 1 education, 2 achievements)
@@ -32,6 +34,7 @@ Realistic placeholder data including:
 **Component:** [AboutSection.vue](src/components/About/AboutSection.vue)
 
 **Left Side (Profile):**
+
 - Gradient avatar placeholder with glassmorphism
 - Hover scale effect on image container
 - Contact info card with icons (email, location)
@@ -39,12 +42,14 @@ Realistic placeholder data including:
 - Social links with animations
 
 **Right Side (Content):**
+
 - Name and title
 - 3-paragraph bio with staggered fade-in animations
 - Quick stats cards (Years Exp, Projects, Tech Stack)
 - Gradient backgrounds with borders
 
 **Responsive Behavior:**
+
 - Mobile: Stacked (bio first, then image)
 - Desktop: Side-by-side layout
 - Smooth reordering with CSS Grid
@@ -54,12 +59,14 @@ Realistic placeholder data including:
 **File:** [SkillsGrid.vue](src/components/About/SkillsGrid.vue)
 
 **Category Filtering:**
+
 - 5 categories: All, Frontend, Backend, Tools, Design
 - Dynamic count badges
 - Smooth filter transitions
 - Active state with gradient styling
 
 **Animated Progress Bars:**
+
 - Intersection Observer triggers animations
 - Anime.js powered width transitions
 - Staggered entrance (100ms delay per skill)
@@ -68,6 +75,7 @@ Realistic placeholder data including:
 - Color-coded gradients per skill
 
 **Grid Layout:**
+
 - 1 column on mobile
 - 2 columns on desktop
 - Smooth transitions when filtering
@@ -77,17 +85,20 @@ Realistic placeholder data including:
 **File:** [Timeline.vue](src/components/About/Timeline.vue)
 
 **Filter System:**
+
 - 4 filters: All, Experience, Education, Achievements
 - Emoji icons for each type
 - Smooth category switching
 
 **Timeline Design:**
+
 - Desktop: Alternating left/right layout with center line
 - Mobile: Single column stacked layout
 - Vertical gradient line connecting items
 - Circular badges for each timeline dot
 
 **Timeline Cards:**
+
 - Type badge with gradient (experience/education/achievement)
 - Period (start - end dates)
 - Title and organization
@@ -98,6 +109,7 @@ Realistic placeholder data including:
 - Hover effects with border reveal
 
 **Staggered Animations:**
+
 - IntersectionObserver for scroll detection
 - Alternate slide direction (left/right)
 - Fade in + slide + scale
@@ -109,16 +121,19 @@ Realistic placeholder data including:
 **File:** [SocialLinks.vue](src/components/About/SocialLinks.vue)
 
 **Supported Platforms:**
+
 - GitHub, LinkedIn, Twitter
 - Email, Dribbble, CodePen, Medium
 
 **Hover Effects:**
+
 - Scale to 1.15 + rotate 5°
 - Anime.js smooth transitions
 - Custom color per platform
 - Tooltip showing username
 
 **Features:**
+
 - Configurable sizes (sm/md/lg)
 - SVG icons for each platform
 - Glass effect backgrounds
@@ -127,6 +142,7 @@ Realistic placeholder data including:
 ### 7. Parallax Background
 
 **Implementation:**
+
 - Two gradient orbs with different speeds (0.2 and -0.15)
 - Geometric decorative shapes (circle and rotated square)
 - Performance-optimized with requestAnimationFrame
@@ -137,6 +153,7 @@ Realistic placeholder data including:
 **Composable:** [useIntersectionObserver.ts](src/composables/useIntersectionObserver.ts)
 
 **Features:**
+
 - Single element observer
 - Multi-element observer for lists
 - Configurable threshold and root margin
@@ -161,22 +178,18 @@ Edit [src/data/aboutData.ts](src/data/aboutData.ts):
 
 ```typescript
 export const personalInfo: PersonalInfo = {
-  name: 'Your Name',
-  title: 'Your Title',
-  bio: [
-    'First paragraph...',
-    'Second paragraph...',
-    'Third paragraph...'
-  ],
+  name: "Your Name",
+  title: "Your Title",
+  bio: ["First paragraph...", "Second paragraph...", "Third paragraph..."],
   contact: {
-    email: 'your.email@example.com',
-    location: 'Your City, State'
+    email: "davxgonzales@gmail.com",
+    location: "Your City, State",
   },
   availability: {
-    status: 'available', // 'available' | 'busy' | 'unavailable'
-    message: 'Your custom message'
-  }
-}
+    status: "available", // 'available' | 'busy' | 'unavailable'
+    message: "Your custom message",
+  },
+};
 ```
 
 ### Add/Update Skills
@@ -184,15 +197,16 @@ export const personalInfo: PersonalInfo = {
 ```typescript
 export const skills: Skill[] = [
   {
-    name: 'Skill Name',
+    name: "Skill Name",
     level: 85, // 0-100
-    category: 'frontend', // frontend | backend | tools | design
-    color: 'from-blue-400 to-purple-500' // Tailwind gradient
-  }
-]
+    category: "frontend", // frontend | backend | tools | design
+    color: "from-blue-400 to-purple-500", // Tailwind gradient
+  },
+];
 ```
 
 **Available Gradient Colors:**
+
 - Blue/Purple: `from-blue-400 to-purple-500`
 - Green/Emerald: `from-green-400 to-emerald-500`
 - Cyan/Blue: `from-cyan-400 to-blue-500`
@@ -205,22 +219,23 @@ export const skills: Skill[] = [
 export const timeline: TimelineItem[] = [
   {
     id: 1,
-    type: 'experience', // experience | education | achievement
-    title: 'Your Job Title',
-    organization: 'Company Name',
-    location: 'City, State', // optional
+    type: "experience", // experience | education | achievement
+    title: "Your Job Title",
+    organization: "Company Name",
+    location: "City, State", // optional
     period: {
-      start: 'Jan 2022',
-      end: 'Present' // or 'Dec 2023'
+      start: "Jan 2022",
+      end: "Present", // or 'Dec 2023'
     },
-    description: 'Brief description of role...',
-    highlights: [ // optional
-      'Achievement 1',
-      'Achievement 2'
+    description: "Brief description of role...",
+    highlights: [
+      // optional
+      "Achievement 1",
+      "Achievement 2",
     ],
-    tags: ['Vue 3', 'TypeScript'] // optional
-  }
-]
+    tags: ["Vue 3", "TypeScript"], // optional
+  },
+];
 ```
 
 ### Update Social Links
@@ -228,45 +243,48 @@ export const timeline: TimelineItem[] = [
 ```typescript
 export const socialLinks: SocialLink[] = [
   {
-    platform: 'GitHub',
-    url: 'https://github.com/yourusername',
-    icon: 'github', // github | linkedin | twitter | email | dribbble | codepen | medium
-    username: '@yourusername', // Shows in tooltip
-    color: 'hover:text-gray-900' // Custom hover color
-  }
-]
+    platform: "GitHub",
+    url: "https://github.com/yourusername",
+    icon: "github", // github | linkedin | twitter | email | dribbble | codepen | medium
+    username: "@yourusername", // Shows in tooltip
+    color: "hover:text-gray-900", // Custom hover color
+  },
+];
 ```
 
 ### Customize Animations
 
 #### Bio Text Animation
+
 [AboutSection.vue:28-35](src/components/About/AboutSection.vue#L28-L35)
 
 ```typescript
 anime({
   targets: paragraphs,
   opacity: [0, 1],
-  translateY: [30, 0],    // Slide distance
-  duration: 800,          // Animation speed
+  translateY: [30, 0], // Slide distance
+  duration: 800, // Animation speed
   delay: anime.stagger(200), // Delay between paragraphs
-  easing: 'easeOutCubic'
-})
+  easing: "easeOutCubic",
+});
 ```
 
 #### Progress Bar Animation
+
 [SkillsGrid.vue:60-67](src/components/About/SkillsGrid.vue#L60-L67)
 
 ```typescript
 anime({
   targets: progressBar,
   width: `${skill.level}%`,
-  duration: 1500,         // Bar fill duration
-  delay: index * 100,     // Stagger delay
-  easing: 'easeOutExpo'  // Easing function
-})
+  duration: 1500, // Bar fill duration
+  delay: index * 100, // Stagger delay
+  easing: "easeOutExpo", // Easing function
+});
 ```
 
 #### Timeline Card Animation
+
 [Timeline.vue:66-75](src/components/About/Timeline.vue#L66-L75)
 
 ```typescript
@@ -276,41 +294,51 @@ anime({
   translateX: [index % 2 === 0 ? -50 : 50, 0], // Alternate direction
   translateY: [30, 0],
   duration: 800,
-  delay: index * 150,     // Stagger delay
-  easing: 'easeOutCubic'
-})
+  delay: index * 150, // Stagger delay
+  easing: "easeOutCubic",
+});
 ```
 
 ### Styling Customization
 
 #### Quick Stats Cards
+
 [AboutSection.vue:202-215](src/components/About/AboutSection.vue#L202-L215)
 
 Update numbers and labels:
+
 ```vue
 <p class="text-3xl font-bold">5+</p>
 <p class="text-sm">Years Exp.</p>
 ```
 
 #### Availability Colors
+
 [AboutSection.vue:42-52](src/components/About/AboutSection.vue#L42-L52)
 
 ```typescript
 switch (status) {
-  case 'available': return 'bg-green-500'   // Available for work
-  case 'busy': return 'bg-yellow-500'       // Partially available
-  case 'unavailable': return 'bg-red-500'   // Not available
+  case "available":
+    return "bg-green-500"; // Available for work
+  case "busy":
+    return "bg-yellow-500"; // Partially available
+  case "unavailable":
+    return "bg-red-500"; // Not available
 }
 ```
 
 #### Timeline Type Colors
+
 [Timeline.vue:42-50](src/components/About/Timeline.vue#L42-L50)
 
 ```typescript
 switch (type) {
-  case 'experience': return 'from-blue-500 to-cyan-500'
-  case 'education': return 'from-purple-500 to-pink-500'
-  case 'achievement': return 'from-yellow-500 to-orange-500'
+  case "experience":
+    return "from-blue-500 to-cyan-500";
+  case "education":
+    return "from-purple-500 to-pink-500";
+  case "achievement":
+    return "from-yellow-500 to-orange-500";
 }
 ```
 
@@ -365,8 +393,9 @@ Replace the gradient placeholder in [AboutSection.vue:104](src/components/About/
 ### Add More Skill Categories
 
 1. Update type in [src/types/about.ts](src/types/about.ts):
+
 ```typescript
-category: 'frontend' | 'backend' | 'tools' | 'design' | 'mobile'
+category: "frontend" | "backend" | "tools" | "design" | "mobile";
 ```
 
 2. Add skills with new category in data file
@@ -379,10 +408,10 @@ Edit [Timeline.vue:24-29](src/components/About/Timeline.vue#L24-L29):
 
 ```typescript
 const filters = [
-  { key: 'all', label: 'All', icon: '📚' },
-  { key: 'experience', label: 'Work', icon: '💼' },
+  { key: "all", label: "All", icon: "📚" },
+  { key: "experience", label: "Work", icon: "💼" },
   // Add more filters...
-]
+];
 ```
 
 ### Change Social Icon Size

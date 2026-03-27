@@ -9,35 +9,27 @@ import SocialLinks from "./SocialLinks.vue";
 import { personalInfo, skills, timeline, socialLinks } from "@/data/aboutData";
 
 const bioRef = ref<HTMLElement | null>(null);
-const imageRef = ref<HTMLElement | null>(null);
 
 const { elementRef: sectionRef, isVisible } = useIntersectionObserver({
   threshold: 0.1,
   once: true,
 });
 
-const { elementRef: parallaxRef1, transform: parallaxTransform1 } = useParallax(
-  { speed: 0.2 },
-);
-const { elementRef: parallaxRef2, transform: parallaxTransform2 } = useParallax(
-  { speed: -0.15 },
-);
+const { elementRef: parallaxRef1, transform: parallaxTransform1 } = useParallax({ speed: 0.2 });
+const { elementRef: parallaxRef2, transform: parallaxTransform2 } = useParallax({ speed: -0.15 });
 
-// Animate bio text
 onMounted(() => {
   const checkVisibility = setInterval(() => {
     if (isVisible.value && bioRef.value) {
       const paragraphs = bioRef.value.querySelectorAll("p");
-
       anime({
         targets: paragraphs,
         opacity: [0, 1],
-        translateY: [30, 0],
-        duration: 800,
-        delay: anime.stagger(200),
+        translateY: [24, 0],
+        duration: 700,
+        delay: anime.stagger(150),
         easing: "easeOutCubic",
       });
-
       clearInterval(checkVisibility);
     }
   }, 100);
@@ -45,14 +37,10 @@ onMounted(() => {
 
 const getAvailabilityColor = () => {
   switch (personalInfo.availability?.status) {
-    case "available":
-      return "bg-green-500";
-    case "busy":
-      return "bg-yellow-500";
-    case "unavailable":
-      return "bg-red-500";
-    default:
-      return "bg-gray-500";
+    case "available": return "#22C55E";
+    case "busy": return "#F59E0B";
+    case "unavailable": return "#EF4444";
+    default: return "#71717A";
   }
 };
 </script>
@@ -61,270 +49,160 @@ const getAvailabilityColor = () => {
   <section
     id="about"
     ref="sectionRef"
-    class="section-container py-20 relative overflow-hidden bg-gradient-to-b from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-950 dark:to-gray-900"
+    class="section-container py-24 relative overflow-hidden"
   >
-    <!-- Parallax Background Elements -->
-    <div
-      ref="parallaxRef1"
-      :style="{ transform: parallaxTransform1 }"
-      class="absolute top-20 -right-20 w-96 h-96 bg-primary-400/10 dark:bg-primary-600/5 rounded-full blur-3xl pointer-events-none"
-    ></div>
-    <div
-      ref="parallaxRef2"
-      :style="{ transform: parallaxTransform2 }"
-      class="absolute -bottom-20 -left-20 w-96 h-96 bg-accent-400/10 dark:bg-accent-600/5 rounded-full blur-3xl pointer-events-none"
-    ></div>
+    <!-- Texture -->
+    <div class="absolute inset-0 pointer-events-none opacity-50"
+         style="background-image: radial-gradient(circle, rgba(255,107,43,0.08) 1px, transparent 1px); background-size: 32px 32px;"></div>
 
-    <!-- Geometric shapes -->
-    <div
-      class="absolute top-1/4 left-10 w-24 h-24 border-2 border-primary-300/20 dark:border-primary-700/10 rounded-full opacity-50"
-    ></div>
-    <div
-      class="absolute bottom-1/4 right-10 w-32 h-32 border-2 border-accent-300/20 dark:border-accent-700/10 rounded-lg rotate-45 opacity-50"
-    ></div>
+    <!-- Parallax blobs -->
+    <div ref="parallaxRef1" :style="{ transform: parallaxTransform1 }"
+         class="absolute top-20 -right-20 w-96 h-96 rounded-full pointer-events-none blur-3xl opacity-10"
+         style="background: radial-gradient(circle, rgba(255,107,43,0.3), transparent 70%);"></div>
+    <div ref="parallaxRef2" :style="{ transform: parallaxTransform2 }"
+         class="absolute -bottom-20 -left-20 w-96 h-96 rounded-full pointer-events-none blur-3xl opacity-10"
+         style="background: radial-gradient(circle, rgba(15,118,110,0.3), transparent 70%);"></div>
 
     <div class="container-padding relative z-10">
-      <!-- Section Header -->
-      <div class="text-center mb-16">
-        <h2 class="text-5xl md:text-6xl font-bold mb-4 gradient-text">
-          About Me
-        </h2>
-        <p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Get to know more about my journey, skills, and experience
+      <!-- Header -->
+      <div class="mb-16">
+        <p class="section-label mb-3">// Who I Am</p>
+        <h2 class="text-4xl md:text-5xl font-bold gradient-text">About Me</h2>
+        <p class="mt-4 text-base max-w-lg text-zinc-600 dark:text-zinc-400">
+          A little about my journey, skill set, and what drives me.
         </p>
       </div>
 
-      <!-- Personal Info Split Layout -->
-      <div
-        class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start mb-20"
-      >
-        <!-- Left: Profile Image/Avatar -->
-        <div class="order-2 lg:order-1">
-          <div ref="imageRef" class="relative group">
-            <!-- Profile Image Container -->
-            <div class="relative aspect-square max-w-md mx-auto">
-              <!-- Glass effect card -->
-              <div
-                class="absolute inset-0 glass-effect rounded-3xl shadow-2xl transform group-hover:scale-105 transition-transform duration-500"
-              ></div>
+      <!-- Split layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start mb-20">
 
-              <!-- Image placeholder with gradient -->
-              <div class="relative w-full h-full rounded-3xl overflow-hidden">
-                <div
-                  class="absolute inset-0 bg-gradient-to-br from-primary-400 via-accent-400 to-primary-600 flex items-center justify-center"
-                >
-                  <svg
-                    class="w-1/2 h-1/2 text-white/30"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    ></path>
+        <!-- Left: Profile -->
+        <div class="order-2 lg:order-1">
+          <div class="relative">
+            <!-- Profile image container -->
+            <div class="relative aspect-square max-w-sm mx-auto lg:mx-0 group">
+              <div class="w-full h-full rounded-2xl overflow-hidden border glass-effect shadow-2xl transition-all duration-500 group-hover:scale-[1.02]">
+                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary-500/10 to-accent-600/10 dark:from-primary-500/20 dark:to-accent-600/20">
+                  <svg class="w-1/3 h-1/3 text-primary-500/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
               </div>
-
-              <!-- Decorative elements -->
-              <div
-                class="absolute -top-4 -right-4 w-32 h-32 bg-primary-400/20 dark:bg-primary-600/20 rounded-full blur-2xl -z-10"
-              ></div>
-              <div
-                class="absolute -bottom-4 -left-4 w-40 h-40 bg-accent-400/20 dark:bg-accent-600/20 rounded-full blur-2xl -z-10"
-              ></div>
+              <!-- Decorative corners -->
+              <div class="absolute -bottom-4 -right-4 w-24 h-24 rounded-2xl border-b-2 border-r-2 border-primary-500/30"></div>
+              <div class="absolute -top-4 -left-4 w-16 h-16 rounded-2xl border-t-2 border-l-2 border-accent-600/30"></div>
             </div>
 
-            <!-- Contact Info Card -->
-            <div class="mt-8 glass-effect rounded-2xl p-6 space-y-4">
-              <div class="flex items-center gap-3">
-                <div
-                  class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center"
-                >
-                  <svg
-                    class="w-5 h-5 text-primary-600 dark:text-primary-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    ></path>
+            <!-- Contact card -->
+            <div class="mt-12 rounded-2xl p-6 space-y-5 glass-effect border border-white/20 dark:border-white/10 shadow-xl">
+
+              <!-- Email -->
+              <div class="flex items-center gap-4 group/item">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-primary-500/10 dark:bg-primary-500/20 group-hover/item:scale-110 transition-transform">
+                  <svg class="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">Email</p>
-                  <a
-                    :href="`mailto:${personalInfo.contact.email}`"
-                    class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                  >
+                  <p class="text-xs font-bold font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Email</p>
+                  <a :href="`mailto:${personalInfo.contact.email}`"
+                     class="text-sm font-semibold transition-colors duration-200 text-zinc-800 dark:text-zinc-100 hover:text-primary-500">
                     {{ personalInfo.contact.email }}
                   </a>
                 </div>
               </div>
 
-              <div
-                v-if="personalInfo.contact.location"
-                class="flex items-center gap-3"
-              >
-                <div
-                  class="w-10 h-10 rounded-full bg-accent-100 dark:bg-accent-900/30 flex items-center justify-center"
-                >
-                  <svg
-                    class="w-5 h-5 text-accent-600 dark:text-accent-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    ></path>
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    ></path>
+              <!-- Location -->
+              <div v-if="personalInfo.contact.location" class="flex items-center gap-4 group/item">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-accent-600/10 dark:bg-accent-600/20 group-hover/item:scale-110 transition-transform">
+                  <svg class="w-5 h-5 text-accent-600 dark:text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    Location
-                  </p>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
+                  <p class="text-xs font-bold font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Location</p>
+                  <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
                     {{ personalInfo.contact.location }}
                   </p>
                 </div>
               </div>
 
-              <!-- Availability Status -->
-              <div
-                v-if="personalInfo.availability"
-                class="pt-4 border-t border-gray-200 dark:border-gray-700"
-              >
-                <div class="flex items-center gap-3">
-                  <div
-                    :class="[
-                      'w-3 h-3 rounded-full animate-pulse',
-                      getAvailabilityColor(),
-                    ]"
-                  ></div>
-                  <span
-                    class="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize"
-                  >
-                    {{ personalInfo.availability.status }}
-                    <span
-                      v-if="personalInfo.availability.message"
-                      class="text-gray-500 dark:text-gray-400 font-normal"
-                    >
-                      - {{ personalInfo.availability.message }}
-                    </span>
+              <!-- Availability -->
+              <div v-if="personalInfo.availability" class="pt-4 border-t border-zinc-200 dark:border-white/5 flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full animate-pulse shrink-0"
+                     :style="{ background: getAvailabilityColor() }"></div>
+                <span class="text-sm font-medium capitalize text-zinc-600 dark:text-zinc-400">
+                  {{ personalInfo.availability.status }}
+                  <span v-if="personalInfo.availability.message" class="text-zinc-400 dark:text-zinc-600 ml-1">
+                    — {{ personalInfo.availability.message }}
                   </span>
-                </div>
+                </span>
               </div>
             </div>
 
-            <!-- Social Links -->
-            <div class="mt-6 flex justify-center lg:justify-start">
+            <!-- Social links -->
+            <div class="mt-6">
               <SocialLinks :links="socialLinks" size="md" :animated="true" />
             </div>
           </div>
         </div>
 
-        <!-- Right: Bio Content -->
+        <!-- Right: Bio -->
         <div class="order-1 lg:order-2">
           <div ref="bioRef" class="space-y-6">
             <div>
-              <h3
-                class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2"
-              >
+              <h3 class="text-3xl font-bold mb-2 text-zinc-900 dark:text-zinc-50">
                 {{ personalInfo.name }}
               </h3>
-              <p
-                class="text-xl text-primary-600 dark:text-primary-400 font-semibold mb-6"
-              >
+              <p class="text-base font-bold font-mono text-accent-700 dark:text-accent-400">
                 {{ personalInfo.title }}
               </p>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-5">
               <p
                 v-for="(paragraph, index) in personalInfo.bio"
                 :key="index"
-                class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed"
-                style="opacity: 0"
+                class="text-base leading-relaxed text-zinc-600 dark:text-zinc-400 opacity-0"
               >
                 {{ paragraph }}
               </p>
             </div>
 
-            <!-- Quick Stats -->
+            <!-- Stats -->
             <div class="grid grid-cols-3 gap-4 pt-6">
-              <div
-                class="text-center p-4 rounded-xl bg-gradient-to-br from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 border border-primary-200 dark:border-primary-800"
-              >
-                <p
-                  class="text-3xl font-bold text-primary-600 dark:text-primary-400"
-                >
-                  5+
-                </p>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Years Exp.
-                </p>
+              <div class="px-4 py-5 rounded-2xl glass-effect border dark:border-white/5 text-center shadow-lg transition-transform hover:scale-105">
+                <p class="text-3xl font-bold text-primary-500">5+</p>
+                <p class="text-[10px] mt-1 font-bold font-mono text-zinc-500 uppercase tracking-tighter">Years Exp.</p>
               </div>
-              <div
-                class="text-center p-4 rounded-xl bg-gradient-to-br from-accent-50 to-primary-50 dark:from-accent-900/20 dark:to-primary-900/20 border border-accent-200 dark:border-accent-800"
-              >
-                <p
-                  class="text-3xl font-bold text-accent-600 dark:text-accent-400"
-                >
-                  50+
-                </p>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Projects
-                </p>
+              <div class="px-4 py-5 rounded-2xl glass-effect border dark:border-white/5 text-center shadow-lg transition-transform hover:scale-105">
+                <p class="text-3xl font-bold text-accent-600 dark:text-accent-400">50+</p>
+                <p class="text-[10px] mt-1 font-bold font-mono text-zinc-500 uppercase tracking-tighter">Projects</p>
               </div>
-              <div
-                class="text-center p-4 rounded-xl bg-gradient-to-br from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 border border-primary-200 dark:border-primary-800"
-              >
-                <p
-                  class="text-3xl font-bold text-primary-600 dark:text-primary-400"
-                >
-                  15+
-                </p>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Tech Stack
-                </p>
+              <div class="px-4 py-5 rounded-2xl glass-effect border dark:border-white/5 text-center shadow-lg transition-transform hover:scale-105">
+                <p class="text-3xl font-bold text-primary-500">15+</p>
+                <p class="text-[10px] mt-1 font-bold font-mono text-zinc-500 uppercase tracking-tighter">Tech Stack</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Skills Section -->
-      <div class="mb-20">
-        <div class="text-center mb-12">
-          <h3 class="text-4xl font-bold text-gray-900 dark:text-white mb-3">
-            Skills & Expertise
-          </h3>
-          <p class="text-lg text-gray-600 dark:text-gray-400">
-            Technologies and tools I work with
-          </p>
+      <!-- Skills -->
+      <div class="mb-24">
+        <div class="mb-10">
+          <p class="section-label mb-2">// Expertise</p>
+          <h3 class="text-3xl font-bold text-zinc-900 dark:text-zinc-100">Skills &amp; Tools</h3>
         </div>
-
         <SkillsGrid :skills="skills" :show-categories="true" />
       </div>
 
-      <!-- Timeline Section -->
+      <!-- Timeline -->
       <div>
         <Timeline :items="timeline" />
       </div>

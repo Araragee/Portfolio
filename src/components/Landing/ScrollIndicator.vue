@@ -13,7 +13,8 @@ const scrollToNext = () => {
   <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
     <button
       @click="scrollToNext"
-      class="flex flex-col items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors duration-300 group cursor-pointer bg-transparent border-none"
+      class="flex flex-col items-center gap-2 transition-colors duration-300 group cursor-pointer bg-transparent border-none"
+      style="color: rgba(161,161,170,0.5);"
       aria-label="Scroll to next section"
     >
       <span class="text-sm font-medium uppercase tracking-wider">Scroll</span>

@@ -14,21 +14,18 @@ interface Shape {
 }
 
 const shapes = ref<Shape[]>([])
-const containerRef = ref<HTMLElement | null>(null)
 
-// Generate random shapes
-const generateShapes = (count: number = 15) => {
+const generateShapes = (count: number = 10) => {
   const shapeTypes: Shape['type'][] = ['circle', 'square', 'triangle', 'hexagon']
-
   for (let i = 0; i < count; i++) {
     shapes.value.push({
       id: i,
       type: shapeTypes[Math.floor(Math.random() * shapeTypes.length)],
-      size: Math.random() * 100 + 50, // 50-150px
-      x: Math.random() * 100, // 0-100%
-      y: Math.random() * 100, // 0-100%
+      size: Math.random() * 80 + 30,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
       rotation: Math.random() * 360,
-      duration: Math.random() * 10000 + 10000, // 10-20s
+      duration: Math.random() * 10000 + 12000,
       delay: Math.random() * 2000
     })
   }
@@ -36,24 +33,14 @@ const generateShapes = (count: number = 15) => {
 
 onMounted(() => {
   generateShapes()
-
-  // Animate shapes
-  shapes.value.forEach((shape, index) => {
+  shapes.value.forEach((shape) => {
     const element = document.getElementById(`shape-${shape.id}`)
     if (element) {
       anime({
         targets: element,
-        translateY: [
-          { value: -30, duration: shape.duration / 2 },
-          { value: 0, duration: shape.duration / 2 }
-        ],
-        translateX: [
-          { value: Math.random() * 40 - 20, duration: shape.duration / 2 },
-          { value: 0, duration: shape.duration / 2 }
-        ],
-        rotate: [
-          { value: shape.rotation + 360, duration: shape.duration }
-        ],
+        translateY: [{ value: -24, duration: shape.duration / 2 }, { value: 0, duration: shape.duration / 2 }],
+        translateX: [{ value: Math.random() * 32 - 16, duration: shape.duration / 2 }, { value: 0, duration: shape.duration / 2 }],
+        rotate: [{ value: shape.rotation + 360, duration: shape.duration }],
         loop: true,
         easing: 'easeInOutSine',
         delay: shape.delay
@@ -63,34 +50,36 @@ onMounted(() => {
 })
 
 const getShapeClass = (type: Shape['type']) => {
-  const baseClass = 'absolute opacity-20 dark:opacity-10'
+  const base = 'absolute'
   switch (type) {
     case 'circle':
-      return `${baseClass} rounded-full bg-gradient-to-br from-primary-400 to-accent-400`
+      return `${base} rounded-full`
     case 'square':
-      return `${baseClass} bg-gradient-to-br from-accent-400 to-primary-400`
-    case 'triangle':
-      return `${baseClass} bg-gradient-to-br from-primary-300 to-accent-300`
-    case 'hexagon':
-      return `${baseClass} bg-gradient-to-br from-accent-300 to-primary-300`
+      return `${base} rounded-sm`
     default:
-      return baseClass
+      return base
   }
 }
 
 const getShapeStyle = (shape: Shape) => {
+  const isOrange = shape.id % 3 !== 0
+  const color = isOrange ? 'rgba(255, 107, 43,' : 'rgba(15, 118, 110,'
+  const opacity = 0.06 + (shape.id % 4) * 0.02
+
   return {
     width: `${shape.size}px`,
     height: `${shape.size}px`,
     left: `${shape.x}%`,
     top: `${shape.y}%`,
-    transform: `rotate(${shape.rotation}deg)`
+    transform: `rotate(${shape.rotation}deg)`,
+    border: `1px solid ${color}${opacity + 0.04})`,
+    background: `${color}${opacity})`,
   }
 }
 </script>
 
 <template>
-  <div ref="containerRef" class="absolute inset-0 overflow-hidden pointer-events-none">
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
     <div
       v-for="shape in shapes"
       :id="`shape-${shape.id}`"
@@ -98,14 +87,11 @@ const getShapeStyle = (shape: Shape) => {
       :class="getShapeClass(shape.type)"
       :style="getShapeStyle(shape)"
     >
-      <!-- Triangle shape using clip-path -->
       <div
         v-if="shape.type === 'triangle'"
         class="w-full h-full"
         style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%)"
       ></div>
-
-      <!-- Hexagon shape using clip-path -->
       <div
         v-if="shape.type === 'hexagon'"
         class="w-full h-full"
@@ -114,7 +100,3 @@ const getShapeStyle = (shape: Shape) => {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Additional animations can be added here */
-</style>
