@@ -97,7 +97,7 @@ const pillars: Pillar[] = [
 
       <!-- Chronology -->
       <section class="mb-24" aria-labelledby="chronology-heading">
-        <div class="flex items-center justify-between mb-12">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 md:gap-0 mb-12">
           <h2
             id="chronology-heading"
             class="font-headline text-3xl font-semibold tracking-tight uppercase"
@@ -118,12 +118,12 @@ const pillars: Pillar[] = [
           <div
             v-for="entry in timeline"
             :key="entry.period"
-            class="grid grid-cols-12 py-8 border-b border-outline group"
+            class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-0 py-8 border-b border-outline group"
           >
-            <div class="col-span-3 font-mono text-[13px] tracking-widest text-secondary uppercase pt-1">
+            <div class="col-span-1 md:col-span-3 font-mono text-[13px] tracking-widest text-secondary uppercase pt-1">
               {{ entry.period }}
             </div>
-            <div class="col-span-9">
+            <div class="col-span-1 md:col-span-9">
               <h3 class="font-body text-xl font-bold mb-2">{{ entry.title }}</h3>
               <p class="text-secondary font-body mb-4">{{ entry.company }}</p>
               <p class="text-on-surface-variant text-[15px] leading-relaxed">{{ entry.description }}</p>

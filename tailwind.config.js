@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   // Dark mode removed per revamp plan
   theme: {
     extend: {
@@ -13,27 +10,27 @@ export default {
         "inverse-primary": "#F9F9F8",
         "surface-dim": "#E5E5E5",
         "on-tertiary-container": "#111111",
-        "outline": "#E5E5E5",
+        outline: "#E5E5E5",
         "on-tertiary-fixed-variant": "#111111",
         "on-secondary-fixed-variant": "#111111",
         "primary-container": "#111111",
-        "surface": "#F9F9F8",
+        surface: "#F9F9F8",
         "secondary-fixed-dim": "#D1D1D1",
         "outline-variant": "#888888",
-        "error": "#BA1A1A",
+        error: "#BA1A1A",
         "on-tertiary-fixed": "#111111",
         "inverse-on-surface": "#F9F9F8",
         "surface-container-low": "#F9F9F8",
         "on-primary": "#FFFFFF",
         "on-secondary-fixed": "#111111",
-        "secondary": "#888888",
+        secondary: "#888888",
         "tertiary-fixed-dim": "#E5E5E5",
         "on-surface-variant": "#888888",
         "surface-variant": "#F4F4F3",
         "primary-fixed-dim": "#111111",
         "error-container": "#FFDAD6",
         "surface-container-high": "#E5E5E5",
-        "primary": "#111111",
+        primary: "#111111",
         "on-tertiary": "#FFFFFF",
         "tertiary-container": "#E5E5E5",
         "on-error": "#FFFFFF",
@@ -48,10 +45,10 @@ export default {
         "surface-container-lowest": "#FFFFFF",
         "tertiary-fixed": "#F4F4F3",
         "on-primary-fixed-variant": "#FFFFFF",
-        "tertiary": "#111111",
+        tertiary: "#111111",
         "primary-fixed": "#111111",
         "on-primary-fixed": "#FFFFFF",
-        "background": "#F9F9F8",
+        background: "#F9F9F8",
         "surface-container": "#F4F4F3",
         "surface-tint": "#111111",
         "on-surface": "#111111",
@@ -88,4 +85,4 @@ export default {
     },
   },
   plugins: [],
-}
+};

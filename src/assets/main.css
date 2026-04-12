@@ -1,7 +1,7 @@
 /* Fontshare — Clash Display + Switzer */
-@import url('https://api.fontshare.com/v2/css?f[]=clash-display@700,600,400,500,300&f[]=switzer@600,800,900,400,300,500,700&display=swap');
+@import url("https://api.fontshare.com/v2/css?f[]=clash-display@700,600,400,500,300&f[]=switzer@600,800,900,400,300,500,700&display=swap");
 /* Google Fonts — Space Grotesk + JetBrains Mono */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -9,13 +9,13 @@
 
 @layer base {
   :root {
-    --surface: #F9F9F8;
+    --surface: #f9f9f8;
     --on-surface: #111111;
-    --outline: #E5E5E5;
+    --outline: #e5e5e5;
     --secondary: #888888;
     --primary: #111111;
     --inverse-surface: #111111;
-    --inverse-on-surface: #F9F9F8;
+    --inverse-on-surface: #f9f9f8;
   }
 
   * {
@@ -30,7 +30,7 @@
     @apply m-0 p-0 antialiased;
     background-color: var(--surface);
     color: var(--on-surface);
-    font-family: 'Switzer', 'Public Sans', sans-serif;
+    font-family: "Switzer", "Public Sans", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -71,7 +71,7 @@
 
   /* Monolith label — small mono caps */
   .label-mono {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: "JetBrains Mono", monospace;
     @apply text-[11px] tracking-[0.3em] uppercase;
   }
 
@@ -100,22 +100,48 @@
     text-wrap: balance;
   }
 
-  .animation-delay-100 { animation-delay: 100ms; }
-  .animation-delay-200 { animation-delay: 200ms; }
-  .animation-delay-300 { animation-delay: 300ms; }
-  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
 }
 
 /* Custom scrollbar — thin, monochromatic */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #E5E5E5; }
-::-webkit-scrollbar-thumb:hover { background: #888888; }
-* { scrollbar-width: thin; scrollbar-color: #E5E5E5 transparent; }
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #e5e5e5;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #888888;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #e5e5e5 transparent;
+}
 
 /* Selection — black on white inversion */
-::selection { background: #111111; color: #F9F9F8; }
-::-moz-selection { background: #111111; color: #F9F9F8; }
+::selection {
+  background: #111111;
+  color: #f9f9f8;
+}
+::-moz-selection {
+  background: #111111;
+  color: #f9f9f8;
+}
 
 /* Focus */
 :focus-visible {
@@ -125,7 +151,9 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
