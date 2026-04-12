@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@700,600,400,500,300&amp;f[]=switzer@600,800,900,400,300,500,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#FFFFFF",
+                        "inverse-primary": "#F9F9F8",
+                        "surface-dim": "#E5E5E5",
+                        "on-tertiary-container": "#111111",
+                        "outline": "#E5E5E5",
+                        "on-tertiary-fixed-variant": "#111111",
+                        "on-secondary-fixed-variant": "#111111",
+                        "primary-container": "#111111",
+                        "surface": "#F9F9F8",
+                        "secondary-fixed-dim": "#D1D1D1",
+                        "outline-variant": "#888888",
+                        "error": "#BA1A1A",
+                        "on-tertiary-fixed": "#111111",
+                        "inverse-on-surface": "#F9F9F8",
+                        "surface-container-low": "#F9F9F8",
+                        "on-primary": "#FFFFFF",
+                        "on-secondary-fixed": "#111111",
+                        "secondary": "#888888",
+                        "tertiary-fixed-dim": "#E5E5E5",
+                        "on-surface-variant": "#888888",
+                        "surface-variant": "#F4F4F3",
+                        "primary-fixed-dim": "#111111",
+                        "error-container": "#FFDAD6",
+                        "surface-container-high": "#E5E5E5",
+                        "primary": "#111111",
+                        "on-tertiary": "#FFFFFF",
+                        "tertiary-container": "#E5E5E5",
+                        "on-error": "#FFFFFF",
+                        "on-primary-container": "#F9F9F8",
+                        "on-background": "#111111",
+                        "on-secondary-container": "#111111",
+                        "on-error-container": "#93000A",
+                        "on-secondary": "#FFFFFF",
+                        "inverse-surface": "#111111",
+                        "secondary-container": "#F4F4F3",
+                        "surface-container-highest": "#D1D1D1",
+                        "surface-container-lowest": "#FFFFFF",
+                        "tertiary-fixed": "#F4F4F3",
+                        "on-primary-fixed-variant": "#FFFFFF",
+                        "tertiary": "#111111",
+                        "primary-fixed": "#111111",
+                        "on-primary-fixed": "#FFFFFF",
+                        "background": "#F9F9F8",
+                        "surface-container": "#F4F4F3",
+                        "surface-tint": "#111111",
+                        "on-surface": "#111111",
+                        "secondary-fixed": "#E5E5E5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Clash Display", "sans-serif"],
+                        "body": ["Switzer", "sans-serif"],
+                        "label": ["Space Grotesk", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee 25s linear infinite;
+        }
+        .project-row:hover .project-bg {
+            opacity: 0.1;
+            transform: scale(1.01);
+        }
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary selection:text-surface overflow-x-hidden">
+<header class="fixed top-0 left-0 w-full z-50 bg-[#F9F9F8]/90 backdrop-blur-md border-b border-neutral-200 flex justify-between items-center px-6 md:px-[120px] py-6">
+<div class="text-xl font-black tracking-tighter text-neutral-900 font-headline">ARCHITECT.VUE</div>
+<nav class="hidden md:flex items-center gap-12">
+<a class="font-headline uppercase tracking-[0.2em] text-[11px] font-semibold text-neutral-900 border-b border-neutral-900 pb-1 hover:text-neutral-900 transition-colors duration-200" href="#">Case Studies</a>
+<a class="font-headline uppercase tracking-[0.2em] text-[11px] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors duration-200" href="#">Manifesto</a>
+<a class="font-headline uppercase tracking-[0.2em] text-[11px] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors duration-200" href="#">Contact</a>
+</nav>
+<div class="font-headline uppercase tracking-[0.2em] text-[11px] font-semibold text-neutral-900 hidden md:block opacity-50">VUE3 / TS / NODE</div>
+</header>
+<main class="pt-40">
+<!-- Hero Section -->
+<section class="px-6 md:px-[120px] mb-40">
+<div class="flex flex-col gap-6 mb-12">
+<span class="font-mono text-[11px] tracking-[0.3em] uppercase text-secondary">AVAILABLE FOR Q1 2025</span>
+<h1 class="text-[clamp(3.5rem,10vw,140px)] font-headline font-bold leading-[0.85] tracking-[-0.03em] text-on-surface uppercase">
+                Senior Vue.js<br/>&amp; TS Engineer
+            </h1>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-end">
+<div class="md:col-span-8">
+<p class="text-2xl md:text-[32px] max-w-2xl leading-[1.15] font-normal text-on-surface/80">
+                    Building hyper-efficient, structurally sound web architectures with TypeScript and Vue. Focusing on technical precision and performance optimization.
+                </p>
+</div>
+<div class="md:col-span-4 flex justify-end">
+<div class="flex flex-col items-end gap-2">
+<span class="font-mono text-[11px] tracking-[0.3em] uppercase opacity-50">Location</span>
+<span class="text-lg font-bold font-headline tracking-tight uppercase">Zürich, CH — Remote</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Tech Marquee -->
+<section class="border-y border-outline py-12 overflow-hidden bg-surface mb-40">
+<div class="flex whitespace-nowrap animate-marquee">
+<div class="flex items-center gap-20 pr-20">
+<span class="font-headline font-bold text-6xl md:text-8xl uppercase tracking-tighter opacity-10">VUE3</span>
+<span class="font-headline font-bold text-6xl md:text-8xl uppercase tracking-tighter">TYPESCRIPT</span>
+<span class="font-headline font-bold text-6xl md:text-8xl uppercase tracking-tighter opacity-10">VITE</span>
+<span class="font-headline font-bold text-6xl md:text-8xl uppercase tracking-tighter">PINIA</span>
+<span class="font-headline font-bold text-6xl md:text-8xl uppercase tracking-tighter opacity-10">NUXT</span>
+</div>
+<div class="flex items-center gap-20 pr-20">
+<span class="font-headline font-bold text-6xl md:text-8xl uppercase tracking-tighter opacity-10">VUE3</span>
+<span class="font-headline font-bold text-6xl md:text-8xl uppercase tracking-tighter">TYPESCRIPT</span>
+<span class="font-headline font-bold text-6xl md:text-8xl uppercase tracking-tighter opacity-10">VITE</span>
+<span class="font-headline font-bold text-6xl md:text-8xl uppercase tracking-tighter">PINIA</span>
+<span class="font-headline font-bold text-6xl md:text-8xl uppercase tracking-tighter opacity-10">NUXT</span>
+</div>
+</div>
+</section>
+<!-- Edge-to-Edge Projects -->
+<section class="mb-40">
+<div class="px-6 md:px-[120px] mb-12 flex justify-between items-end">
+<h2 class="font-mono text-[11px] tracking-[0.3em] uppercase text-secondary">PROJECTS ARCHIVE</h2>
+<span class="font-mono text-[11px] tracking-[0.3em] uppercase text-secondary opacity-50">001 — 004</span>
+</div>
+<!-- Project 01 -->
+<div class="project-row group relative w-full border-t border-outline overflow-hidden transition-all duration-700">
+<img class="project-bg absolute inset-0 w-full h-full object-cover opacity-0 grayscale transition-all duration-1000 pointer-events-none z-0" data-alt="Monochrome wide shot of a brutalist concrete building" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3b9utaZziDn93T1noENE5cgOXYDiJ-5FZEp7kF7EccI9NxvxLtW_wHN5124KZFTa9ffea5YFCzrzKLvBTXVjFIULLbeCaTfZ21mZTCbucaA22o_RAyyTbNRr_x7mRrNxEHreqCvTbQNyNov9pO5x00pHJOJP0rKPRa-cYWHIL-o-CgLf7Jx4bUJ6zMXDNKIQ9V78w1MHZ-yJjTxLmeCOWFvhoxpXOJkKf-GbsNL2IvG17J9AQyoJfqMT_5yUowbz6sIcO2cbotS8"/>
+<div class="relative z-10 px-6 md:px-[120px] py-20 md:py-32 flex flex-col md:flex-row justify-between items-start md:items-center group-hover:bg-surface-bright/40 transition-colors">
+<div class="flex items-start gap-12 w-full md:w-auto">
+<span class="font-mono text-[11px] mt-6 opacity-30">01</span>
+<h3 class="text-4xl md:text-[90px] font-headline font-bold tracking-[-0.03em] uppercase leading-none">Nexus Dashboard</h3>
+</div>
+<div class="flex flex-col items-start md:items-end w-full md:w-auto mt-8 md:mt-0">
+<span class="font-mono text-[11px] tracking-[0.3em] uppercase text-secondary mb-4 opacity-50">Internal Tooling</span>
+<p class="font-body text-xl md:text-2xl md:text-right max-w-sm leading-tight text-on-surface/70">Complex data visualization engine built with Vue 3 and D3.js core components.</p>
+</div>
+</div>
+</div>
+<!-- Project 02 -->
+<div class="project-row group relative w-full border-t border-outline overflow-hidden transition-all duration-700">
+<img class="project-bg absolute inset-0 w-full h-full object-cover opacity-0 grayscale transition-all duration-1000 pointer-events-none z-0" data-alt="B&amp;W close-up of structural steel beams" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXXyZjOo3YcmSUgZiU8mVWVpxZ0PGJMJ61B1B-Jr1hCgJ51MzkRRPtdZ2TgwhG9mC1ohG2bzDMzm0Ag5ZN9BhLG0vMejEWlWpQDuQq_tj2idli6nttd47RZzwEmF8Ox68m-NZc6UbOhg7UbY4KZRQ8IF1Xb8Bu63EmMPFCeyfT_JNLHC13pHPxOaPyMes4BuJk_oPB6eTgaUeuuRvKU1F9wGm8_mSthY0LeY9S6BERkCKK3HpX-uPxuTF94AS2Iw95lt4johMskHQ"/>
+<div class="relative z-10 px-6 md:px-[120px] py-20 md:py-32 flex flex-col md:flex-row justify-between items-start md:items-center group-hover:bg-surface-bright/40 transition-colors">
+<div class="flex items-start gap-12 w-full md:w-auto">
+<span class="font-mono text-[11px] mt-6 opacity-30">02</span>
+<h3 class="text-4xl md:text-[90px] font-headline font-bold tracking-[-0.03em] uppercase leading-none">Archiv System</h3>
+</div>
+<div class="flex flex-col items-start md:items-end w-full md:w-auto mt-8 md:mt-0">
+<span class="font-mono text-[11px] tracking-[0.3em] uppercase text-secondary mb-4 opacity-50">E-Commerce Architecture</span>
+<p class="font-body text-xl md:text-2xl md:text-right max-w-sm leading-tight text-on-surface/70">Highly scalable headless storefront using Nuxt 3 and Pinia state management.</p>
+</div>
+</div>
+</div>
+<!-- Project 03 -->
+<div class="project-row group relative w-full border-t border-outline overflow-hidden transition-all duration-700">
+<img class="project-bg absolute inset-0 w-full h-full object-cover opacity-0 grayscale transition-all duration-1000 pointer-events-none z-0" data-alt="Minimalist grayscale image of a winding concrete staircase" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArQuLIEN6npa4y_p02p6tnhufsDgDgvEjzPXVbEm1Z6Zl1FvMzH__Cvcyzumo4chZAgvvhu--KP75p8E_wCivEsz7rJAkSFutqnomDjp5jynrHFX2xBFnO9NEJ6WDwy582AOsNugsSqv7Fg1Gl4AhIMazc6OGwa5j33JD0ssqmDi9gLW9U9R06zhMKPf0W9Xi7UtvsqJ3qhcvybg1HwfzdPvnjl1dnequ5IiHYEjup3rnoYrVOCJIlyj5zeb0nAUUF3-U19rb43D4"/>
+<div class="relative z-10 px-6 md:px-[120px] py-20 md:py-32 flex flex-col md:flex-row justify-between items-start md:items-center group-hover:bg-surface-bright/40 transition-colors">
+<div class="flex items-start gap-12 w-full md:w-auto">
+<span class="font-mono text-[11px] mt-6 opacity-30">03</span>
+<h3 class="text-4xl md:text-[90px] font-headline font-bold tracking-[-0.03em] uppercase leading-none">Quant Trading UI</h3>
+</div>
+<div class="flex flex-col items-start md:items-end w-full md:w-auto mt-8 md:mt-0">
+<span class="font-mono text-[11px] tracking-[0.3em] uppercase text-secondary mb-4 opacity-50">Financial Tech</span>
+<p class="font-body text-xl md:text-2xl md:text-right max-w-sm leading-tight text-on-surface/70">Real-time performance metrics and high-frequency trading dashboard.</p>
+</div>
+</div>
+</div>
+<!-- Project 04 -->
+<div class="project-row group relative w-full border-y border-outline overflow-hidden transition-all duration-700">
+<img class="project-bg absolute inset-0 w-full h-full object-cover opacity-0 grayscale transition-all duration-1000 pointer-events-none z-0" data-alt="Atmospheric architectural detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBD2biK58Lo12ci_dAjzrQluvUs90IZsYPWXm5KfbjoP4XdkQ7qCkc2b3ZKIKDDS8Cc8oVyGng1sieR5yfXCvulsph2XLfiWtEg9zxGobhOSEOebrLTMjVYa4nkvcJUHWtF4gXLArapzAac8A4KTRqGeLI20u6bwEN28tghClYYrGleiFg5IjoUEAr3nLMG0twEm1uGei0eZf43azFVpb0PE4-C_Fz1aHdvOynuXyNAgvH5uOBLFXXgbjHS88WSvuO5s4QDORGl940"/>
+<div class="relative z-10 px-6 md:px-[120px] py-20 md:py-32 flex flex-col md:flex-row justify-between items-start md:items-center group-hover:bg-surface-bright/40 transition-colors">
+<div class="flex items-start gap-12 w-full md:w-auto">
+<span class="font-mono text-[11px] mt-6 opacity-30">04</span>
+<h3 class="text-4xl md:text-[90px] font-headline font-bold tracking-[-0.03em] uppercase leading-none">Kinetics Framework</h3>
+</div>
+<div class="flex flex-col items-start md:items-end w-full md:w-auto mt-8 md:mt-0">
+<span class="font-mono text-[11px] tracking-[0.3em] uppercase text-secondary mb-4 opacity-50">Open Source</span>
+<p class="font-body text-xl md:text-2xl md:text-right max-w-sm leading-tight text-on-surface/70">A custom reactive animation library for Vue, built with raw performance.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Structural Content / Bento Split -->
+<section class="px-6 md:px-[120px] mb-40 grid grid-cols-1 md:grid-cols-2 gap-px bg-outline">
+<div class="bg-surface p-12 md:p-20 flex flex-col justify-between aspect-square">
+<div class="flex flex-col gap-8">
+<span class="font-mono text-[11px] tracking-[0.3em] uppercase text-secondary">The Philosophy</span>
+<h4 class="text-4xl md:text-5xl font-headline font-bold tracking-tighter uppercase leading-none">Code as<br/>Architecture</h4>
+<p class="text-lg md:text-xl font-normal text-on-surface/70 leading-relaxed max-w-md">
+                    I believe software should be built with the same longevity and structural integrity as physical landmarks. Clean, maintainable TypeScript isn't just a preference—it's a requirement for systems that intend to last.
+                </p>
+</div>
+<button class="w-full md:w-max px-10 py-5 bg-primary text-surface font-headline font-bold uppercase tracking-[0.2em] text-[11px] hover:bg-surface hover:text-primary border border-primary transition-all duration-300">
+                View Technical Manifesto
+            </button>
+</div>
+<div class="grid grid-cols-1 gap-px bg-outline">
+<div class="bg-primary text-surface p-12 md:p-20 flex flex-col gap-12">
+<span class="font-mono text-[11px] tracking-[0.3em] uppercase opacity-40">Core Expertise</span>
+<ul class="flex flex-col gap-6">
+<li class="flex justify-between items-center border-b border-surface/10 pb-6">
+<span class="text-2xl font-headline font-medium uppercase tracking-tight">Enterprise Vue 3</span>
+<span class="font-mono text-[11px] opacity-60">8+ YRS</span>
+</li>
+<li class="flex justify-between items-center border-b border-surface/10 pb-6">
+<span class="text-2xl font-headline font-medium uppercase tracking-tight">TypeScript Arch</span>
+<span class="font-mono text-[11px] opacity-60">6+ YRS</span>
+</li>
+<li class="flex justify-between items-center border-b border-surface/10 pb-6">
+<span class="text-2xl font-headline font-medium uppercase tracking-tight">Node.js Ecosystem</span>
+<span class="font-mono text-[11px] opacity-60">5+ YRS</span>
+</li>
+<li class="flex justify-between items-center pb-2">
+<span class="text-2xl font-headline font-medium uppercase tracking-tight">Design Systems</span>
+<span class="font-mono text-[11px] opacity-60">4+ YRS</span>
+</li>
+</ul>
+</div>
+<div class="bg-surface p-12 md:p-16">
+<div class="flex flex-col gap-8">
+<span class="font-mono text-[11px] tracking-[0.3em] uppercase text-secondary">Past Collaborations</span>
+<div class="flex flex-wrap gap-x-8 gap-y-4 items-center">
+<span class="text-2xl md:text-3xl font-headline font-bold tracking-tighter">GOOGLE</span>
+<span class="text-neutral-300">/</span>
+<span class="text-2xl md:text-3xl font-headline font-bold tracking-tighter">STRIPE</span>
+<span class="text-neutral-300">/</span>
+<span class="text-2xl md:text-3xl font-headline font-bold tracking-tighter">APPLE</span>
+<span class="text-neutral-300">/</span>
+<span class="text-2xl md:text-3xl font-headline font-bold tracking-tighter">BMW</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="bg-primary text-surface py-40 px-6 md:px-[120px] text-center">
+<h2 class="text-[clamp(3rem,12vw,160px)] font-headline font-bold tracking-[-0.03em] mb-16 uppercase leading-[0.85]">
+            Let's construct <br/>the future.
+        </h2>
+<div class="flex flex-col md:flex-row justify-center items-center gap-16 font-headline font-semibold text-[11px] tracking-[0.3em] uppercase">
+<a class="hover:opacity-50 transition-opacity decoration-0" href="mailto:contact@architect.vue">contact@architect.vue</a>
+<a class="hover:opacity-50 transition-opacity decoration-0" href="#">Download CV</a>
+<a class="hover:opacity-50 transition-opacity decoration-0" href="#">LinkedIn</a>
+</div>
+</section>
+</main>
+<footer class="bg-surface border-t border-neutral-200 flex flex-col md:flex-row justify-between items-center px-6 md:px-[120px] py-10 w-full font-mono text-[11px] tracking-[0.3em] uppercase">
+<div class="text-neutral-900 font-bold mb-6 md:mb-0">©2024 ENGINEERED PRECISION</div>
+<div class="flex gap-12">
+<a class="text-neutral-500 hover:text-neutral-900 transition-all duration-300" href="#">GitHub</a>
+<a class="text-neutral-500 hover:text-neutral-900 transition-all duration-300" href="#">LinkedIn</a>
+<a class="text-neutral-500 hover:text-neutral-900 transition-all duration-300" href="#">Source</a>
+</div>
+</footer>
+</body></html>
