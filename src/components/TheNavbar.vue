@@ -6,13 +6,13 @@ const route = useRoute();
 const router = useRouter();
 
 const isCaseStudy = computed(() => route.name === "CaseStudy");
-const isManifesto = computed(() => route.name === "Manifesto");
 
 const isMenuOpen = ref(false);
 
 const navLinks = [
   { label: "Case Studies", to: "/" },
   { label: "Manifesto", to: "/manifesto" },
+  { label: "Personal", to: "/personal" },
 ];
 
 function goBack() {

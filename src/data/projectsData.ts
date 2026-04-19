@@ -2,16 +2,74 @@ import type { Project } from '@/types/caseStudy'
 
 export const projects: Project[] = [
   {
-    slug: 'lms-ai-platform',
+    slug: 'cbms-portal',
     index: '01',
+    title: 'CBMS Portal',
+    categoryLabel: 'Government / Data Visualization',
+    description:
+      'Data-visualization portal for the Community-Based Monitoring System at the Philippine Statistics Authority — dashboards, geospatial views, and analyst tooling over national survey data.',
+    backgroundImage:
+      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
+    role: 'Lead Front-end Developer — PSA Central Office',
+    stack: 'Vue 3, TypeScript, Pinia, Vuetify, ECharts, D3, Babylon.js, Laravel',
+    timeline: '2022 — Present',
+    liveUrl: undefined,
+    introStatement:
+      'A public-sector analytics portal surfacing CBMS indicators for policymakers and researchers. Built inside the PSA Central Office, the frontend is a typed Vue 3 application that renders millions of rows of municipal survey data through interactive dashboards, geographic layers, and exportable reports.',
+    heroImage:
+      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1400&q=80',
+    sections: [
+      {
+        heading: 'The Challenge',
+        body: 'National survey datasets are large, hierarchical, and politically sensitive. The portal had to let analysts drill from region → province → municipality → barangay without stalling the browser, while enforcing strict data-release rules. Legacy reporting at PSA relied on static PDFs — the ask was to replace that workflow with an interactive, typed, auditable web application.',
+      },
+      {
+        heading: 'Implementation Strategy',
+        body: 'A Vue 3 + Pinia core feeds a visualization layer built on ECharts, D3, and Observable Plot — each chart type wrapped in a composable so instrumentation, legends, and export behavior stay consistent. Vuetify handles dense data-table surfaces and form-heavy admin views; Babylon.js powers the 3D geographic scene. A Laravel service (via laravel-vite-plugin) brokers auth and data access between the client and the PSA data layer.',
+        code: {
+          filename: 'composables/useIndicator.ts',
+          content: `import { storeToRefs } from 'pinia'
+import { useIndicatorStore } from '@/stores/indicator'
+
+export function useIndicator(code: string) {
+  const store = useIndicatorStore()
+  const { series, loading } = storeToRefs(store)
+
+  async function load(level: GeoLevel, id: string) {
+    await store.fetchSeries({ code, level, id })
+  }
+
+  return { series, loading, load }
+}`,
+        },
+      },
+      {
+        heading: 'Outcomes',
+        body: 'The portal is now the analyst-facing surface for CBMS rounds at PSA. Render-time for large indicator sets dropped from unusable to sub-second through virtualized tables, throttled store updates, and precomputed aggregates. The typed store layer has kept the codebase stable across three years of schema changes.',
+      },
+    ],
+    gallery: [
+      {
+        src: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80',
+        alt: 'Indicator dashboard view',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80',
+        alt: 'Drill-down data table',
+      },
+    ],
+  },
+  {
+    slug: 'lms-ai-platform',
+    index: '02',
     title: 'LMS-AI Platform',
     categoryLabel: 'EdTech / AI Integration',
     description:
       'Adaptive learning management system with real-time AI risk scoring, instructor intervention workflows, and student analytics dashboards.',
     backgroundImage:
       'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
-    role: 'Lead Frontend Engineer',
-    stack: 'Vue 3, Pinia, TypeScript, FastAPI, PostgreSQL',
+    role: 'Full-stack Developer',
+    stack: 'Vue 3, Pinia, TypeScript, FastAPI, PostgreSQL, Docker',
     timeline: '2025 — Present',
     liveUrl: undefined,
     introStatement:
@@ -25,7 +83,7 @@ export const projects: Project[] = [
       },
       {
         heading: 'Implementation Strategy',
-        body: 'The frontend was architected around a strict separation between the AI data-layer (Pinia stores with typed API contracts) and the presentation layer. Vue 3 Composition API composables were used to encapsulate all real-time polling and risk calculation logic, keeping components declarative and testable.',
+        body: 'The frontend was architected around a strict separation between the AI data-layer (Pinia stores with typed API contracts) and the presentation layer. Vue 3 Composition API composables were used to encapsulate all real-time polling and risk calculation logic, keeping components declarative and testable. The FastAPI backend and PostgreSQL schema ship together via docker-compose.',
         code: {
           filename: 'stores/riskStore.ts',
           content: `import { defineStore } from 'pinia'
@@ -33,7 +91,7 @@ import type { StudentRisk, RiskLevel } from '@/types/risk'
 
 export const useRiskStore = defineStore('risk', () => {
   const students = ref<StudentRisk[]>([])
-  
+
   async function fetchRiskScores(courseId: number) {
     const response = await api.get(\`/courses/\${courseId}/risk-analysis\`)
     students.value = response.data
@@ -64,143 +122,44 @@ export const useRiskStore = defineStore('risk', () => {
     ],
   },
   {
-    slug: 'portfolio-architecture',
-    index: '02',
-    title: 'Portfolio Architecture',
-    categoryLabel: 'Design System / Open Source',
-    description:
-      'Monolith Architectural design system — brutalist editorial aesthetic built entirely in Vue 3 + TypeScript + Tailwind with zero runtime dependencies.',
-    backgroundImage:
-      'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=80',
-    role: 'Architect & Developer',
-    stack: 'Vue 3, TypeScript, Tailwind CSS, Vite',
-    timeline: '2026',
-    liveUrl: 'https://yourportfolio.com',
-    introStatement:
-      'A complete design system built from first principles — rejecting every UX convention in favor of the stark, structural clarity of brutalist print design. Typography is the interface. Whitespace is the layout. Color is prohibited.',
-    heroImage:
-      'https://images.unsplash.com/photo-1551434678-e076c223a692?w=1400&q=80',
-    sections: [
-      {
-        heading: 'The Philosophy',
-        body: 'Most portfolio sites over-signal with gradients, glassmorphism, and particle effects. This system argues the opposite: that restraint is a technical statement. The discipline required to build a beautiful interface with only black, white, and a single serif — that is the portfolio.',
-      },
-      {
-        heading: 'Design Token Architecture',
-        body: 'All colors, spacing, and typography are defined as Tailwind design tokens, mapped directly to the Monolith Architectural spec. No ad-hoc utilities. No one-off values. Every visual decision is a function of the token system.',
-        code: {
-          filename: 'tailwind.config.js',
-          content: `// Monolith Architectural tokens
-colors: {
-  surface: '#F9F9F8',       // warm off-white paper
-  'on-surface': '#111111',  // near-black
-  outline: '#E5E5E5',       // hairline divider
-  secondary: '#888888',     // metadata grey
-  primary: '#111111',       // CTA black
-}`,
-        },
-      },
-    ],
-    gallery: [
-      {
-        src: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&q=80',
-        alt: 'Typography system detail',
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1545235617-9465d2a55698?w=800&q=80',
-        alt: 'Grid layout structure',
-      },
-    ],
-  },
-  {
-    slug: 'enterprise-dashboard',
+    slug: 'nutrisipe',
     index: '03',
-    title: 'Enterprise Dashboard',
-    categoryLabel: 'Internal Tooling / Data Viz',
+    title: 'OfficialNutrisipe',
+    categoryLabel: 'Social / Recipe Platform',
     description:
-      'Complex data visualization engine for internal analytics. Real-time KPI tracking, drill-down tables, and role-based access control in Vue 3.',
+      'A social recipe and nutrition platform with real-time messaging, OAuth login, and a Sanity-backed content pipeline. Live on Cloudflare Pages.',
     backgroundImage:
-      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80',
-    role: 'Senior Frontend Engineer',
-    stack: 'Vue 3, TypeScript, D3.js, Pinia, Node.js',
-    timeline: '2024',
-    introStatement:
-      'Rebuilding a legacy jQuery dashboard into a fully typed, reactive Vue 3 architecture — reducing time-to-insight for data analysts by 60% through intelligent data pre-fetching and component virtualization.',
-    heroImage:
-      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1400&q=80',
-    sections: [
-      {
-        heading: 'The Challenge',
-        body: "The existing dashboard rendered 10,000+ row tables synchronously, freezing the browser on every filter. The real challenge wasn't the data — it was the architectural debt of five years of jQuery patches.",
-      },
-      {
-        heading: 'Implementation Strategy',
-        body: 'Virtual scrolling with @tanstack/vue-virtual eliminated render bottlenecks. Pinia stores with smart caching reduced API calls by 70%. TypeScript strict mode enforced data contracts across 40+ components.',
-      },
-      {
-        heading: 'Outcomes',
-        body: 'P95 dashboard load time dropped from 4.2s to 800ms. PDF export was rebuilt as a headless Vue 3 render pipeline, eliminating a legacy PhantomJS dependency.',
-      },
-    ],
-    gallery: [
-      {
-        src: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80',
-        alt: 'Analytics charts view',
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80',
-        alt: 'Data table interface',
-      },
-    ],
-  },
-  {
-    slug: 'headless-storefront',
-    index: '04',
-    title: 'Headless Storefront',
-    categoryLabel: 'E-Commerce Architecture',
-    description:
-      'Highly scalable headless commerce frontend using Nuxt 3, Pinia state management, and a fully typed Shopify Storefront API integration.',
-    backgroundImage:
-      'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80',
-    role: 'Frontend Architect',
-    stack: 'Nuxt 3, Pinia, TypeScript, Shopify API, Tailwind',
+      'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80',
+    role: 'Front-end Developer',
+    stack: 'React 17, Sanity CMS, Socket.io, Google OAuth, Tailwind',
     timeline: '2023',
-    liveUrl: undefined,
+    liveUrl: 'https://officialnutrisipe.pages.dev/',
     introStatement:
-      'Decoupling a monolithic Shopify theme into a fully headless Nuxt 3 storefront — enabling independent frontend deployments, sub-100ms navigation via prefetching, and a typed GraphQL API layer.',
+      'A Pinterest-style social platform for recipes and nutrition content — users publish, save, and discuss recipes in real time. The React client talks to a Sanity-managed content layer and a Socket.io service for live interactions.',
     heroImage:
       'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1400&q=80',
     sections: [
       {
-        heading: 'The Challenge',
-        body: 'Shopify Liquid themes are tightly coupled to the platform renderer, making modern frontend tooling impossible. The goal was full decoupling while maintaining Shopify as the commerce engine.',
+        heading: 'The Idea',
+        body: 'Most recipe sites treat content as static. Nutrisipe frames recipes as social objects — saveable, remixable, and discussable. The product goal was to combine structured nutrition metadata with the low-friction browsing of a social feed.',
       },
       {
         heading: 'Implementation Strategy',
-        body: 'Nuxt 3 with the Composition API provided the SSR + SPA hybrid model required. A typed GraphQL client with auto-generated types from the Shopify schema eliminated runtime type errors entirely.',
-        code: {
-          filename: 'composables/useCart.ts',
-          content: `export function useCart() {
-  const cart = useCartStore()
-  
-  async function addItem(variantId: string, quantity: number) {
-    await cart.addToCart({ variantId, quantity })
-    // Optimistic UI update before API confirms
-  }
-  
-  return { cart, addItem }
-}`,
-        },
+        body: 'Sanity provides the structured schema for recipes, ingredients, and author profiles, with image assets served through its CDN. A lightweight Socket.io service handles presence and live comment threads. Authentication is federated through Google OAuth, keeping onboarding to a single tap.',
+      },
+      {
+        heading: 'Outcomes',
+        body: 'Shipped to production at officialnutrisipe.pages.dev with a masonry feed, authenticated publishing, and real-time commenting. The Sanity schema has absorbed multiple content-model changes without migrations on the client.',
       },
     ],
     gallery: [
       {
-        src: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&q=80',
-        alt: 'Product listing page',
+        src: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80',
+        alt: 'Recipe feed view',
       },
       {
-        src: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80',
-        alt: 'Shopping cart interface',
+        src: 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=800&q=80',
+        alt: 'Recipe detail with nutrition info',
       },
     ],
   },

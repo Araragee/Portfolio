@@ -12,7 +12,7 @@ const currentYear = new Date().getFullYear()
     </div>
     <div class="flex gap-12">
       <a
-        href="https://github.com/Araragee"
+        href="https://github.com/Araragi"
         target="_blank"
         rel="noopener noreferrer"
         class="text-secondary hover:text-on-surface transition-all duration-300 no-underline"

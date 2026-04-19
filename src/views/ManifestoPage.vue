@@ -21,22 +21,22 @@ interface Pillar {
 
 const timeline: TimelineEntry[] = [
   {
-    period: '2024 — PRES.',
-    title: 'Senior Frontend Engineer',
-    company: 'Independent / Freelance',
-    description: 'Building scalable Vue 3 applications and design systems for clients across EdTech, FinTech, and E-commerce. Defining architectural standards, establishing TypeScript strict-mode patterns, and leading frontend teams.'
+    period: 'OCT 2023 — PRES.',
+    title: 'Front-end Developer',
+    company: 'Philippine Statistics Authority — Central Office',
+    description: 'Lead front-end for the CBMS Portal — the analyst-facing surface for Community-Based Monitoring System data across the Philippines. Vue 3, TypeScript, Pinia, Vuetify, ECharts, and D3 on the client; Laravel on the server.'
   },
   {
-    period: '2022 — 2024',
-    title: 'Frontend Developer',
-    company: 'LMS-AI Project',
-    description: 'Led complete frontend architecture for an adaptive LMS platform with AI-driven risk prediction. Vue 3 Composition API, Pinia, and a fully typed API contract layer with FastAPI backend.'
+    period: 'MAR — MAY 2023',
+    title: 'Web Designer / UI-UX Junior Intern',
+    company: 'iPhitech — Clark, Pampanga',
+    description: 'OJT internship focused on web design, UI/UX, and front-end prototyping. Produced responsive marketing pages and translated Figma mockups into production HTML/CSS.'
   },
   {
-    period: '2021 — 2022',
-    title: 'Junior Web Developer',
-    company: 'Contract Projects',
-    description: 'Built responsive web applications and landing pages with Vue 2 and React. Focused on accessible HTML, CSS architecture, and cross-browser compatibility.'
+    period: '2019 — JUL 2023',
+    title: 'BS Computer Science',
+    company: 'Tarlac State University',
+    description: 'Graduated July 2023. Built the foundation in software engineering, algorithms, and web technologies that underpins all production work since.'
   },
 ]
 
@@ -104,14 +104,13 @@ const pillars: Pillar[] = [
           >
             Chronology
           </h2>
-          <a
-            href="/resume.pdf"
-            download
-            class="btn-monolith px-6 py-3 text-[11px]"
-            id="download-resume-btn"
+          <span
+            class="btn-monolith px-6 py-3 text-[11px] opacity-40 cursor-not-allowed select-none"
+            title="Resume coming soon"
+            aria-disabled="true"
           >
-            Download Resume
-          </a>
+            Resume — Coming Soon
+          </span>
         </div>
 
         <div class="border-t border-outline">

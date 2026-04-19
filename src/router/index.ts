@@ -14,6 +14,12 @@ const routes: Array<RouteRecordRaw> = [
     meta: { title: 'Manifesto — ARCHITECT.VUE' }
   },
   {
+    path: '/personal',
+    name: 'Personal',
+    component: () => import('@/views/PersonalPage.vue'),
+    meta: { title: 'Personal — ARCHITECT.VUE' }
+  },
+  {
     path: '/case-study/:slug',
     name: 'CaseStudy',
     component: () => import('@/views/CaseStudyPage.vue'),
