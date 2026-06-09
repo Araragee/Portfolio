@@ -1,7 +1,4 @@
-/* Fontshare — Clash Display + Switzer */
-@import url("https://api.fontshare.com/v2/css?f[]=clash-display@700,600,400,500,300&f[]=switzer@600,800,900,400,300,500,700&display=swap");
-/* Google Fonts — Space Grotesk + JetBrains Mono */
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap");
+/* ─── Fonts loaded via <link> in index.html — no @import duplication ─── */
 
 @tailwind base;
 @tailwind components;
@@ -24,6 +21,8 @@
 
   html {
     @apply scroll-smooth;
+    /* Prevent horizontal overflow from animations */
+    overflow-x: hidden;
   }
 
   body {
@@ -40,66 +39,93 @@
   }
 }
 
-@layer components {
-  /* Monolith button — rectangular, inversion hover */
-  .btn-monolith {
-    @apply inline-flex items-center justify-center px-10 py-5;
-    @apply bg-primary text-surface font-headline font-bold uppercase;
-    @apply tracking-[0.2em] text-[11px] border border-primary;
-    @apply transition-all duration-300;
-  }
-
-  .btn-monolith:hover {
-    @apply bg-surface text-primary;
-  }
-
-  .btn-monolith-inverse {
-    @apply inline-flex items-center justify-center px-10 py-5;
-    @apply bg-surface text-primary font-headline font-bold uppercase;
-    @apply tracking-[0.2em] text-[11px] border border-primary;
-    @apply transition-all duration-300;
-  }
-
-  .btn-monolith-inverse:hover {
-    @apply bg-primary text-surface;
-  }
-
-  /* Hairline divider */
-  .hairline {
-    @apply border-t border-outline;
-  }
-
-  /* Monolith label — small mono caps */
-  .label-mono {
-    font-family: "JetBrains Mono", monospace;
-    @apply text-[11px] tracking-[0.3em] uppercase;
-  }
-
-  /* Project row hover system */
-  .project-row:hover .project-bg {
-    opacity: 0.1;
-    transform: scale(1.01);
-  }
-
-  /* Screen reader only */
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-  }
-}
-
+/* ─── Fluid Typography Scale ─── */
 @layer utilities {
+  /* Display — hero headings, CTA blocks */
+  .text-display-xl {
+    font-size: clamp(2.75rem, 10vw, 10rem);
+    line-height: 0.85;
+    letter-spacing: -0.03em;
+  }
+  .text-display-lg {
+    font-size: clamp(2.5rem, 8vw, 7rem);
+    line-height: 0.88;
+    letter-spacing: -0.03em;
+  }
+  .text-display {
+    font-size: clamp(2rem, 6vw, 5.625rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+  }
+
+  /* Headings — section titles, project names */
+  .text-heading-xl {
+    font-size: clamp(2rem, 4vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .text-heading-lg {
+    font-size: clamp(1.75rem, 3.5vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+  }
+  .text-heading {
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  /* Subheading — intro statements, pull quotes */
+  .text-subheading {
+    font-size: clamp(1.125rem, 2vw, 1.75rem);
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+  }
+
+  /* Body — prose, descriptions */
+  .text-body-lg {
+    font-size: clamp(1.0625rem, 1.4vw, 1.375rem);
+    line-height: 1.6;
+    letter-spacing: 0;
+  }
+  .text-body {
+    font-size: clamp(0.9375rem, 1.1vw, 1.125rem);
+    line-height: 1.6;
+    letter-spacing: 0;
+  }
+  .text-body-sm {
+    font-size: clamp(0.875rem, 1vw, 1rem);
+    line-height: 1.55;
+    letter-spacing: 0;
+  }
+
+  /* Caption — metadata, timeline periods */
+  .text-caption {
+    font-size: clamp(0.75rem, 0.9vw, 0.8125rem);
+    line-height: 1.4;
+    letter-spacing: 0.15em;
+  }
+
+  /* Label — nav links, mono labels, footer */
+  .text-label {
+    font-size: clamp(0.6875rem, 0.8vw, 0.75rem);
+    line-height: 1.3;
+    letter-spacing: 0.2em;
+  }
+
+  /* Marquee — scrolling tech labels */
+  .text-marquee {
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  /* Text balance */
   .text-balance {
     text-wrap: balance;
   }
 
+  /* Animation delays */
   .animation-delay-100 {
     animation-delay: 100ms;
   }
@@ -114,7 +140,157 @@
   }
 }
 
-/* Custom scrollbar — thin, monochromatic */
+@layer components {
+  /* ─── Responsive section padding ─── */
+  .section-padding {
+    @apply px-5 sm:px-6 md:px-16 lg:px-[120px];
+  }
+
+  /* ─── Monolith button — rectangular, inversion hover ─── */
+  .btn-monolith {
+    @apply inline-flex items-center justify-center px-10 py-5;
+    @apply bg-primary text-surface font-headline font-bold uppercase;
+    @apply tracking-[0.2em] border border-primary;
+    @apply transition-all duration-300;
+    font-size: clamp(0.6875rem, 0.8vw, 0.75rem);
+  }
+
+  .btn-monolith:hover {
+    @apply bg-surface text-primary;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(17, 17, 17, 0.08);
+  }
+
+  .btn-monolith:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  .btn-monolith-inverse {
+    @apply inline-flex items-center justify-center px-10 py-5;
+    @apply bg-surface text-primary font-headline font-bold uppercase;
+    @apply tracking-[0.2em] border border-primary;
+    @apply transition-all duration-300;
+    font-size: clamp(0.6875rem, 0.8vw, 0.75rem);
+  }
+
+  .btn-monolith-inverse:hover {
+    @apply bg-primary text-surface;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(17, 17, 17, 0.08);
+  }
+
+  .btn-monolith-inverse:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  /* ─── Hairline divider ─── */
+  .hairline {
+    @apply border-t border-outline;
+  }
+
+  /* ─── Monolith label — small mono caps ─── */
+  .label-mono {
+    font-family: "JetBrains Mono", monospace;
+    @apply uppercase;
+    font-size: clamp(0.6875rem, 0.8vw, 0.75rem);
+    letter-spacing: 0.3em;
+  }
+
+  /* ─── Project row hover system ─── */
+  .project-row:hover .project-bg {
+    opacity: 0.1;
+    transform: scale(1.01);
+  }
+
+  .project-row:hover .project-title {
+    transform: translateX(6px);
+  }
+
+  .project-row:hover .project-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ─── Screen reader only ─── */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* ─── Skip to content link ─── */
+  .skip-link {
+    @apply sr-only;
+    @apply bg-primary text-surface font-mono uppercase tracking-widest;
+    font-size: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    z-index: 9999;
+  }
+
+  .skip-link:focus {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    padding: 0.75rem 1.5rem;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  /* ─── Scroll-reveal animation states ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal-stagger {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal-stagger.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Page transitions ─── */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+/* ─── Custom scrollbar — thin, monochromatic ─── */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -133,7 +309,15 @@
   scrollbar-color: #e5e5e5 transparent;
 }
 
-/* Selection — black on white inversion */
+/* Scrollbar variant for dark sections */
+.dark-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+.dark-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* ─── Selection — black on white inversion ─── */
 ::selection {
   background: #111111;
   color: #f9f9f8;
@@ -143,13 +327,26 @@
   color: #f9f9f8;
 }
 
-/* Focus */
+/* ─── Focus ─── */
 :focus-visible {
   outline: 2px solid #111111;
   outline-offset: 2px;
 }
 
-/* Reduced motion */
+/* High-contrast focus for dark backgrounds */
+.bg-primary :focus-visible,
+[class*="bg-primary"] :focus-visible {
+  outline-color: #f9f9f8;
+}
+
+/* ─── Body scroll lock (mobile menu) ─── */
+body.menu-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* ─── Reduced motion ─── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -158,5 +355,16 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .reveal,
+  .reveal-stagger {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .page-enter-active,
+  .page-leave-active {
+    transition: none !important;
   }
 }

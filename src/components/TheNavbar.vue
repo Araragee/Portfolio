@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch, onMounted, onUnmounted, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
@@ -8,6 +8,8 @@ const router = useRouter();
 const isCaseStudy = computed(() => route.name === "CaseStudy");
 
 const isMenuOpen = ref(false);
+const isScrolled = ref(false);
+const menuRef = ref<HTMLElement | null>(null);
 
 const navLinks = [
   { label: "Case Studies", to: "/" },
@@ -22,16 +24,79 @@ function goBack() {
 function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value;
 }
+
+function closeMenu() {
+  isMenuOpen.value = false;
+}
+
+// Lock body scroll when menu is open
+watch(isMenuOpen, (open) => {
+  if (open) {
+    document.body.classList.add("menu-open");
+    nextTick(() => {
+      // Focus the first link in the menu
+      const firstLink = menuRef.value?.querySelector("a");
+      firstLink?.focus();
+    });
+  } else {
+    document.body.classList.remove("menu-open");
+  }
+});
+
+// Close menu on route change
+watch(() => route.path, () => {
+  closeMenu();
+});
+
+// Navbar scroll detection
+function onScroll() {
+  isScrolled.value = window.scrollY > 20;
+}
+
+// Keyboard handling for menu
+function onMenuKeydown(e: KeyboardEvent) {
+  if (e.key === "Escape") {
+    closeMenu();
+  }
+  // Focus trap
+  if (e.key === "Tab" && menuRef.value) {
+    const focusableEls = menuRef.value.querySelectorAll<HTMLElement>(
+      'a, button, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstEl = focusableEls[0];
+    const lastEl = focusableEls[focusableEls.length - 1];
+    if (e.shiftKey && document.activeElement === firstEl) {
+      e.preventDefault();
+      lastEl?.focus();
+    } else if (!e.shiftKey && document.activeElement === lastEl) {
+      e.preventDefault();
+      firstEl?.focus();
+    }
+  }
+}
+
+onMounted(() => {
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", onScroll);
+  document.body.classList.remove("menu-open");
+});
 </script>
 
 <template>
   <header
-    class="fixed top-0 left-0 w-full z-50 border-b border-outline flex justify-between items-center px-6 md:px-[120px] py-6"
-    style="
-      background: rgba(249, 249, 248, 0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    "
+    class="fixed top-0 left-0 w-full z-50 border-b border-outline flex justify-between items-center section-padding py-5 md:py-6 transition-all duration-300"
+    :style="{
+      background: isScrolled
+        ? 'rgba(249, 249, 248, 0.96)'
+        : 'rgba(249, 249, 248, 0.88)',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+      borderColor: isScrolled ? '#e5e5e5' : 'transparent',
+    }"
   >
     <!-- Case Study variant: back arrow + project label -->
     <template v-if="isCaseStudy">
@@ -54,14 +119,9 @@ function toggleMenu() {
         >
           <path d="M19 12H5M5 12L12 19M5 12L12 5" />
         </svg>
-        <span
-          class="font-mono text-[11px] tracking-[0.2em] uppercase font-medium"
-          >Index</span
-        >
+        <span class="font-mono text-label uppercase font-medium">Index</span>
       </button>
-      <span
-        class="font-mono text-[11px] tracking-[0.2em] uppercase text-secondary hidden md:block"
-      >
+      <span class="font-mono text-label uppercase text-secondary hidden md:block">
         Case Study
       </span>
     </template>
@@ -78,36 +138,43 @@ function toggleMenu() {
       </router-link>
 
       <nav
-        class="hidden md:flex items-center gap-12"
+        class="hidden md:flex items-center gap-10 lg:gap-12"
         aria-label="Main navigation"
       >
         <router-link
           v-for="link in navLinks"
           :key="link.to"
           :to="link.to"
-          class="font-headline uppercase tracking-[0.2em] text-[11px] font-semibold transition-colors duration-200 no-underline"
+          class="font-headline uppercase text-label font-semibold transition-all duration-300 no-underline relative"
           :class="
             route.path === link.to
-              ? 'text-on-surface border-b border-on-surface pb-1'
+              ? 'text-on-surface'
               : 'text-secondary hover:text-on-surface'
           "
           :id="`nav-${link.label.toLowerCase().replace(/\s+/g, '-')}`"
         >
           {{ link.label }}
+          <!-- Animated underline indicator -->
+          <span
+            class="absolute left-0 -bottom-1 h-px bg-on-surface transition-all duration-300"
+            :class="route.path === link.to ? 'w-full' : 'w-0'"
+          ></span>
         </router-link>
       </nav>
 
       <div
-        class="font-headline uppercase tracking-[0.2em] text-[11px] font-semibold text-on-surface hidden md:block opacity-50"
+        class="font-headline uppercase text-label font-semibold text-on-surface hidden lg:block opacity-50"
       >
         VUE3 / TS / NODE
       </div>
 
       <!-- Mobile menu button -->
       <button
-        class="md:hidden flex flex-col justify-center items-center w-8 h-8 z-[60] bg-transparent border-none p-0 cursor-pointer text-on-surface"
+        class="md:hidden flex flex-col justify-center items-center w-10 h-10 z-[60] bg-transparent border-none p-0 cursor-pointer text-on-surface -mr-1"
         @click="toggleMenu"
-        aria-label="Toggle menu"
+        :aria-label="isMenuOpen ? 'Close menu' : 'Open menu'"
+        :aria-expanded="isMenuOpen"
+        aria-controls="mobile-menu"
       >
         <span
           class="block w-6 h-[2px] bg-current transition-transform duration-300 origin-center"
@@ -126,28 +193,59 @@ function toggleMenu() {
   </header>
 
   <!-- Mobile Menu Overlay -->
-  <div
-    v-show="isMenuOpen"
-    class="fixed inset-0 z-40 flex flex-col items-center justify-center gap-12 md:hidden"
-    style="
-      background: rgba(249, 249, 248, 0.98);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    "
-  >
-    <router-link
-      v-for="link in navLinks"
-      :key="link.to"
-      :to="link.to"
-      class="font-headline uppercase tracking-[0.2em] text-2xl font-semibold transition-colors duration-200 no-underline"
-      :class="
-        route.path === link.to
-          ? 'text-on-surface border-b-2 border-on-surface pb-1'
-          : 'text-secondary hover:text-on-surface'
+  <Transition name="mobile-menu">
+    <div
+      v-if="isMenuOpen"
+      ref="menuRef"
+      id="mobile-menu"
+      class="fixed inset-0 z-40 flex flex-col items-center justify-center gap-10 md:hidden"
+      style="
+        background: rgba(249, 249, 248, 0.98);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
       "
-      @click="isMenuOpen = false"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Navigation menu"
+      @keydown="onMenuKeydown"
     >
-      {{ link.label }}
-    </router-link>
-  </div>
+      <router-link
+        v-for="link in navLinks"
+        :key="link.to"
+        :to="link.to"
+        class="font-headline uppercase tracking-[0.15em] text-2xl font-semibold transition-all duration-300 no-underline"
+        :class="
+          route.path === link.to
+            ? 'text-on-surface'
+            : 'text-secondary hover:text-on-surface'
+        "
+        @click="closeMenu"
+      >
+        {{ link.label }}
+      </router-link>
+
+      <!-- Tech stack label in mobile menu -->
+      <span class="font-mono text-label uppercase text-secondary opacity-40 mt-8">
+        VUE3 / TS / NODE
+      </span>
+    </div>
+  </Transition>
 </template>
+
+<style scoped>
+/* Mobile menu transition */
+.mobile-menu-enter-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.mobile-menu-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.mobile-menu-enter-from {
+  opacity: 0;
+  transform: translateY(-12px);
+}
+.mobile-menu-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+</style>

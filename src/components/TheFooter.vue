@@ -4,13 +4,13 @@ const currentYear = new Date().getFullYear()
 
 <template>
   <footer
-    class="bg-surface border-t border-outline flex flex-col md:flex-row justify-between items-center px-6 md:px-[120px] py-10 w-full font-mono text-[11px] tracking-[0.3em] uppercase"
+    class="bg-surface border-t border-outline flex flex-col md:flex-row justify-between items-center section-padding py-8 md:py-10 w-full font-mono text-label uppercase"
     role="contentinfo"
   >
-    <div class="text-on-surface font-bold mb-6 md:mb-0">
+    <div class="text-on-surface font-bold mb-4 md:mb-0">
       &copy;{{ currentYear }} ENGINEERED PRECISION
     </div>
-    <div class="flex gap-12">
+    <div class="flex flex-wrap justify-center gap-6 md:gap-10">
       <a
         href="https://github.com/Araragi"
         target="_blank"

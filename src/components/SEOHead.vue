@@ -13,22 +13,24 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: 'Your Name - Front-end Developer Portfolio',
-  description: 'Portfolio showcasing modern web development projects built with Vue 3, TypeScript, and cutting-edge technologies. Specializing in creating beautiful, performant, and accessible web applications.',
+  title: 'ARCHITECT.VUE — Frontend Engineer Portfolio',
+  description: 'Portfolio of Dex — Senior Vue.js & TypeScript engineer specializing in scalable web architectures, design systems, and performance optimization.',
   image: '/og-image.jpg',
-  url: 'https://yourportfolio.com',
+  url: 'https://architect-vue.vercel.app',
   type: 'website',
   twitterCard: 'summary_large_image',
-  author: 'Your Name',
+  author: 'Dex Gonzales',
   keywords: () => [
     'web developer',
     'front-end developer',
     'vue developer',
     'typescript developer',
     'portfolio',
-    'web design',
+    'web architecture',
     'ui/ux',
-    'react developer'
+    'vue 3',
+    'pinia',
+    'design systems'
   ]
 })
 
@@ -53,7 +55,7 @@ useHead({
     { property: 'og:image', content: props.image },
     { property: 'og:image:width', content: '1200' },
     { property: 'og:image:height', content: '630' },
-    { property: 'og:site_name', content: props.title },
+    { property: 'og:site_name', content: 'ARCHITECT.VUE' },
     { property: 'og:locale', content: 'en_US' },
 
     // Twitter
@@ -62,11 +64,10 @@ useHead({
     { name: 'twitter:title', content: props.title },
     { name: 'twitter:description', content: props.description },
     { name: 'twitter:image', content: props.image },
-    { name: 'twitter:creator', content: '@yourusername' },
 
-    // Theme Color
-    { name: 'theme-color', content: '#0ea5e9' },
-    { name: 'msapplication-TileColor', content: '#0ea5e9' },
+    // Theme Color — matches palette
+    { name: 'theme-color', content: '#111111' },
+    { name: 'msapplication-TileColor', content: '#111111' },
 
     // Mobile
     { name: 'viewport', content: 'width=device-width, initial-scale=1.0, maximum-scale=5.0' },
@@ -95,12 +96,11 @@ useHead({
         name: props.author,
         url: props.url,
         image: props.image,
-        jobTitle: 'Front-end Developer',
+        jobTitle: 'Senior Front-end Developer',
         description: props.description,
         sameAs: [
-          'https://github.com/yourusername',
-          'https://linkedin.com/in/yourusername',
-          'https://twitter.com/yourusername'
+          'https://github.com/Araragee',
+          'https://linkedin.com/in/davxloper'
         ]
       })
     }

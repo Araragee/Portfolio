@@ -15,7 +15,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <main class="pt-40" id="main-content">
+  <main class="pt-28 md:pt-40" id="main-content">
     <HeroSection />
     <TechMarquee />
     <ProjectsArchive />

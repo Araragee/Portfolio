@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111111" />
     <meta
       name="description"
       content="Portfolio of Dex — Frontend engineer specialising in Vue 3, TypeScript, and modern web architecture."
@@ -12,6 +13,10 @@
       name="keywords"
       content="web developer, front-end developer, vue.js, typescript, portfolio, architect"
     />
+    <!-- Preconnect to font origins for faster loading -->
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Fontshare: Clash Display + Switzer -->
     <link
       href="https://api.fontshare.com/v2/css?f[]=clash-display@700,600,400,500,300&f[]=switzer@600,800,900,400,300,500,700&display=swap"
@@ -25,6 +30,8 @@
     <title>ARCHITECT.VUE — Frontend Engineer</title>
   </head>
   <body>
+    <!-- Skip to content link for keyboard/screen reader users -->
+    <a href="#main-content" class="skip-link">Skip to content</a>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

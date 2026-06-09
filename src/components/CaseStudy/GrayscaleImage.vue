@@ -18,7 +18,10 @@ defineProps<{
         :src="src"
         :alt="alt"
         class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 group-hover:scale-[1.01]"
+        width="1200"
+        height="800"
         loading="lazy"
+        decoding="async"
       />
     </div>
     <figcaption
