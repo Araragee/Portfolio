@@ -1,13 +1,7 @@
 <script setup lang="ts">
-const techs = [
-  "VUE3",
-  "TYPESCRIPT",
-  "VITE",
-  "PINIA",
-  "REACT",
-  "NODE.JS",
-  "TAILWIND",
-];
+import { siteConfig } from '@/data/siteConfig'
+
+const techs = siteConfig.techs
 </script>
 
 <template>

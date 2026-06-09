@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useStaggerAnimation } from '@/composables/useScrollAnimation'
+import { siteConfig } from '@/data/siteConfig'
 
-// Hero availability status — update as needed
-const availability = 'AVAILABLE FOR OPPORTUNITIES'
-const location = 'Philippines — Remote'
+const availability = siteConfig.hero.availability
+const location = siteConfig.hero.location
 
 const { containerRef } = useStaggerAnimation({ threshold: 0.15 })
 </script>
@@ -25,17 +25,15 @@ const { containerRef } = useStaggerAnimation({ threshold: 0.15 })
         data-stagger
         id="hero-heading"
         class="font-headline font-bold text-display-xl text-on-surface uppercase"
+        v-html="siteConfig.hero.headline"
       >
-        Senior Vue.js<br />&amp; TS Engineer
       </h1>
     </div>
 
     <div data-stagger class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-end">
       <div class="md:col-span-8">
         <p class="text-subheading max-w-2xl font-normal text-on-surface/80">
-          Building hyper-efficient, structurally sound web architectures
-          with TypeScript and Vue. Focusing on technical precision
-          and performance optimization.
+          {{ siteConfig.hero.description }}
         </p>
       </div>
       <div class="md:col-span-4 flex justify-start md:justify-end">

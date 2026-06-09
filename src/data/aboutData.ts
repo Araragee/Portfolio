@@ -257,6 +257,13 @@ export const socialLinks: SocialLink[] = [
     color: "hover:text-gray-900 dark:hover:text-white",
   },
   {
+    platform: "LinkedIn",
+    url: "https://linkedin.com/in/davxloper",
+    icon: "linkedin",
+    username: "@davxloper",
+    color: "hover:text-blue-500 dark:hover:text-blue-400",
+  },
+  {
     platform: "Email",
     url: "mailto:davxgonzales@gmail.com",
     icon: "email",

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue'
 import { useScrollAnimation, useStaggerAnimation } from '@/composables/useScrollAnimation'
+import { siteConfig } from '@/data/siteConfig'
+import { timeline as aboutTimeline, personalInfo } from '@/data/aboutData'
 
 useSeoMeta({
-  title: 'Manifesto — ARCHITECT.VUE',
+  title: `Manifesto — ${siteConfig.brandName}`,
   description: 'Engineering philosophy, chronology, and technical pillars of a senior Vue.js & TypeScript architect.',
 })
 
@@ -11,62 +13,20 @@ const { elementRef: heroRef } = useScrollAnimation({ threshold: 0.1 })
 const { containerRef: timelineRef } = useStaggerAnimation({ staggerDelay: 120 })
 const { containerRef: pillarsRef } = useStaggerAnimation({ staggerDelay: 100 })
 
-interface TimelineEntry {
-  period: string
-  title: string
-  company: string
-  description: string
-}
+// Map timeline from central aboutData to match page rendering structure
+const timeline = aboutTimeline.map(item => {
+  const periodStr = item.period.end === 'Present'
+    ? `${item.period.start} — PRES.`
+    : `${item.period.start} — ${item.period.end.toUpperCase()}`
+  return {
+    period: periodStr,
+    title: item.title,
+    company: item.organization,
+    description: item.description
+  }
+})
 
-interface Pillar {
-  number: string
-  heading: string
-  body: string
-}
-
-const timeline: TimelineEntry[] = [
-  {
-    period: 'OCT 2023 — PRES.',
-    title: 'Front-end Developer',
-    company: 'Philippine Statistics Authority — Central Office',
-    description: 'Lead front-end for the CBMS Portal — the analyst-facing surface for Community-Based Monitoring System data across the Philippines. Vue 3, TypeScript, Pinia, Vuetify, ECharts, and D3 on the client; Laravel on the server.'
-  },
-  {
-    period: 'MAR — MAY 2023',
-    title: 'Web Designer / UI-UX Junior Intern',
-    company: 'iPhitech — Clark, Pampanga',
-    description: 'OJT internship focused on web design, UI/UX, and front-end prototyping. Produced responsive marketing pages and translated Figma mockups into production HTML/CSS.'
-  },
-  {
-    period: '2019 — JUL 2023',
-    title: 'BS Computer Science',
-    company: 'Tarlac State University',
-    description: 'Graduated July 2023. Built the foundation in software engineering, algorithms, and web technologies that underpins all production work since.'
-  },
-]
-
-const pillars: Pillar[] = [
-  {
-    number: 'Pillar 01',
-    heading: 'Structural Integrity',
-    body: 'Code should reflect the physical world. Clean abstractions and modular patterns ensure a system that can withstand the weight of expansion without collapse. TypeScript strict mode is non-negotiable.',
-  },
-  {
-    number: 'Pillar 02',
-    heading: 'Aggressive Minimalism',
-    body: 'Subtract until only the essential remains. If a feature does not clarify the user\'s intent, it is noise. If a line of code does not earn its existence, it is deleted.',
-  },
-  {
-    number: 'Pillar 03',
-    heading: 'Performance as Design',
-    body: 'A slow interface is a broken interface. Bundle size, render blocking, and layout shift are design decisions — not afterthoughts for the DevOps team.',
-  },
-  {
-    number: 'Pillar 04',
-    heading: 'Composable Architecture',
-    body: 'The Vue 3 Composition API changed my thinking about software. Logic should be composable, testable, and portable. Components should be declarative. State should have a single owner.',
-  },
-]
+const pillars = siteConfig.manifesto.pillars
 </script>
 
 <template>
@@ -93,8 +53,8 @@ const pillars: Pillar[] = [
           </p>
           <p class="text-body leading-relaxed font-body text-secondary">
             Every pixel must earn its right to exist. Every function must serve a singular,
-            irreducible purpose. We do not build for the moment — we build for the continuum,
-            creating architectural patterns that resist the erosion of shifting trends.
+            irreducible purpose. We do not build for the continuum — we create architectural
+            patterns that resist the erosion of shifting trends.
           </p>
         </div>
       </section>
@@ -108,6 +68,7 @@ const pillars: Pillar[] = [
           >
             Chronology
           </h2>
+          <!-- TODO: Phase 2 - Replace coming soon placeholder with actual PDF link or download flow -->
           <span
             class="btn-monolith px-5 py-2.5 opacity-40 cursor-not-allowed select-none"
             title="Resume coming soon"
@@ -160,8 +121,8 @@ const pillars: Pillar[] = [
       <!-- Decorative Architecture Image -->
       <figure class="mb-20 md:mb-24 border border-outline p-1.5 md:p-2 bg-white" aria-label="Architectural reference">
         <img
-          src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=80"
-          alt="Minimalist brutalist architecture — clean geometric forms against a pale sky"
+          :src="siteConfig.manifesto.referenceImage.url"
+          :alt="siteConfig.manifesto.referenceImage.alt"
           class="w-full grayscale contrast-125 brightness-95 hover:grayscale-0 transition-all duration-700"
           width="1200"
           height="800"
@@ -169,7 +130,7 @@ const pillars: Pillar[] = [
           decoding="async"
         />
         <figcaption class="mt-3 md:mt-4 font-mono text-label text-secondary uppercase text-center">
-          Structural Reference: Brutalist Precision, 2026
+          {{ siteConfig.manifesto.referenceImage.caption }}
         </figcaption>
       </figure>
 
@@ -182,7 +143,7 @@ const pillars: Pillar[] = [
           Build with Precision
         </h2>
         <a
-          href="mailto:davxgonzales@gmail.com"
+          :href="`mailto:${personalInfo.contact.email}`"
           class="inline-flex items-center gap-4 border-b border-surface pb-2 font-mono text-caption uppercase hover:opacity-70 transition-opacity no-underline text-surface"
           id="manifesto-contact-link"
           aria-label="Contact me"

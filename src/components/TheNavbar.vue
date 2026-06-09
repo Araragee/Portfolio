@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted, onUnmounted, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { siteConfig } from "@/data/siteConfig";
 
 const route = useRoute();
 const router = useRouter();
@@ -134,7 +135,7 @@ onUnmounted(() => {
         id="site-logo-link"
         aria-label="Home"
       >
-        ARCHITECT.VUE
+        {{ siteConfig.brandName }}
       </router-link>
 
       <nav
@@ -165,7 +166,7 @@ onUnmounted(() => {
       <div
         class="font-headline uppercase text-label font-semibold text-on-surface hidden lg:block opacity-50"
       >
-        VUE3 / TS / NODE
+        {{ siteConfig.techStackSubtitle }}
       </div>
 
       <!-- Mobile menu button -->
@@ -226,7 +227,7 @@ onUnmounted(() => {
 
       <!-- Tech stack label in mobile menu -->
       <span class="font-mono text-label uppercase text-secondary opacity-40 mt-8">
-        VUE3 / TS / NODE
+        {{ siteConfig.techStackSubtitle }}
       </span>
     </div>
   </Transition>

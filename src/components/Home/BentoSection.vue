@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { useScrollAnimation, useStaggerAnimation } from "@/composables/useScrollAnimation";
+import { siteConfig } from "@/data/siteConfig";
 
 const router = useRouter();
 const { elementRef: sectionRef } = useScrollAnimation({ threshold: 0.1 });
@@ -10,14 +11,8 @@ function goManifesto() {
   router.push("/manifesto");
 }
 
-const expertise = [
-  { label: "Enterprise Vue 3", years: "3+ YRS" },
-  { label: "TypeScript Arch", years: "3+ YRS" },
-  { label: "Node.js Ecosystem", years: "2+ YRS" },
-  { label: "Design Systems", years: "2+ YRS" },
-];
-
-const technologies = ["VUE 3", "REACT", "PINIA", "VITE", "NODE"];
+const expertise = siteConfig.bento.expertise;
+const technologies = siteConfig.bento.technologies;
 </script>
 
 <template>
@@ -38,16 +33,13 @@ const technologies = ["VUE 3", "REACT", "PINIA", "VITE", "NODE"];
         <h2
           id="philosophy-heading"
           class="font-headline font-bold text-heading-xl uppercase leading-none"
+          v-html="siteConfig.bento.philosophyTitle"
         >
-          Code as<br />Architecture
         </h2>
         <p
           class="text-body font-normal text-on-surface/70 leading-relaxed max-w-md font-body"
         >
-          I believe software should be built with the same longevity and
-          structural integrity as physical landmarks. Clean, maintainable
-          TypeScript isn't just a preference — it's a requirement for systems
-          that intend to last.
+          {{ siteConfig.bento.philosophyBody }}
         </p>
       </div>
       <button

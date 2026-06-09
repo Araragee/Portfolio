@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue'
+import { siteConfig } from '@/data/siteConfig'
+import { socialLinks } from '@/data/aboutData'
 
 interface Props {
   title?: string
@@ -13,25 +15,14 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: 'ARCHITECT.VUE — Frontend Engineer Portfolio',
-  description: 'Portfolio of Dex — Senior Vue.js & TypeScript engineer specializing in scalable web architectures, design systems, and performance optimization.',
+  title: siteConfig.seo.defaultTitle,
+  description: siteConfig.seo.description,
   image: '/og-image.jpg',
-  url: 'https://architect-vue.vercel.app',
+  url: siteConfig.seo.url,
   type: 'website',
   twitterCard: 'summary_large_image',
-  author: 'Dex Gonzales',
-  keywords: () => [
-    'web developer',
-    'front-end developer',
-    'vue developer',
-    'typescript developer',
-    'portfolio',
-    'web architecture',
-    'ui/ux',
-    'vue 3',
-    'pinia',
-    'design systems'
-  ]
+  author: siteConfig.seo.author,
+  keywords: () => siteConfig.seo.keywords
 })
 
 // Use unhead for meta tags management
@@ -55,7 +46,7 @@ useHead({
     { property: 'og:image', content: props.image },
     { property: 'og:image:width', content: '1200' },
     { property: 'og:image:height', content: '630' },
-    { property: 'og:site_name', content: 'ARCHITECT.VUE' },
+    { property: 'og:site_name', content: siteConfig.brandName },
     { property: 'og:locale', content: 'en_US' },
 
     // Twitter
@@ -96,12 +87,11 @@ useHead({
         name: props.author,
         url: props.url,
         image: props.image,
-        jobTitle: 'Senior Front-end Developer',
+        jobTitle: siteConfig.seo.jobTitle,
         description: props.description,
-        sameAs: [
-          'https://github.com/Araragee',
-          'https://linkedin.com/in/davxloper'
-        ]
+        sameAs: socialLinks
+          .filter(link => link.url.startsWith('http'))
+          .map(link => link.url)
       })
     }
   ]

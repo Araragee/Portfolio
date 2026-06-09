@@ -1,14 +1,27 @@
 <script setup lang="ts">
 import { useScrollAnimation } from '@/composables/useScrollAnimation'
+import { socialLinks } from '@/data/aboutData'
 
 const { elementRef } = useScrollAnimation({ threshold: 0.1 })
 
-// CTA contact links
-const contactLinks = [
-  { label: 'davxgonzales@gmail.com', href: 'mailto:davxgonzales@gmail.com', id: 'cta-email-link' },
-  { label: 'GitHub', href: 'https://github.com/Araragee', id: 'cta-github-link', external: true },
-  { label: 'LinkedIn', href: 'https://linkedin.com/in/davxloper', id: 'cta-linkedin-link', external: true },
-]
+// CTA contact links mapped dynamically from centralized aboutData socials
+const contactLinks = socialLinks.map(link => {
+  if (link.platform === 'Email') {
+    return {
+      label: link.url.replace('mailto:', ''),
+      href: link.url,
+      id: 'cta-email-link',
+      external: false
+    }
+  } else {
+    return {
+      label: link.platform,
+      href: link.url,
+      id: `cta-${link.platform.toLowerCase()}-link`,
+      external: true
+    }
+  }
+})
 </script>
 
 <template>

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { siteConfig } from '@/data/siteConfig'
+import { socialLinks } from '@/data/aboutData'
+
 const currentYear = new Date().getFullYear()
 </script>
 
@@ -8,36 +11,20 @@ const currentYear = new Date().getFullYear()
     role="contentinfo"
   >
     <div class="text-on-surface font-bold mb-4 md:mb-0">
-      &copy;{{ currentYear }} ENGINEERED PRECISION
+      &copy;{{ currentYear }} {{ siteConfig.brandName }}
     </div>
     <div class="flex flex-wrap justify-center gap-6 md:gap-10">
       <a
-        href="https://github.com/Araragi"
-        target="_blank"
-        rel="noopener noreferrer"
+        v-for="link in socialLinks"
+        :key="link.platform"
+        :href="link.url"
+        :target="link.platform !== 'Email' ? '_blank' : undefined"
+        :rel="link.platform !== 'Email' ? 'noopener noreferrer' : undefined"
         class="text-secondary hover:text-on-surface transition-all duration-300 no-underline"
-        id="footer-github-link"
-        aria-label="GitHub profile"
+        :id="`footer-${link.platform.toLowerCase()}-link`"
+        :aria-label="link.platform === 'Email' ? 'Send email' : `${link.platform} profile`"
       >
-        GitHub
-      </a>
-      <a
-        href="https://linkedin.com/in/davxloper"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-secondary hover:text-on-surface transition-all duration-300 no-underline"
-        id="footer-linkedin-link"
-        aria-label="LinkedIn profile"
-      >
-        LinkedIn
-      </a>
-      <a
-        href="mailto:davxgonzales@gmail.com"
-        class="text-secondary hover:text-on-surface transition-all duration-300 no-underline"
-        id="footer-email-link"
-        aria-label="Send email"
-      >
-        Contact
+        {{ link.platform === 'Email' ? 'Contact' : link.platform }}
       </a>
     </div>
   </footer>
