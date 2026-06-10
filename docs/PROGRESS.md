@@ -27,12 +27,20 @@ Agent continuity file. Read this + `docs/PLAN.md` + root `CLAUDE.md` to resume.
       `vendor-three`: 210.53 KB gz (budget ≤ 220 KB) ✅
       First-load JS: ~88 KB gz (budget ≤ 110 KB) ✅
 
-### Phase 8 — next
-- [ ] Route swap: journey → `/`; old HomePage demoted
-- [ ] Navbar/footer restyle to journey idiom
-- [ ] Case study pages particle echo (same canvas, static formation)
-- [ ] Full a11y audit (keyboard, headings, contrast, reduced-motion)
-- [ ] 12-principles audit on all DOM animations
+### Phase 8 ✅ (mostly done — audits outstanding)
+- [x] Route swap: `/` → Journey; `/journey` → redirect; old HomePage → `/home`
+- [x] Footer hidden on journey route (`App.vue v-if`)
+- [x] Navbar: transparent on journey, no border, 2 links instead of 3
+- [x] Case study particle echo: `CaseStudyCanvas.vue` + `CaseStudyField.vue`
+      scatter formation, 1500 particles cap, lazy-loaded (same vendor-three chunk)
+- [ ] Full a11y audit (keyboard, headings, contrast, reduced-motion) — TODO
+- [ ] 12-principles audit on all DOM animations — TODO
+
+### Phase 9 — QA & launch (next after audits)
+- [ ] Cross-browser: Chrome, Safari (incl. iOS), Firefox
+- [ ] Devices: mid Android, older iPhone, 4K desktop
+- [ ] 404/SPA fallback config (gh-pages/netlify/vercel)
+- [ ] Rollback plan: tag pre-launch commit
 
 ### Phase 9 — QA & launch
 - [ ] Cross-browser: Chrome, Safari (incl. iOS), Firefox

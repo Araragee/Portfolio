@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSeoMeta } from '@unhead/vue'
 import { getProjectBySlug, getNextProject } from '@/data/projectsData'
@@ -7,6 +7,14 @@ import GrayscaleImage from '@/components/CaseStudy/GrayscaleImage.vue'
 import NextProjectFooter from '@/components/CaseStudy/NextProjectFooter.vue'
 import ProjectBrowser from '@/components/CaseStudy/ProjectBrowser.vue'
 import { useScrollAnimation } from '@/composables/useScrollAnimation'
+import { useWebGLSupport } from '@/composables/useWebGLSupport'
+
+// Lazy: same vendor-three chunk as journey — never blocks first paint
+const CaseStudyCanvas = defineAsyncComponent(
+  () => import('@/components/CaseStudy/CaseStudyCanvas.vue'),
+)
+
+const { webglSupported } = useWebGLSupport()
 
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
@@ -40,6 +48,8 @@ useSeoMeta({
 
     <!-- Case study content -->
     <template v-else>
+      <!-- Particle echo: fixed behind hero panel (one context per page) -->
+      <CaseStudyCanvas v-if="webglSupported" />
       <div class="flex flex-col lg:flex-row min-h-screen relative">
         <!-- Left Panel: Sticky Metadata (30%) -->
         <aside

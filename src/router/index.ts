@@ -3,17 +3,22 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 const routes: Array<RouteRecordRaw> = [
   {
+    // Phase 8: journey is now the home — docs/PLAN.md §Phase 8
     path: '/',
-    name: 'Home',
-    component: () => import('@/views/HomePage.vue'),
-    meta: { title: "Dave Gonzales — Vue.js & TypeScript Developer" }
-  },
-  {
-    // "The Long Way Around" redesign — replaces '/' once Phases 1–8 land (docs/PLAN.md)
-    path: '/journey',
     name: 'Journey',
     component: () => import('@/views/JourneyPage.vue'),
     meta: { title: "The Long Way Around — Dave Gonzales" }
+  },
+  {
+    path: '/journey',
+    redirect: '/'
+  },
+  {
+    // Demoted: kept at /home until Phase 9 sign-off (do not delete — PLAN.md)
+    path: '/home',
+    name: 'Home',
+    component: () => import('@/views/HomePage.vue'),
+    meta: { title: "Dave Gonzales — Vue.js & TypeScript Developer" }
   },
   {
     path: '/manifesto',

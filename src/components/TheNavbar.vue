@@ -6,6 +6,7 @@ const route = useRoute();
 const router = useRouter();
 
 const isCaseStudy = computed(() => route.name === "CaseStudy");
+const isJourney = computed(() => route.name === "Journey");
 
 const isMenuOpen = ref(false);
 const isScrolled = ref(false);
@@ -13,11 +14,20 @@ const isHidden = ref(false);
 let lastScrollY = 0;
 const menuRef = ref<HTMLElement | null>(null);
 
-const navLinks = [
-  { label: "Case Studies", to: "/" },
-  { label: "How I work", to: "/manifesto" },
-  { label: "Personal", to: "/personal" },
-];
+// On journey: drop "Case Studies" — you're already on it.
+// On other pages: full list, pointing back to '/' (the journey/home).
+const navLinks = computed(() =>
+  isJourney.value
+    ? [
+        { label: "How I work", to: "/manifesto" },
+        { label: "Personal", to: "/personal" },
+      ]
+    : [
+        { label: "Case Studies", to: "/" },
+        { label: "How I work", to: "/manifesto" },
+        { label: "Personal", to: "/personal" },
+      ],
+);
 
 function goBack() {
   router.push("/");
@@ -98,14 +108,14 @@ onUnmounted(() => {
 
 <template>
   <header
-    class="fixed top-0 left-0 w-full z-50 border-b border-outline flex justify-between items-center section-padding py-5 md:py-6 transition-all duration-300"
+    class="fixed top-0 left-0 w-full z-50 border-b flex justify-between items-center section-padding py-5 md:py-6 transition-all duration-300"
     :style="{
-      background: isScrolled
-        ? 'rgba(249, 249, 248, 0.96)'
-        : 'rgba(249, 249, 248, 0.88)',
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
-      borderColor: isScrolled ? '#e5e5e5' : 'transparent',
+      background: isJourney
+        ? (isScrolled ? 'rgba(249,249,248,0.75)' : 'transparent')
+        : (isScrolled ? 'rgba(249,249,248,0.96)' : 'rgba(249,249,248,0.88)'),
+      backdropFilter: isJourney && !isScrolled ? 'none' : 'blur(12px)',
+      WebkitBackdropFilter: isJourney && !isScrolled ? 'none' : 'blur(12px)',
+      borderColor: isScrolled && !isJourney ? '#e5e5e5' : 'transparent',
       transform: isHidden ? 'translateY(-100%)' : 'translateY(0)',
     }"
   >

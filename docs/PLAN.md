@@ -114,15 +114,14 @@ Everything below exists and is verified working:
 **Accept:** dither on = same fps tier as dither off on a mid mobile device;
 budgets green; fallback visually coherent.
 
-## Phase 8 — Make it the site
+## Phase 8 — Make it the site (partial ✅)
 
 **Goal:** journey becomes `/`.
 
-- [ ] Route swap: journey → `/`; old HomePage demoted (keep file until Phase 9
-      sign-off; do not delete without explicit approval)
-- [ ] Navbar/footer restyle to journey idiom; CTA section folds into epilogue
-- [ ] Case study pages get a lightweight particle echo on their hero (same
-      canvas component, single static formation — still one context per page)
+- [x] Route swap: journey → `/`; old HomePage demoted to `/home`
+- [x] Footer hidden on journey; navbar transparent/minimal on journey
+- [x] Case study pages get a lightweight particle echo on their hero
+      (`CaseStudyCanvas.vue` + `CaseStudyField.vue`, scatter formation, lazy-loaded)
 - [ ] Full a11y audit (keyboard, headings, contrast, reduced-motion)
 - [ ] 12-principles audit on all DOM animations (`/12-principles-of-animation`)
 

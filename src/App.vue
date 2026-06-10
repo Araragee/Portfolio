@@ -6,6 +6,7 @@ import TheFooter from '@/components/TheFooter.vue'
 
 const route = useRoute()
 const routeKey = computed(() => route.path)
+const isJourney = computed(() => route.name === 'Journey')
 </script>
 
 <template>
@@ -15,5 +16,6 @@ const routeKey = computed(() => route.path)
       <component :is="Component" :key="routeKey" />
     </Transition>
   </router-view>
-  <TheFooter />
+  <!-- Footer hidden on journey — the epilogue chapter serves as the ending -->
+  <TheFooter v-if="!isJourney" />
 </template>
