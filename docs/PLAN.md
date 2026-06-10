@@ -41,7 +41,7 @@ Everything below exists and is verified working:
 
 **Goal:** chapters read as a story, not stacked sections.
 
-- [x] Text reveal: IntersectionObserver + anime.js (stagger 40ms, duration 450ms, easeOutCubic, once:true)
+- [x] Text reveal: IntersectionObserver + anime.js (stagger 40ms, duration 300ms, easeOutCubic, once:true; trimmed from 450ms in Phase 8 audit)
 - [x] Layout offsets: field slides opposite text column (see also TWEAKS/A)
 - [x] Progress rail: live `{{ scrollPercent }}%` + 7 chapter tick squares
 - [ ] Anchor deep-links: `/journey#psa` → Lenis scrollTo _(deferred — not blocking)_
@@ -137,7 +137,7 @@ budgets green; fallback visually coherent.
 - [x] Pre-launch tag: `v1.0.0-pre-launch` created
 - [ ] Choose host (gh-pages / Netlify / Vercel) + document in CLAUDE.md
 - [ ] Lighthouse /journey ≥ 90 perf
-- [ ] Decide: keep `/home` or delete old `HomePage.vue`
+- [x] Delete old `HomePage.vue` + Home components (done — journey is the only home)
 
 ---
 
