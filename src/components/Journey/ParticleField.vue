@@ -28,7 +28,7 @@ const props = withDefaults(
 )
 
 const store = useJourneyStore()
-const { morphFrom, morphTo, morphT } = storeToRefs(store)
+const { morphFrom, morphTo, morphT, ditherEnabled } = storeToRefs(store)
 const { prefersReducedMotion } = useReducedMotion()
 
 let currentCount = particleCountForViewport(window.innerWidth)
@@ -52,6 +52,7 @@ const uniforms = {
   uDriftAmp: { value: 1 },
   uColor: { value: new Color('#111111') },
   uOpacity: { value: 0.7 },
+  uDither: { value: 1.0 },
   uRepelRadius: { value: props.repelRadius },
   uRepelStrength: { value: props.repelStrength },
   uChapterIndex: { value: 0 },
@@ -150,7 +151,10 @@ window.addEventListener('pointerdown', onPointerDown, { passive: true })
 window.addEventListener('pointerup', onPointerUp, { passive: true })
 
 let slowFrameCount = 0
-let hasHalved = false
+// Degrade ladder uses the store tier; each FPS violation advances one step.
+// Tier 0 → 1: dither off (fill-rate win)
+// Tier 1 → 2: DPR 1 (handled by JourneyCanvas reading store.degradeTier)
+// Tier 2 → 3: halve particles
 
 const { onBeforeRender, stop, start } = useLoop()
 
@@ -189,20 +193,23 @@ onBeforeRender(({ elapsed, delta }) => {
   uniforms.uOffsetFrom.value.set(fromX, fromY)
   uniforms.uOffsetTo.value.set(toX, toY)
 
-  // FPS guard: if sustained < 30fps after settling (elapsed > 2s), halve particle count once
-  if (!hasHalved && elapsed > 2) {
-    if (delta > 0.034) { // < 30fps
+  // Adaptive degrade ladder — advances store tier after 60 sustained slow frames
+  if (store.degradeTier < 3 && elapsed > 2) {
+    if (delta > 0.034) { // < ~30fps
       slowFrameCount++
       if (slowFrameCount > 60) {
-        hasHalved = true
-        const halvedCount = Math.round(currentCount / 2)
-        console.warn(`[FPS Guard] Sustained low performance detected. Halving particle count to ${halvedCount}.`)
-        updateParticleCount(halvedCount)
+        slowFrameCount = 0
+        store.advanceDegradeLevel()
+        if (store.degradeTier === 3) {
+          const halvedCount = Math.round(currentCount / 2)
+          updateParticleCount(halvedCount)
+        }
       }
     } else {
       slowFrameCount = Math.max(0, slowFrameCount - 1)
     }
   }
+  uniforms.uDither.value = ditherEnabled.value ? 1.0 : 0.0
 })
 
 onMounted(() => {

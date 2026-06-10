@@ -119,11 +119,47 @@ void main() {
 export const particleFragmentShader = /* glsl */ `
 uniform vec3 uColor;
 uniform float uOpacity;
+uniform float uDither;
 
 varying float vAlpha;
 
+// Bayer 4×4 ordered dither using float comparisons only (avoids constant
+// array literals which are unsupported in WebKit GLSL ES 3.0).
+// Returns threshold in [0,1] for the given screen-space position.
+float bayerThreshold(vec2 fragCoord) {
+  float x = mod(floor(fragCoord.x), 4.0);
+  float y = mod(floor(fragCoord.y), 4.0);
+  float v = 0.0;
+  if (x < 1.0) {
+    if (y < 1.0)      v =  0.0;
+    else if (y < 2.0) v = 12.0;
+    else if (y < 3.0) v =  3.0;
+    else              v = 15.0;
+  } else if (x < 2.0) {
+    if (y < 1.0)      v =  8.0;
+    else if (y < 2.0) v =  4.0;
+    else if (y < 3.0) v = 11.0;
+    else              v =  7.0;
+  } else if (x < 3.0) {
+    if (y < 1.0)      v =  2.0;
+    else if (y < 2.0) v = 14.0;
+    else if (y < 3.0) v =  1.0;
+    else              v = 13.0;
+  } else {
+    if (y < 1.0)      v = 10.0;
+    else if (y < 2.0) v =  6.0;
+    else if (y < 3.0) v =  9.0;
+    else              v =  5.0;
+  }
+  return (v + 0.5) / 16.0;
+}
+
 void main() {
-  // Square points on purpose — brutalist, reads as dither at distance
-  gl_FragColor = vec4(uColor, uOpacity * vAlpha);
+  float alpha = uOpacity * vAlpha;
+  if (uDither > 0.5) {
+    // 1-bit ordered dither — quantise alpha to 0 or 1 per screen pixel
+    alpha = step(bayerThreshold(gl_FragCoord.xy), alpha);
+  }
+  gl_FragColor = vec4(uColor, alpha);
 }
 `

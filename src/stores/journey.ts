@@ -90,6 +90,16 @@ export const useJourneyStore = defineStore('journey', () => {
     return fieldOffsetFor(journeyChapters[next])
   })
 
+  // --- Phase 7: adaptive degrade ladder ---
+  // Tier 0 = full quality; each step sacrifices one layer to recover fps.
+  // ParticleField drives progression; JourneyCanvas reads dpr.
+  const degradeTier = ref(0)
+  const ditherEnabled = computed(() => degradeTier.value < 1)
+
+  function advanceDegradeLevel(): void {
+    if (degradeTier.value < 3) degradeTier.value++
+  }
+
   // --- Loader readiness (docs/TWEAKS/B-loading-splash.md) ---
   const assetsLoaded = ref(false)        // vendor-three chunk arrived
   const firstFrameRendered = ref(false)  // ParticleField drew a frame
@@ -135,5 +145,8 @@ export const useJourneyStore = defineStore('journey', () => {
     markFirstFrame,
     markFontsLoaded,
     setScrollProgress,
+    degradeTier,
+    ditherEnabled,
+    advanceDegradeLevel,
   }
 })
