@@ -1,0 +1,120 @@
+import type { JourneyChapter } from '@/types/journey'
+
+/**
+ * Chapter content for "The Long Way Around".
+ * Copy is draft quality — Phase 4 (storytelling pass) refines it.
+ * Source of truth for the story: src/data/personalData.ts.
+ */
+export const journeyChapters: JourneyChapter[] = [
+  {
+    id: 'prologue',
+    index: '000',
+    title: 'The long way around',
+    era: 'Prologue',
+    heightVh: 150,
+    morphState: 'scatter',
+    paragraphs: [
+      'I came into software the long way around.',
+      'Dave Gonzales. Frontend engineer. I build interfaces for the data of 110 million people.',
+    ],
+    interactionHint: 'move cursor — the field gives way',
+    morphStart: 0.1,
+    morphEnd: 0.6,
+    cameraZ: 8,
+  },
+  {
+    id: 'student',
+    index: '001',
+    title: 'Recursion at 2am',
+    era: 'CS student',
+    heightVh: 150,
+    morphState: 'tree',
+    paragraphs: [
+      'School gave me the vocabulary, but not the fluency. Lectures, theory, late-night study groups trying to make sense of recursion at 2 AM.',
+      'Fluency came from building. Small projects, broken projects, projects that never shipped — static pages, then jQuery, then Vue.',
+    ],
+    interactionHint: 'hover a branch — it grows one level',
+    morphStart: 0.1,
+    morphEnd: 0.6,
+    cameraZ: 8,
+  },
+  {
+    id: 'internship',
+    index: '002',
+    title: 'First paid pixels',
+    era: 'iPhitech, Clark — Mar–May 2023',
+    heightVh: 150,
+    morphState: 'grid',
+    paragraphs: [
+      'A 3-month web-design internship was the first time I got paid to care about pixels.',
+      'Wireframes, layouts, the discipline of shipping something a client actually sees.',
+    ],
+    interactionHint: 'drag the grid — it springs back',
+    morphStart: 0.1,
+    morphEnd: 0.6,
+    cameraZ: 8,
+  },
+  {
+    id: 'psa-map',
+    index: '003',
+    title: 'The portal',
+    era: 'Philippine Statistics Authority, Oct 2023 — now',
+    heightVh: 150,
+    morphState: 'archipelago',
+    paragraphs: [
+      'By October 2023 I landed at the Philippine Statistics Authority, building the CBMS Portal — community-based monitoring data for the whole country.',
+    ],
+    interactionHint: 'hover a region — particles lift',
+    morphStart: 0.1,
+    morphEnd: 0.8,
+    cameraZ: 7.2,
+  },
+  {
+    id: 'psa-logo',
+    index: '003',
+    title: 'The portal',
+    era: 'Philippine Statistics Authority, Oct 2023 — now',
+    heightVh: 150,
+    morphState: 'psaLogo',
+    paragraphs: [
+      'Vue 3, TypeScript, ECharts. Real scale government systems.',
+      'I built the thing, and became the developer I wanted to be along the way.',
+    ],
+    interactionHint: 'scrub to see the globe spin',
+    morphStart: 0.1,
+    morphEnd: 0.8,
+    cameraZ: 7.2,
+  },
+  {
+    id: 'projects',
+    index: '004',
+    title: 'Side quests',
+    era: 'Freelance + personal projects',
+    heightVh: 150,
+    morphState: 'artifact',
+    paragraphs: [
+      'Off the clock the building continues — freelance Vue work, experiments, this site.',
+      'Each project is a station on the road. Step into one to see the case study.',
+    ],
+    interactionHint: 'click an artifact — route carries the particles with it',
+    morphStart: 0.1,
+    morphEnd: 0.6,
+    cameraZ: 8,
+  },
+  {
+    id: 'epilogue',
+    index: '005',
+    title: 'End of the road',
+    era: 'Epilogue',
+    heightVh: 200,
+    morphState: 'textMass',
+    paragraphs: [
+      'Everything you scrolled past collapses into one word.',
+      'Have a project, a role, or an argument about frame rates? I read every message.',
+    ],
+    interactionHint: 'click the word — it explodes, then reforms',
+    morphStart: 0.3,
+    morphEnd: 0.7,
+    cameraZ: 8,
+  },
+]

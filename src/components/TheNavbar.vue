@@ -9,6 +9,8 @@ const isCaseStudy = computed(() => route.name === "CaseStudy");
 
 const isMenuOpen = ref(false);
 const isScrolled = ref(false);
+const isHidden = ref(false);
+let lastScrollY = 0;
 const menuRef = ref<HTMLElement | null>(null);
 
 const navLinks = [
@@ -50,7 +52,15 @@ watch(() => route.path, () => {
 
 // Navbar scroll detection
 function onScroll() {
-  isScrolled.value = window.scrollY > 20;
+  const currentScrollY = window.scrollY;
+  isScrolled.value = currentScrollY > 20;
+  
+  if (currentScrollY > 60 && currentScrollY > lastScrollY && !isMenuOpen.value) {
+    isHidden.value = true;
+  } else {
+    isHidden.value = false;
+  }
+  lastScrollY = currentScrollY;
 }
 
 // Keyboard handling for menu
@@ -96,6 +106,7 @@ onUnmounted(() => {
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',
       borderColor: isScrolled ? '#e5e5e5' : 'transparent',
+      transform: isHidden ? 'translateY(-100%)' : 'translateY(0)',
     }"
   >
     <!-- Case Study variant: back arrow + project label -->

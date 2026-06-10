@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { templateCompilerOptions } from '@tresjs/core'
 import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  // templateCompilerOptions teaches the Vue compiler about Tres* / primitive elements
+  plugins: [vue({ ...templateCompilerOptions })],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
@@ -14,9 +16,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor-vue': ['vue', 'vue-router'],
+          'vendor-vue': ['vue', 'vue-router', 'pinia'],
           'vendor-animation': ['animejs'],
           'vendor-head': ['@unhead/vue'],
+          'vendor-three': ['three', '@tresjs/core'],
           'components-home': [
             './src/components/Home/HeroSection.vue',
             './src/components/Home/TechMarquee.vue',
@@ -38,7 +41,7 @@ export default defineConfig({
   },
   // Performance optimizations
   optimizeDeps: {
-    include: ['vue', 'vue-router', 'animejs', '@unhead/vue']
+    include: ['vue', 'vue-router', 'pinia', 'animejs', '@unhead/vue', 'lenis']
   },
   // Server configuration
   server: {

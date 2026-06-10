@@ -9,6 +9,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { title: "Dave Gonzales — Vue.js & TypeScript Developer" }
   },
   {
+    // "The Long Way Around" redesign — replaces '/' once Phases 1–8 land (docs/PLAN.md)
+    path: '/journey',
+    name: 'Journey',
+    component: () => import('@/views/JourneyPage.vue'),
+    meta: { title: "The Long Way Around — Dave Gonzales" }
+  },
+  {
     path: '/manifesto',
     name: 'Manifesto',
     component: () => import('@/views/ManifestoPage.vue'),
