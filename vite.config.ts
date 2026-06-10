@@ -20,14 +20,6 @@ export default defineConfig({
           'vendor-animation': ['animejs'],
           'vendor-head': ['@unhead/vue'],
           'vendor-three': ['three', '@tresjs/core'],
-          'components-home': [
-            './src/components/Home/HeroSection.vue',
-            './src/components/Home/TechMarquee.vue',
-            './src/components/Home/ProjectsArchive.vue',
-            './src/components/Home/ProjectRow.vue',
-            './src/components/Home/BentoSection.vue',
-            './src/components/Home/CTASection.vue',
-          ],
           'components-case-study': [
             './src/components/CaseStudy/GrayscaleImage.vue',
             './src/components/CaseStudy/NextProjectFooter.vue',

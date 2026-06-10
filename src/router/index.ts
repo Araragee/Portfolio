@@ -14,13 +14,6 @@ const routes: Array<RouteRecordRaw> = [
     redirect: '/'
   },
   {
-    // Demoted: kept at /home until Phase 9 sign-off (do not delete — PLAN.md)
-    path: '/home',
-    name: 'Home',
-    component: () => import('@/views/HomePage.vue'),
-    meta: { title: "Dave Gonzales — Vue.js & TypeScript Developer" }
-  },
-  {
     path: '/manifesto',
     name: 'Manifesto',
     component: () => import('@/views/ManifestoPage.vue'),

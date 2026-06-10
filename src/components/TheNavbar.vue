@@ -16,7 +16,7 @@ const menuRef = ref<HTMLElement | null>(null);
 const menuTriggerRef = ref<HTMLButtonElement | null>(null);
 
 // On journey: drop "Case Studies" — you're already on it.
-// On other pages: full list, pointing back to '/' (the journey/home).
+// On other pages: full list, pointing back to '/'.
 const navLinks = computed(() =>
   isJourney.value
     ? [
