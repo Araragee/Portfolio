@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { computed, watch, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
+import anime from 'animejs'
 import type { JourneyChapter } from '@/types/journey'
 import { useIntersectionObserver } from '@/composables/useIntersectionObserver'
-import anime from 'animejs'
 import { useReducedMotion } from '@/composables/useReducedMotion'
 import { projects } from '@/data/projectsData'
 
 const props = defineProps<{
   chapter: JourneyChapter
 }>()
+
+const { elementRef, isVisible } = useIntersectionObserver({
+  threshold: 0.2,
+  once: true,
+})
+const { prefersReducedMotion } = useReducedMotion()
 
 // Static class lookup so Tailwind can see the literals (no dynamic vh values)
 const runwayStyle = computed(
@@ -20,30 +26,16 @@ const runwayStyle = computed(
     })[props.chapter.heightVh],
 )
 
-const { elementRef, isVisible } = useIntersectionObserver({
-  threshold: 0.2,
-  once: true
-})
-const { prefersReducedMotion } = useReducedMotion()
-
-watch(isVisible, (visible) => {
-  if (visible && elementRef.value && !prefersReducedMotion.value) {
-    const targets = elementRef.value.querySelectorAll('.reveal-text')
-    anime({
-      targets,
-      translateY: [30, 0],
-      opacity: [0, 1],
-      easing: 'easeOutCubic',
-      duration: 600,
-      delay: anime.stagger(100)
-    })
-  } else if (visible && prefersReducedMotion.value && elementRef.value) {
-    const targets = elementRef.value.querySelectorAll('.reveal-text')
-    targets.forEach((el) => {
-      ;(el as HTMLElement).style.opacity = '1'
-    })
-  }
-})
+// Text column sits on chapter.textSide; the particle field slides opposite
+// (docs/TWEAKS/A-field-offset.md) — no id-based special-casing
+const textColumnStyle = computed(
+  () =>
+    ({
+      left: 'md:w-1/2',
+      right: 'md:w-1/2 md:ml-auto',
+      center: 'md:w-3/5 md:mx-auto md:text-center',
+    })[props.chapter.textSide],
+)
 
 onMounted(() => {
   if (elementRef.value && !prefersReducedMotion.value) {
@@ -54,12 +46,23 @@ onMounted(() => {
   }
 })
 
-const textContainerClass = computed(() => {
-  // Add specific layout offsets to avoid collisions
-  if (props.chapter.id === 'epilogue') return 'md:w-1/2 md:mt-[-20vh]'
-  if (props.chapter.id.startsWith('psa-')) return 'md:w-1/2 md:ml-auto z-10'
-  if (props.chapter.id === 'projects') return 'md:w-[45%]'
-  return 'md:w-1/2'
+watch(isVisible, (visible) => {
+  if (!visible || !elementRef.value) return
+  const targets = elementRef.value.querySelectorAll('.reveal-text')
+  if (prefersReducedMotion.value) {
+    targets.forEach((el) => {
+      ;(el as HTMLElement).style.opacity = '1'
+    })
+    return
+  }
+  anime({
+    targets,
+    translateY: [30, 0],
+    opacity: [0, 1],
+    easing: 'easeOutCubic',
+    duration: 450,
+    delay: anime.stagger(40),
+  })
 })
 </script>
 
@@ -67,19 +70,26 @@ const textContainerClass = computed(() => {
   <section :id="chapter.id" :class="runwayStyle" ref="elementRef">
     <div class="sticky top-0 flex h-screen items-center">
       <div class="mx-auto w-full max-w-5xl px-6">
-        <!-- Custom Prologue Layout -->
-        <div v-if="chapter.id === 'prologue'" class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-end w-full">
+        <!-- Hero layout (prologue) -->
+        <div
+          v-if="chapter.layout === 'hero'"
+          class="grid w-full grid-cols-1 items-end gap-8 md:grid-cols-12 md:gap-12"
+        >
           <div class="md:col-span-8">
-            <span class="reveal-text font-mono text-label uppercase text-secondary block mb-4">
+            <span class="reveal-text mb-4 block font-mono text-label uppercase text-secondary">
               {{ chapter.index }} / {{ chapter.era }}
             </span>
-            <h1 class="reveal-text font-headline font-bold text-display-lg text-primary uppercase leading-[0.85] tracking-tight">
+            <h1
+              class="reveal-text font-headline text-display-lg font-bold uppercase leading-[0.85] tracking-tight text-primary"
+            >
               Dave Gonzales
             </h1>
-            <p class="reveal-text font-mono text-label uppercase text-secondary mt-2 tracking-[0.2em]">
+            <p
+              class="reveal-text mt-2 font-mono text-label uppercase tracking-[0.2em] text-secondary"
+            >
               Frontend Engineer
             </p>
-            <div class="mt-8 space-y-4 max-w-xl">
+            <div class="mt-8 max-w-xl space-y-4">
               <p
                 v-for="(paragraph, i) in chapter.paragraphs"
                 :key="i"
@@ -89,27 +99,27 @@ const textContainerClass = computed(() => {
               </p>
             </div>
           </div>
-          <div class="md:col-span-4 flex justify-start md:justify-end reveal-text">
-            <div class="flex flex-col items-start md:items-end gap-6">
-              <div class="flex flex-col items-start md:items-end gap-1">
+          <div class="reveal-text flex justify-start md:col-span-4 md:justify-end">
+            <div class="flex flex-col items-start gap-6 md:items-end">
+              <div class="flex flex-col items-start gap-1 md:items-end">
                 <span class="font-mono text-label uppercase opacity-50">Focus</span>
-                <span class="text-sm font-bold font-headline tracking-tight uppercase">Vue 3 · TS · WebGL</span>
+                <span class="font-headline text-sm font-bold uppercase tracking-tight">Vue 3 · TS · WebGL</span>
               </div>
-              <div class="flex flex-col items-start md:items-end gap-1">
+              <div class="flex flex-col items-start gap-1 md:items-end">
                 <span class="font-mono text-label uppercase opacity-50">Location</span>
-                <span class="text-sm font-bold font-headline tracking-tight uppercase">Philippines</span>
+                <span class="font-headline text-sm font-bold uppercase tracking-tight">Philippines</span>
               </div>
-              <div class="flex flex-col items-start md:items-end gap-1">
+              <div class="flex flex-col items-start gap-1 md:items-end">
                 <span class="font-mono text-label uppercase opacity-50">Status</span>
-                <span class="text-sm font-bold font-headline tracking-tight uppercase text-secondary">Open to Offers</span>
+                <span class="font-headline text-sm font-bold uppercase tracking-tight text-secondary">Open to Offers</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Default Layout for other chapters -->
-        <div v-else :class="textContainerClass">
-          <template v-if="chapter.id === 'psa-map' || !chapter.id.startsWith('psa-')">
+        <!-- Default chapter layout -->
+        <div v-else :class="textColumnStyle">
+          <template v-if="!chapter.isContinuation">
             <p class="reveal-text font-mono text-xs uppercase tracking-widest text-secondary">
               {{ chapter.index }} / {{ chapter.era }}
             </p>
@@ -119,7 +129,19 @@ const textContainerClass = computed(() => {
               {{ chapter.title }}
             </h2>
           </template>
-          <div :class="['max-w-xl space-y-4', chapter.id.startsWith('psa-') && chapter.id !== 'psa-map' ? 'mt-32' : 'mt-8']">
+
+          <div v-if="chapter.stat" class="reveal-text mt-10">
+            <p class="font-headline text-5xl font-bold tracking-tight text-primary">
+              {{ chapter.stat.value }}
+            </p>
+            <p
+              class="mt-2 border-t border-outline-variant/30 pt-2 font-mono text-xs uppercase tracking-widest text-secondary"
+            >
+              {{ chapter.stat.label }}
+            </p>
+          </div>
+
+          <div class="mt-8 max-w-xl space-y-4" :class="{ 'md:mx-auto': chapter.textSide === 'center' }">
             <p
               v-for="(paragraph, i) in chapter.paragraphs"
               :key="i"
@@ -128,45 +150,30 @@ const textContainerClass = computed(() => {
               {{ paragraph }}
             </p>
           </div>
+
           <p class="reveal-text mt-10 font-mono text-xs text-outline-variant">
             ↳ {{ chapter.interactionHint }}
           </p>
 
-          <!-- Projects List -->
-          <div v-if="chapter.id === 'projects'" class="mt-12 space-y-6">
+          <div v-if="chapter.showProjects" class="mt-12 space-y-6">
             <RouterLink
               v-for="project in projects"
               :key="project.slug"
               :to="`/case-study/${project.slug}`"
-              class="reveal-text block group border-l border-outline-variant/30 pl-4 transition-colors hover:border-primary"
+              class="reveal-text group block border-l border-outline-variant/30 pl-4 transition-colors hover:border-primary"
             >
-              <h3 class="font-headline text-xl font-medium tracking-tight text-primary transition-colors group-hover:text-primary">
+              <h3
+                class="font-headline text-xl font-medium tracking-tight text-primary"
+              >
                 {{ project.title }}
               </h3>
-              <p class="font-mono text-xs text-secondary mt-1 uppercase tracking-widest">
+              <p class="mt-1 font-mono text-xs uppercase tracking-widest text-secondary">
                 {{ project.role }}
               </p>
-              <p class="font-body text-sm text-outline-variant mt-2">
+              <p class="mt-2 font-body text-sm text-outline-variant">
                 {{ project.stack }}
               </p>
             </RouterLink>
-          </div>
-        </div>
-
-        <!-- PSA Stats Floating Block -->
-        <div 
-          v-if="chapter.id.startsWith('psa-')" 
-          class="absolute left-6 top-1/2 -translate-y-1/2 md:left-[10%] max-w-[280px] pointer-events-none transition-opacity duration-300"
-        >
-          <div class="space-y-12">
-            <div v-if="chapter.id === 'psa-map'" class="reveal-text">
-              <p class="font-headline text-5xl font-bold tracking-tight text-primary">110M+</p>
-              <p class="font-mono text-xs text-secondary uppercase tracking-widest mt-2 border-t border-outline-variant/30 pt-2">Citizens' Data Handled</p>
-            </div>
-            <div v-if="chapter.id === 'psa-logo'" class="reveal-text">
-              <p class="font-headline text-5xl font-bold tracking-tight text-primary">Solid</p>
-              <p class="font-mono text-xs text-secondary uppercase tracking-widest mt-2 border-t border-outline-variant/30 pt-2">Responsive. World-Class.</p>
-            </div>
           </div>
         </div>
       </div>

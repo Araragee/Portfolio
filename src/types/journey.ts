@@ -16,6 +16,9 @@ export type MorphStateId =
 /** Allowed scroll-runway heights. Constrained so Tailwind classes stay static. */
 export type ChapterHeightVh = 150 | 200 | 300
 
+/** Which side the DOM text column sits on (desktop). Field slides opposite. */
+export type TextSide = 'left' | 'right' | 'center'
+
 export interface JourneyChapter {
   /** Stable id, used as v-for key and anchor. */
   id: string
@@ -32,12 +35,24 @@ export interface JourneyChapter {
   paragraphs: string[]
   /** Mono label describing the chapter interaction, e.g. 'hover branch → extends'. */
   interactionHint: string
-  /** Fraction of runway where morph begins (e.g. 0.1) */
+  /** Fraction of runway where morph begins (e.g. 0.55) */
   morphStart: number
-  /** Fraction of runway where morph ends (e.g. 0.5) */
+  /** Fraction of runway where morph ends (e.g. 0.95) */
   morphEnd: number
   /** Camera Z position for this chapter */
   cameraZ: number
+  /** Text column side; the particle field offsets to the opposite side. */
+  textSide: TextSide
+  /** Explicit field offset [x, y] in world units — overrides textSide derivation. */
+  fieldOffset?: [number, number]
+  /** Layout variant: 'hero' renders the prologue name treatment. */
+  layout?: 'hero'
+  /** Continuation of the previous chapter — hides the index/era/title block. */
+  isContinuation?: boolean
+  /** Render the projects list inside this chapter's text column. */
+  showProjects?: boolean
+  /** Mono stat callout rendered in the text column. */
+  stat?: { value: string; label: string }
 }
 
 /** Precomputed particle positions per morph state (count * 3 floats each). */

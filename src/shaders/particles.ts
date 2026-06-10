@@ -22,6 +22,15 @@ uniform int uChapterIndex;
 uniform float uInteractState;
 uniform vec3 uInteractPos;
 
+// Counter-side field offset (docs/TWEAKS/A-field-offset.md):
+// slides the whole formation away from the chapter's text column,
+// interpolated with the same eased t as the morph so it travels with it.
+uniform vec2 uOffsetFrom;
+uniform vec2 uOffsetTo;
+uniform float uOffsetScale;
+// Shrinks formations on narrow viewports so half a screen fits them
+uniform float uFormationScale;
+
 varying float vAlpha;
 
 float easeInOutCubic(float t) {
@@ -40,6 +49,8 @@ void main() {
   float rawT = clamp((uProgress - stagger) / 0.95, 0.0, 1.0);
   float t = easeInOutCubic(rawT);
   vec3 pos = mix(position, aPositionTo, t);
+  pos.xy *= uFormationScale;
+  pos.xy += mix(uOffsetFrom, uOffsetTo, t) * uOffsetScale;
 
   // Idle drift
   pos.x += sin(uTime * 0.30 + position.y * 2.0) * 0.02 * uDriftAmp;

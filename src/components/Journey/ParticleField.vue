@@ -6,6 +6,7 @@ import {
   Color,
   Points,
   ShaderMaterial,
+  Vector2,
   Vector3,
 } from 'three'
 import { onBeforeUnmount, onMounted, shallowRef, watch } from 'vue'
@@ -56,6 +57,11 @@ const uniforms = {
   uChapterIndex: { value: 0 },
   uInteractState: { value: 0 },
   uInteractPos: { value: new Vector3() },
+  uOffsetFrom: { value: new Vector2() },
+  uOffsetTo: { value: new Vector2() },
+  // Mobile keeps the field centered behind the text — no counter-side slide
+  uOffsetScale: { value: window.innerWidth < 768 ? 0 : 1 },
+  uFormationScale: { value: formationScaleForViewport() },
 }
 
 watch(() => props.repelRadius, (val) => {
@@ -96,8 +102,18 @@ function updateParticleCount(newCount: number): void {
   oldGeometry.dispose()
 }
 
+// Narrow viewports: shrink the formation so it fits the half-screen it owns
+// (offset pushes it opposite the text — docs/TWEAKS/A-field-offset.md)
+function formationScaleForViewport(): number {
+  if (window.innerWidth < 768) return 0.85
+  const aspect = window.innerWidth / window.innerHeight
+  return Math.min(1, Math.max(0.62, aspect / 1.5))
+}
+
 // Window resize handler: rebuild targets when crossing the 768px count breakpoint
 function onResize(): void {
+  uniforms.uOffsetScale.value = window.innerWidth < 768 ? 0 : 1
+  uniforms.uFormationScale.value = formationScaleForViewport()
   const newCount = particleCountForViewport(window.innerWidth)
   if (newCount !== currentCount) {
     updateParticleCount(newCount)
@@ -113,7 +129,6 @@ const mouseTarget = new Vector3(999, 999, 0)
 let targetInteractState = 0
 
 function onPointerMove(event: PointerEvent): void {
-  wake()
   const ndcX = (event.clientX / window.innerWidth) * 2 - 1
   const ndcY = -((event.clientY / window.innerHeight) * 2 - 1)
   const aspect = window.innerWidth / window.innerHeight
@@ -121,14 +136,12 @@ function onPointerMove(event: PointerEvent): void {
 }
 
 function onPointerDown(): void {
-  wake()
   targetInteractState = 1
   // Capture where interaction started
   uniforms.uInteractPos.value.copy(mouseTarget)
 }
 
 function onPointerUp(): void {
-  wake()
   targetInteractState = 0
 }
 
@@ -139,27 +152,26 @@ window.addEventListener('pointerup', onPointerUp, { passive: true })
 let slowFrameCount = 0
 let hasHalved = false
 
-const { onBeforeRender } = useLoop()
+const { onBeforeRender, stop, start } = useLoop()
 
-let lastActiveTime = performance.now()
-let isPaused = false
+let hasRenderedFirstFrame = false
 
-function wake() {
-  lastActiveTime = performance.now()
-  if (isPaused) {
-    isPaused = false
+// No idle timeout: the field's drift is intentional ambient motion — freezing
+// it while the visitor reads looks broken. Only a hidden tab stops the loop.
+function onVisibilityChange(): void {
+  if (document.hidden) {
+    stop()
+  } else {
+    start()
   }
 }
 
-watch(() => store.scrollProgress, wake)
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) wake()
-})
+document.addEventListener('visibilitychange', onVisibilityChange)
 
 onBeforeRender(({ elapsed, delta }) => {
-  if (performance.now() - lastActiveTime > 3000 || document.hidden) {
-    isPaused = true
-    return
+  if (!hasRenderedFirstFrame) {
+    hasRenderedFirstFrame = true
+    store.markFirstFrame()
   }
   uniforms.uTime.value = elapsed
   const t = morphT.value
@@ -170,6 +182,12 @@ onBeforeRender(({ elapsed, delta }) => {
   
   uniforms.uChapterIndex.value = store.activeChapterIndex
   uniforms.uInteractState.value += (targetInteractState - uniforms.uInteractState.value) * 0.1
+
+  // Counter-side offsets: field slides away from the text column
+  const [fromX, fromY] = store.fieldOffsetFrom
+  const [toX, toY] = store.fieldOffsetTo
+  uniforms.uOffsetFrom.value.set(fromX, fromY)
+  uniforms.uOffsetTo.value.set(toX, toY)
 
   // FPS guard: if sustained < 30fps after settling (elapsed > 2s), halve particle count once
   if (!hasHalved && elapsed > 2) {
@@ -210,6 +228,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('pointerdown', onPointerDown)
   window.removeEventListener('pointerup', onPointerUp)
   window.removeEventListener('resize', onResize)
+  document.removeEventListener('visibilitychange', onVisibilityChange)
   points.value.geometry.dispose()
   material.dispose()
 })

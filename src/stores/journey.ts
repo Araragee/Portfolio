@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { journeyChapters } from '@/data/journeyData'
+import { fieldOffsetFor, journeyChapters } from '@/data/journeyData'
 import type { MorphStateId } from '@/types/journey'
 
 /**
@@ -69,12 +69,51 @@ export const useJourneyStore = defineStore('journey', () => {
   })
 
   const cameraZ = computed(() => {
-    const currentChapter = journeyChapters[activeChapterIndex.value]
-    const baseZ = 8
-    const targetZ = currentChapter?.cameraZ ?? 8
-    // Smoothly dolly between baseZ and targetZ across the chapter's runway
-    return baseZ + (targetZ - baseZ) * chapterProgress.value
+    // Continuous dolly: lerp from the PREVIOUS chapter's Z (where the camera
+    // actually is at the boundary) to this chapter's Z over the first half of
+    // the runway. Lerping from a fixed base would snap at every boundary.
+    const i = activeChapterIndex.value
+    const fromZ = i > 0 ? journeyChapters[i - 1].cameraZ : journeyChapters[0].cameraZ
+    const targetZ = journeyChapters[i].cameraZ
+    const t = Math.min(1, chapterProgress.value * 2)
+    return fromZ + (targetZ - fromZ) * t
   })
+
+  /** Field offset of the active chapter (uOffsetFrom). */
+  const fieldOffsetFrom = computed<[number, number]>(() =>
+    fieldOffsetFor(journeyChapters[activeChapterIndex.value]),
+  )
+
+  /** Field offset of the next chapter (uOffsetTo) — morph slides toward it. */
+  const fieldOffsetTo = computed<[number, number]>(() => {
+    const next = Math.min(activeChapterIndex.value + 1, journeyChapters.length - 1)
+    return fieldOffsetFor(journeyChapters[next])
+  })
+
+  // --- Loader readiness (docs/TWEAKS/B-loading-splash.md) ---
+  const assetsLoaded = ref(false)        // vendor-three chunk arrived
+  const firstFrameRendered = ref(false)  // ParticleField drew a frame
+  const fontsLoaded = ref(false)         // document.fonts.ready
+
+  const loaderProgress = computed(() => {
+    const done = [assetsLoaded.value, firstFrameRendered.value, fontsLoaded.value]
+      .filter(Boolean).length
+    return done === 3 ? 100 : Math.round((done / 3) * 100)
+  })
+
+  const journeyReady = computed(
+    () => assetsLoaded.value && firstFrameRendered.value && fontsLoaded.value,
+  )
+
+  function markAssetsLoaded(): void {
+    assetsLoaded.value = true
+  }
+  function markFirstFrame(): void {
+    firstFrameRendered.value = true
+  }
+  function markFontsLoaded(): void {
+    fontsLoaded.value = true
+  }
 
   function setScrollProgress(value: number): void {
     scrollProgress.value = Math.min(1, Math.max(0, value))
@@ -88,6 +127,13 @@ export const useJourneyStore = defineStore('journey', () => {
     morphTo,
     morphT,
     cameraZ,
+    fieldOffsetFrom,
+    fieldOffsetTo,
+    loaderProgress,
+    journeyReady,
+    markAssetsLoaded,
+    markFirstFrame,
+    markFontsLoaded,
     setScrollProgress,
   }
 })
