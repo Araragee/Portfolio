@@ -2,11 +2,9 @@
 import { useSeoMeta } from '@unhead/vue'
 import { personalContent } from '@/data/personalData'
 import { useScrollAnimation, useStaggerAnimation } from '@/composables/useScrollAnimation'
-import { personalInfo } from '@/data/aboutData'
-import { siteConfig } from '@/data/siteConfig'
 
 useSeoMeta({
-  title: `Personal — ${siteConfig.brandName}`,
+  title: 'About — Dave Gonzales',
   description:
     'Off-hours: hobbies, personal story, and the values that shape the work.',
 })
@@ -138,11 +136,11 @@ const { containerRef: hobbiesRef } = useStaggerAnimation({ staggerDelay: 100 })
           Say Hello
         </h2>
         <a
-          :href="`mailto:${personalInfo.contact.email}`"
+          href="mailto:davxgonzales@gmail.com"
           class="inline-flex items-center gap-4 border-b border-surface pb-2 font-mono text-caption uppercase hover:opacity-70 transition-opacity no-underline text-surface"
           aria-label="Send an email"
         >
-          <span>{{ personalInfo.contact.email }}</span>
+          <span>davxgonzales@gmail.com</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>

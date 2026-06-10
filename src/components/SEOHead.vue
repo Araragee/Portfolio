@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue'
-import { siteConfig } from '@/data/siteConfig'
-import { socialLinks } from '@/data/aboutData'
 
 interface Props {
   title?: string
@@ -15,14 +13,14 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: siteConfig.seo.defaultTitle,
-  description: siteConfig.seo.description,
+  title: "Dave Gonzales — Vue.js & TypeScript Developer",
+  description: 'Portfolio of Dave Gonzales, a Vue.js and TypeScript developer in the Philippines. Front-end work on the CBMS Portal at the Philippine Statistics Authority.',
   image: '/og-image.jpg',
-  url: siteConfig.seo.url,
+  url: 'https://architect-vue.vercel.app',
   type: 'website',
   twitterCard: 'summary_large_image',
-  author: siteConfig.seo.author,
-  keywords: () => siteConfig.seo.keywords
+  author: "Dave Gonzales",
+  keywords: () => ['web developer', 'front-end developer', 'vue.js', 'typescript', 'portfolio']
 })
 
 // Use unhead for meta tags management
@@ -46,7 +44,7 @@ useHead({
     { property: 'og:image', content: props.image },
     { property: 'og:image:width', content: '1200' },
     { property: 'og:image:height', content: '630' },
-    { property: 'og:site_name', content: siteConfig.brandName },
+    { property: 'og:site_name', content: 'Dave Gonzales' },
     { property: 'og:locale', content: 'en_US' },
 
     // Twitter
@@ -87,11 +85,9 @@ useHead({
         name: props.author,
         url: props.url,
         image: props.image,
-        jobTitle: siteConfig.seo.jobTitle,
+        jobTitle: 'Vue.js & TypeScript Developer',
         description: props.description,
-        sameAs: socialLinks
-          .filter(link => link.url.startsWith('http'))
-          .map(link => link.url)
+        sameAs: ["https://github.com/Araragee", "https://linkedin.com/in/davxloper"]
       })
     }
   ]

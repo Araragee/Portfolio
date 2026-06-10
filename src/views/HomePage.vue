@@ -1,23 +1,21 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue'
 import HeroSection from '@/components/Home/HeroSection.vue'
-import TechMarquee from '@/components/Home/TechMarquee.vue'
 import ProjectsArchive from '@/components/Home/ProjectsArchive.vue'
 import BentoSection from '@/components/Home/BentoSection.vue'
 import CTASection from '@/components/Home/CTASection.vue'
 
 useSeoMeta({
-  title: 'ARCHITECT.VUE — Frontend Engineer',
-  description: 'Senior Vue.js & TypeScript engineer specializing in scalable web architectures, design systems, and performance optimization.',
-  ogTitle: 'ARCHITECT.VUE — Frontend Engineer',
-  ogDescription: 'Senior Vue.js & TypeScript engineer specializing in scalable web architectures.',
+  title: 'Dave Gonzales — Vue.js & TypeScript Developer',
+  description: 'Portfolio of Dave Gonzales, a Vue.js and TypeScript developer in the Philippines. Front-end work on the CBMS Portal at the Philippine Statistics Authority.',
+  ogTitle: 'Dave Gonzales — Vue.js & TypeScript Developer',
+  ogDescription: 'Portfolio of Dave Gonzales, a Vue.js and TypeScript developer in the Philippines. Front-end work on the CBMS Portal at the Philippine Statistics Authority.',
 })
 </script>
 
 <template>
   <main class="pt-28 md:pt-40" id="main-content">
     <HeroSection />
-    <TechMarquee />
     <ProjectsArchive />
     <BentoSection />
     <CTASection />
