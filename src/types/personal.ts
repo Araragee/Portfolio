@@ -1,7 +1,6 @@
 export interface Hobby {
   name: string
   blurb: string
-  icon?: string
 }
 
 export interface Value {
