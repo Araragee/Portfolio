@@ -3,7 +3,6 @@ export type ProjectCategory = 'web-app' | 'mobile' | 'ui-ux' | 'api' | 'tool' | 
 export interface ProjectImage {
   url?: string
   alt: string
-  gradient?: string // Fallback gradient if no image
 }
 
 export interface ProjectLink {

@@ -8,24 +8,22 @@ export const projects: Project[] = [
     categoryLabel: 'Government / Data Visualization',
     description:
       'Data-visualization portal for the Community-Based Monitoring System at the Philippine Statistics Authority — dashboards, geospatial views, and analyst tooling over national survey data.',
-    backgroundImage:
-      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
+    backgroundImage: new URL('@/assets/projects/cbms-hero.png', import.meta.url).href,
     role: 'Lead Front-end Developer — PSA Central Office',
     stack: 'Vue 3, TypeScript, Pinia, Vuetify, ECharts, D3, Babylon.js, Laravel',
-    timeline: '2022 — Present',
+    timeline: '2023 — Present',
     liveUrl: 'https://cbmsportal.psa.gov.ph',
     introStatement:
       'A public-sector analytics portal surfacing CBMS indicators for policymakers and researchers. Built inside the PSA Central Office, the frontend is a typed Vue 3 application that renders millions of rows of municipal survey data through interactive dashboards, geographic layers, and exportable reports.',
-    heroImage:
-      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1400&q=80',
+    heroImage: new URL('@/assets/projects/cbms-hero.png', import.meta.url).href,
     sections: [
       {
-        heading: 'The Challenge',
-        body: 'National survey datasets are large, hierarchical, and politically sensitive. The portal had to let analysts drill from region → province → municipality → barangay without stalling the browser, while enforcing strict data-release rules. Legacy reporting at PSA relied on static PDFs — the ask was to replace that workflow with an interactive, typed, auditable web application.',
+        heading: 'The problem with static PDFs',
+        body: 'National survey datasets are large, hierarchical, and politically sensitive. The portal had to let analysts drill from region to province to municipality to barangay without stalling the browser, while enforcing strict data-release rules. Legacy reporting at PSA relied on static PDFs. The ask was to replace that workflow with an interactive, typed, auditable web application.',
       },
       {
-        heading: 'Implementation Strategy',
-        body: 'A Vue 3 + Pinia core feeds a visualization layer built on ECharts, D3, and Observable Plot — each chart type wrapped in a composable so instrumentation, legends, and export behavior stay consistent. Vuetify handles dense data-table surfaces and form-heavy admin views; Babylon.js powers the 3D geographic scene. A Laravel service (via laravel-vite-plugin) brokers auth and data access between the client and the PSA data layer.',
+        heading: 'How the frontend is put together',
+        body: 'A Vue 3 and Pinia core feeds a visualization layer built on ECharts, D3, and Observable Plot. Each chart type is wrapped in a composable so instrumentation, legends, and export behavior stay consistent. Vuetify handles dense data-table surfaces and form-heavy admin views, while Babylon.js powers the 3D geographic scene. A Laravel service brokers auth and data access between the client and the PSA data layer.',
         code: {
           filename: 'composables/useIndicator.ts',
           content: `import { storeToRefs } from 'pinia'
@@ -44,18 +42,18 @@ export function useIndicator(code: string) {
         },
       },
       {
-        heading: 'Outcomes',
-        body: 'The portal is now the analyst-facing surface for CBMS rounds at PSA. Render-time for large indicator sets dropped from unusable to sub-second through virtualized tables, throttled store updates, and precomputed aggregates. The typed store layer has kept the codebase stable across three years of schema changes.',
+        heading: 'Where it landed',
+        body: 'The portal is now the analyst-facing surface for CBMS rounds at PSA. Render-time for large indicator sets dropped from unusable to sub-second through virtualized tables, throttled store updates, and precomputed aggregates. The typed store layer has kept the codebase stable across schema changes.',
       },
     ],
     gallery: [
       {
-        src: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80',
-        alt: 'Indicator dashboard view',
+        src: new URL('@/assets/projects/cbms-01.png', import.meta.url).href,
+        alt: 'Indicator dashboard, region drill-down view',
       },
       {
-        src: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&q=80',
-        alt: 'Drill-down data table',
+        src: new URL('@/assets/projects/cbms-02.png', import.meta.url).href,
+        alt: 'Indicator dashboard, municipality drill-down view',
       },
     ],
   },
@@ -66,24 +64,22 @@ export function useIndicator(code: string) {
     categoryLabel: 'EdTech / AI Integration',
     description:
       'Adaptive learning management system with real-time AI risk scoring, instructor intervention workflows, and student analytics dashboards.',
-    backgroundImage:
-      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
+    backgroundImage: new URL('@/assets/projects/lms-hero.png', import.meta.url).href,
     role: 'Full-stack Developer',
     stack: 'Vue 3, Pinia, TypeScript, FastAPI, PostgreSQL, Docker',
     timeline: '2025 — Present',
     liveUrl: 'https://lms-ai-frontend.onrender.com/',
     introStatement:
-      'A full-stack LMS platform where AI-driven risk models surface at-risk students in real time, enabling instructors to intervene before dropout occurs. Built with a strict TypeScript architecture and a Vue 3 Composition API throughout.',
-    heroImage:
-      'https://images.unsplash.com/photo-1484807352052-23338990c6c6?w=1400&q=80',
+      'A full-stack LMS platform where AI risk models surface at-risk students in real time, enabling instructors to intervene before dropout occurs. Built with a strict TypeScript architecture and Vue 3 Composition API.',
+    heroImage: new URL('@/assets/projects/lms-hero.png', import.meta.url).href,
     sections: [
       {
-        heading: 'The Challenge',
-        body: 'Traditional LMS platforms surface student risk data too late — often only after exam failure. The challenge was building a predictive layer that updates in real-time as students interact with course content, and surfacing those signals to instructors in a usable workflow.',
+        heading: 'Why risk scores arrive too late',
+        body: 'Traditional LMS platforms surface student risk data too late, often only after exam failure. The goal was building a predictive layer that updates in real-time as students interact with course content, surfacing those signals to instructors in a usable workflow.',
       },
       {
-        heading: 'Implementation Strategy',
-        body: 'The frontend was architected around a strict separation between the AI data-layer (Pinia stores with typed API contracts) and the presentation layer. Vue 3 Composition API composables were used to encapsulate all real-time polling and risk calculation logic, keeping components declarative and testable. The FastAPI backend and PostgreSQL schema ship together via docker-compose.',
+        heading: 'Architecture',
+        body: 'The frontend separates the AI data layer (Pinia stores with typed API contracts) from the presentation layer. Vue 3 Composition API composables encapsulate real-time polling and risk calculation logic, keeping components declarative and testable. The FastAPI backend and PostgreSQL schema ship together via docker-compose.',
         code: {
           filename: 'stores/riskStore.ts',
           content: `import { defineStore } from 'pinia'
@@ -106,18 +102,18 @@ export const useRiskStore = defineStore('risk', () => {
         },
       },
       {
-        heading: 'Visual Outcomes',
-        body: 'The resulting dashboards strip away noise to surface only actionable signals. Each instructor view is context-aware — showing only the students, sections, and risk indicators relevant to their course load. Data density without visual clutter.',
+        heading: 'What instructors see now',
+        body: 'The resulting dashboards strip away noise to surface actionable signals. Each instructor view is context-aware, showing only the students, sections, and risk indicators relevant to their course load.',
       },
     ],
     gallery: [
       {
-        src: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80',
-        alt: 'Dashboard analytics view',
+        src: new URL('@/assets/projects/lms-01.png', import.meta.url).href,
+        alt: 'Instructor dashboard analytics view',
       },
       {
-        src: 'https://images.unsplash.com/photo-1555421689-491a97ff2040?w=800&q=80',
-        alt: 'Risk scoring interface',
+        src: new URL('@/assets/projects/lms-02.png', import.meta.url).href,
+        alt: 'Student risk scoring interface',
       },
     ],
   },
@@ -128,38 +124,36 @@ export const useRiskStore = defineStore('risk', () => {
     categoryLabel: 'Social / Recipe Platform',
     description:
       'A social recipe and nutrition platform with real-time messaging, OAuth login, and a Sanity-backed content pipeline. Live on Cloudflare Pages.',
-    backgroundImage:
-      'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80',
+    backgroundImage: new URL('@/assets/projects/nutrisipe-hero.png', import.meta.url).href,
     role: 'Front-end Developer',
     stack: 'React 17, Sanity CMS, Socket.io, Google OAuth, Tailwind',
     timeline: '2023',
     liveUrl: 'https://officialnutrisipe.pages.dev/',
     introStatement:
-      'A Pinterest-style social platform for recipes and nutrition content — users publish, save, and discuss recipes in real time. The React client talks to a Sanity-managed content layer and a Socket.io service for live interactions.',
-    heroImage:
-      'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1400&q=80',
+      'A Pinterest-style social platform for recipes and nutrition content. Users publish, save, and discuss recipes in real time. The React client talks to a Sanity-managed content layer and a Socket.io service for live interactions.',
+    heroImage: new URL('@/assets/projects/nutrisipe-hero.png', import.meta.url).href,
     sections: [
       {
-        heading: 'The Idea',
-        body: 'Most recipe sites treat content as static. Nutrisipe frames recipes as social objects — saveable, remixable, and discussable. The product goal was to combine structured nutrition metadata with the low-friction browsing of a social feed.',
+        heading: 'Recipes as social objects',
+        body: 'Most recipe sites treat content as static. Nutrisipe frames recipes as saveable, remixable, and discussable objects. The goal was combining structured nutrition metadata with the low-friction browsing of a social feed.',
       },
       {
-        heading: 'Implementation Strategy',
-        body: 'Sanity provides the structured schema for recipes, ingredients, and author profiles, with image assets served through its CDN. A lightweight Socket.io service handles presence and live comment threads. Authentication is federated through Google OAuth, keeping onboarding to a single tap.',
+        heading: 'Stack notes',
+        body: 'Sanity provides the structured schema for recipes, ingredients, and author profiles, with image assets served through its CDN. A lightweight Socket.io service handles presence and live comment threads. Authentication is federated through Google OAuth.',
       },
       {
-        heading: 'Outcomes',
+        heading: 'Shipped',
         body: 'Shipped to production at officialnutrisipe.pages.dev with a masonry feed, authenticated publishing, and real-time commenting. The Sanity schema has absorbed multiple content-model changes without migrations on the client.',
       },
     ],
     gallery: [
       {
-        src: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80',
-        alt: 'Recipe feed view',
+        src: new URL('@/assets/projects/nutrisipe-01.png', import.meta.url).href,
+        alt: 'Nutrisipe recipe feed view',
       },
       {
-        src: 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=800&q=80',
-        alt: 'Recipe detail with nutrition info',
+        src: new URL('@/assets/projects/nutrisipe-02.png', import.meta.url).href,
+        alt: 'Nutrisipe recipe detail with nutrition info',
       },
     ],
   },
@@ -169,26 +163,24 @@ export const useRiskStore = defineStore('risk', () => {
     title: 'Tango',
     categoryLabel: 'Personal / Progressive Web App',
     description:
-      'A couples-first PWA for shared budgeting, goal tracking, todos, and a shared calendar — with real-time sync via Supabase channels and a demo mode fallback.',
-    backgroundImage:
-      'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=1200&q=80',
+      'A couples-first PWA for shared budgeting, goal tracking, todos, and a shared calendar, with real-time sync via Supabase channels and a demo mode fallback.',
+    backgroundImage: new URL('@/assets/projects/tango-hero.png', import.meta.url).href,
     role: 'Solo Developer',
     stack: 'Vue 3, TypeScript, Tailwind v4, Pinia, Supabase, Vite PWA',
     timeline: '2025 — Present',
     liveUrl: 'https://takes22tango.netlify.app/',
     repoUrl: 'https://github.com/Araragee/Tango',
     introStatement:
-      'Tango is a couples-first progressive web app built to replace scattered spreadsheets and notes with one shared surface. Budget together, split goal contributions, track todos with handoff logic, and coordinate on a shared calendar — all synced in real time through Supabase channels. A demo mode activates automatically when Supabase is unconfigured, making the app fully presentable without a live backend.',
-    heroImage:
-      'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=1400&q=80',
+      'Tango is a couples-first progressive web app built to replace scattered spreadsheets and notes with one shared surface. Budget together, split goal contributions, track todos with handoff logic, and coordinate on a shared calendar, all synced in real time through Supabase channels. A demo mode activates automatically when Supabase is unconfigured, making the app fully presentable without a live backend.',
+    heroImage: new URL('@/assets/projects/tango-hero.png', import.meta.url).href,
     sections: [
       {
-        heading: 'The Problem',
-        body: 'Couples managing money and shared commitments typically split across multiple apps — a budgeting tool here, a shared note there, a calendar somewhere else. None of these surfaces talk to each other, and none of them are designed for two people operating as a unit. Tango was built to be that single surface.',
+        heading: 'The scattered surfaces problem',
+        body: 'Couples managing money and shared commitments typically split across multiple apps: a budgeting tool here, a shared note there, a calendar somewhere else. None of these surfaces talk to each other, and none of them are designed for two people operating as a unit. Tango was built to be that single surface.',
       },
       {
-        heading: 'Architecture',
-        body: 'The frontend is a strictly typed Vue 3 + Pinia application compiled as a PWA via vite-plugin-pwa. Each domain (budget, goals, todos, calendar) lives in its own Pinia store with typed API contracts against Supabase. Realtime updates are pushed through Supabase channels and merged into store state directly — no polling. A composable-level demo mode layer intercepts all store reads and writes when the app is run without credentials, keeping the full UI exercisable in a presentation context.',
+        heading: 'PWA architecture',
+        body: 'The frontend is a strictly typed Vue 3 and Pinia application compiled as a PWA via vite-plugin-pwa. Each domain (budget, goals, todos, calendar) lives in its own Pinia store with typed API contracts against Supabase. Realtime updates are pushed through Supabase channels and merged into store state directly without polling. A composable-level demo mode layer intercepts all store reads and writes when the app is run without credentials, keeping the full UI exercisable in a presentation context.',
         code: {
           filename: 'composables/useDemoMode.ts',
           content: `import { inject } from 'vue'
@@ -207,18 +199,18 @@ export function useDemoMode() {
         },
       },
       {
-        heading: 'Outcomes',
+        heading: 'Shipped features',
         body: 'Phase 1–19 of development shipped across 30+ bug fixes and a full feature set: recurring transactions, smart todo handoff, goal contribution splits, and a Vibe Check module. UTC date drift was caught and patched globally via a shared dateUtils composable. The app is installable as a PWA on mobile and desktop.',
       },
     ],
     gallery: [
       {
-        src: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80',
-        alt: 'Budget dashboard',
+        src: new URL('@/assets/projects/tango-01.png', import.meta.url).href,
+        alt: 'Tango budget dashboard',
       },
       {
-        src: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=800&q=80',
-        alt: 'Goal tracking view',
+        src: new URL('@/assets/projects/tango-02.png', import.meta.url).href,
+        alt: 'Tango goal tracking view',
       },
     ],
   },
@@ -228,39 +220,37 @@ export function useDemoMode() {
     title: 'Accomplisher',
     categoryLabel: 'Productivity / Desktop App',
     description:
-      'A local-first Tauri desktop app for PSA developers to generate semi-monthly payroll accomplishment reports, log WFH output, and track IPCR coverage — no server, no login.',
-    backgroundImage:
-      'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1200&q=80',
+      'A local-first Tauri desktop app for PSA developers to generate semi-monthly payroll accomplishment reports, log WFH output, and track IPCR coverage.',
+    backgroundImage: new URL('@/assets/projects/accomplisher-hero.png', import.meta.url).href,
     role: 'Solo Developer — Personal Tool',
     stack: 'Tauri, React, TypeScript, SQLite',
     timeline: '2025 — Present',
     repoUrl: 'https://github.com/Araragee/Accomplisher',
     introStatement:
-      'Accomplisher is a local-first desktop app that replaces the twice-a-month scramble of writing payroll accomplishment reports from memory. Built with Tauri and React, it runs entirely on-device with no server or login — everything lives in a local SQLite database. The interface is designed for a productive person who is caught up, not one who is behind and panicking.',
-    heroImage:
-      'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1400&q=80',
+      'Accomplisher is a local-first desktop app that replaces the twice-a-month scramble of writing payroll accomplishment reports from memory. Built with Tauri and React, it runs entirely on-device with no server or login. Everything lives in a local SQLite database. The interface is designed for a productive person who is caught up, not one who is behind and panicking.',
+    heroImage: new URL('@/assets/projects/accomplisher-hero.png', import.meta.url).href,
     sections: [
       {
-        heading: 'The Problem',
+        heading: 'Fixing the payroll scramble',
         body: 'Government developers at PSA file accomplishment reports every semi-monthly payroll cutoff (11–25 and 26–10). Without tooling, this means reconstructing two weeks of work from memory minutes before the deadline. IPCR target coverage is tracked separately, if at all. WFH logs live in a different place from in-office logs. The accumulation of friction makes every cutoff stressful.',
       },
       {
-        heading: 'Design Philosophy',
-        body: 'The interface draws from the aesthetic of a well-kept paper planner — generous whitespace, soft sage-tinted neutrals, one warm terracotta accent for actions and current state. Flat surfaces, hairline borders, no glow, no glass. This was a deliberate inversion of the previous dark-navy-neon-glassmorphism build. Anti-references were explicitly written into the product spec to keep the design honest.',
+        heading: 'Paper planner aesthetics',
+        body: 'The interface draws from the aesthetic of a well-kept paper planner: generous whitespace, soft sage-tinted neutrals, one warm terracotta accent for actions and current state. Flat surfaces, hairline borders, no glow, no glass. This was a deliberate inversion of the previous dark-navy-neon-glassmorphism build. Anti-references were explicitly written into the product spec to keep the design honest.',
       },
       {
-        heading: 'Implementation',
+        heading: 'Tauri local-first build',
         body: 'Three modules ship in the first version: the accomplishment maker (generates formatted report text for both cutoffs and custom ranges), the WFH log (daily output logged against IPCR commitment hours), and the Task Thinker (lightweight on-device suggestions reasoned from each person\'s IPCR targets and recent logged work). The Tauri shell gives native file access and OS-level window chrome without a web server dependency.',
       },
     ],
     gallery: [
       {
-        src: 'https://images.unsplash.com/photo-1512314889357-e157c22f938d?w=800&q=80',
-        alt: 'Accomplishment report view',
+        src: new URL('@/assets/projects/accomplisher-01.png', import.meta.url).href,
+        alt: 'Accomplisher report view',
       },
       {
-        src: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=800&q=80',
-        alt: 'IPCR coverage tracker',
+        src: new URL('@/assets/projects/accomplisher-02.png', import.meta.url).href,
+        alt: 'Accomplisher IPCR coverage tracker',
       },
     ],
   },
@@ -270,39 +260,37 @@ export function useDemoMode() {
     title: 'Sernan Music Clinic',
     categoryLabel: 'Freelance / Business App',
     description:
-      'A full-stack scheduling and enrollment management app for a music clinic — role-based access for admins, teachers, and students with session booking and attendance tracking.',
-    backgroundImage:
-      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&q=80',
-    role: 'Full-stack Developer — Freelance',
+      'A full-stack scheduling and enrollment management app for a music clinic. Includes role-based access for admins, teachers, and students with session booking and attendance tracking.',
+    backgroundImage: new URL('@/assets/projects/smc-hero.png', import.meta.url).href,
+    role: 'Full-stack Developer',
     stack: 'Vue 3, TypeScript, Pinia, Tailwind, Python, PostgreSQL',
     timeline: '2025',
     repoUrl: 'https://github.com/Araragee/SMC',
     introStatement:
-      'A bespoke web app built for Sernan\'s Music Clinic to replace manual scheduling and paper enrollment records. Three distinct role surfaces — Admin, Teacher, and Student — each scoped to their workflows: the admin manages rosters and clinic settings, teachers view and manage their session schedules, and students browse, enroll, and track their lessons.',
-    heroImage:
-      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1400&q=80',
+      'A bespoke web app built for Sernan\'s Music Clinic to replace manual scheduling and paper enrollment records. Three distinct role surfaces: Admin, Teacher, and Student. Each is scoped to their workflows. The admin manages rosters and clinic settings, teachers view and manage their session schedules, and students browse, enroll, and track their lessons.',
+    heroImage: new URL('@/assets/projects/smc-hero.png', import.meta.url).href,
     sections: [
       {
-        heading: 'The Brief',
-        body: 'The clinic was managing schedules via spreadsheets and messaging apps — fragile, manual, and opaque to students. The ask was a web app that gives the admin a single control surface, teachers visibility into their schedules, and students self-service enrollment and session history.',
+        heading: 'Moving off spreadsheets',
+        body: 'The clinic was managing schedules via spreadsheets and messaging apps: fragile, manual, and opaque to students. The ask was a web app that gives the admin a single control surface, teachers visibility into their schedules, and students self-service enrollment and session history.',
       },
       {
-        heading: 'Role-Based Architecture',
-        body: 'The Vue 3 frontend uses Pinia stores scoped per role, with route guards enforcing access at the router level. Each role loads a different navigation structure and component set on login — admins see the full management suite, teachers see only their schedule and student list, students see only enrollment and their lesson history. The Python backend enforces the same role boundaries at the API layer.',
+        heading: 'Role-based boundaries',
+        body: 'The Vue 3 frontend uses Pinia stores scoped per role, with route guards enforcing access at the router level. Each role loads a different navigation structure and component set on login. Admins see the full management suite, teachers see only their schedule and student list, students see only enrollment and their lesson history. The Python backend enforces the same role boundaries at the API layer.',
       },
       {
-        heading: 'Outcomes',
-        body: 'Delivered a working multi-role scheduling system with session booking, enrollment management, and attendance tracking. Faculty roster includes multiple teachers with distinct schedules, and the system supports student-level session history queries. Built and handed off as a fully functional freelance engagement.',
+        heading: 'Delivery',
+        body: 'Delivered a working multi-role scheduling system with session booking, enrollment management, and attendance tracking. The faculty roster includes multiple teachers with distinct schedules, and the system supports student-level session history queries. Built and handed off as a fully functional freelance engagement.',
       },
     ],
     gallery: [
       {
-        src: 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=800&q=80',
-        alt: 'Schedule management view',
+        src: new URL('@/assets/projects/smc-01.png', import.meta.url).href,
+        alt: 'SMC schedule management view',
       },
       {
-        src: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&q=80',
-        alt: 'Student enrollment interface',
+        src: new URL('@/assets/projects/smc-02.png', import.meta.url).href,
+        alt: 'SMC student enrollment interface',
       },
     ],
   },

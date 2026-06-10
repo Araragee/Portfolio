@@ -1,12 +1,12 @@
 export const siteConfig = {
   // Brand details
-  brandName: 'ARCHITECT.VUE',
+  brandName: 'DAVE GONZALES',
   tagline: 'Frontend Engineer',
   
   // Default SEO Metadata
   seo: {
-    defaultTitle: 'ARCHITECT.VUE — Frontend Engineer Portfolio',
-    description: 'Portfolio of Dex — Senior Vue.js & TypeScript engineer specializing in scalable web architectures, design systems, and performance optimization.',
+    defaultTitle: 'DAVE GONZALES — Frontend Engineer Portfolio',
+    description: 'Portfolio of Dex, a Vue.js & TypeScript engineer specializing in scalable web architectures, design systems, and performance.',
     url: 'https://architect-vue.vercel.app',
     keywords: [
       'web developer',
@@ -20,8 +20,8 @@ export const siteConfig = {
       'pinia',
       'design systems'
     ],
-    author: 'Dex Gonzales',
-    jobTitle: 'Senior Front-end Developer'
+    author: 'Dave Gonzales',
+    jobTitle: 'Front-end Developer'
   },
 
   // Tech Badge Subtitle used in Navbar
@@ -30,9 +30,9 @@ export const siteConfig = {
   // Hero Section configuration
   hero: {
     availability: 'AVAILABLE FOR OPPORTUNITIES',
-    location: 'Philippines — Remote',
-    headline: 'Senior Vue.js<br />& TS Engineer',
-    description: 'Building hyper-efficient, structurally sound web architectures with TypeScript and Vue. Focusing on technical precision and performance optimization.'
+    location: 'Philippines (Remote)',
+    headline: 'Vue.js &<br />TS Engineer',
+    description: 'I build fast, boring, maintainable web applications with Vue and TypeScript.'
   },
 
   // Tech Marquee list
@@ -40,8 +40,8 @@ export const siteConfig = {
 
   // Bento Box section config
   bento: {
-    philosophyTitle: 'Code as<br />Architecture',
-    philosophyBody: "I believe software should be built with the same longevity and structural integrity as physical landmarks. Clean, maintainable TypeScript isn't just a preference — it's a requirement for systems that intend to last.",
+    philosophyTitle: 'Code<br />Philosophy',
+    philosophyBody: "I like code that is easy to read, test, and delete. Clean, maintainable TypeScript is a requirement for systems that intend to last.",
     expertise: [
       { label: "Enterprise Vue 3", years: "3+ YRS" },
       { label: "TypeScript Arch", years: "3+ YRS" },
@@ -55,30 +55,30 @@ export const siteConfig = {
   manifesto: {
     pillars: [
       {
-        number: 'Pillar 01',
-        heading: 'Structural Integrity',
-        body: 'Code should reflect the physical world. Clean abstractions and modular patterns ensure a system that can withstand the weight of expansion without collapse. TypeScript strict mode is non-negotiable.',
+        number: '01',
+        heading: 'Strict Types',
+        body: 'TypeScript strict mode is non-negotiable. It catches errors before runtime and serves as live documentation for the next developer.',
       },
       {
-        number: 'Pillar 02',
-        heading: 'Aggressive Minimalism',
-        body: 'Subtract until only the essential remains. If a feature does not clarify the user\'s intent, it is noise. If a line of code does not earn its existence, it is deleted.',
+        number: '02',
+        heading: 'Simplicity',
+        body: 'I subtract until only the essential remains. If a feature does not clarify the user\'s intent, it is noise. If a line of code does not earn its existence, it gets deleted.',
       },
       {
-        number: 'Pillar 03',
-        heading: 'Performance as Design',
-        body: 'A slow interface is a broken interface. Bundle size, render blocking, and layout shift are design decisions — not afterthoughts for the DevOps team.',
+        number: '03',
+        heading: 'Performance',
+        body: 'A slow interface is a broken interface. Bundle size, render blocking, and layout shift are design decisions.',
       },
       {
-        number: 'Pillar 04',
-        heading: 'Composable Architecture',
+        number: '04',
+        heading: 'Composability',
         body: 'The Vue 3 Composition API changed my thinking about software. Logic should be composable, testable, and portable. Components should be declarative. State should have a single owner.',
       }
     ],
     referenceImage: {
-      url: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=80',
-      alt: 'Minimalist brutalist architecture — clean geometric forms against a pale sky',
-      caption: 'Structural Reference: Brutalist Precision, 2026'
+      url: new URL('@/assets/projects/cbms-hero.png', import.meta.url).href,
+      alt: 'Architecture reference',
+      caption: 'Code as Architecture'
     }
   }
 }

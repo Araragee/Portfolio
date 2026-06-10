@@ -2,13 +2,13 @@ import type { PersonalContent } from '@/types/personal'
 
 export const personalContent: PersonalContent = {
   intro: [
-    'Off the clock, I go by Araragi. This is the side of me that does not ship tickets — the one that reads late, plays late, and argues about frame rates.',
+    'Off the clock, I go by Araragi. This is the side of me that does not ship tickets. It is the side that reads late, plays late, and argues about frame rates.',
     'The professional page is about the work. This page is about the person doing it.',
   ],
   story: [
-    "I came into software the long way around. A CS student first — the lectures, the theory, the late-night study groups trying to make sense of recursion at 2 AM. School gave me the vocabulary; it did not give me the fluency.",
-    'Fluency came from building. Small projects, broken projects, projects that never shipped. I moved from static pages to jQuery to Vue, hunted down stack traces on forums, and slowly put together a mental model of how the web actually works underneath the tooling.',
-    'A 3-month web-design internship at iPhitech in Clark was the first time I got paid to care about pixels. Shortly after, I landed at the Philippine Statistics Authority, where I have now spent three years on the CBMS Portal — building the thing, and becoming the developer I wanted to be along the way.',
+    "I came into software the long way around. I was a CS student first (learning the lectures, the theory, and joining late-night study groups trying to make sense of recursion at 2 AM). School gave me the vocabulary, but it did not give me the fluency.",
+    'Fluency came from building. I worked on small projects, broken projects, and projects that never shipped. I moved from static pages to jQuery to Vue, hunted down stack traces on forums, and slowly put together a mental model of how the web actually works underneath the tooling.',
+    'A 3-month web-design internship at iPhitech in Clark from March to May 2023 was the first time I got paid to care about pixels. By October 2023, I landed at the Philippine Statistics Authority, where I\'ve worked on the CBMS Portal since 2023, building the thing and becoming the developer I wanted to be along the way.',
   ],
   values: [
     {
@@ -21,33 +21,33 @@ export const personalContent: PersonalContent = {
     },
     {
       title: 'Restraint',
-      body: 'The best interface is the one that gets out of the way. If a feature does not earn its place, it does not belong.',
+      body: 'The best interface is the one that gets out of the way. I delete features that do not earn their place.',
     },
     {
       title: 'Collaboration',
-      body: 'Software is a team sport. Clear writing, honest reviews, and the assumption that the next developer is smarter than me.',
+      body: 'Software is a team sport. I value clear writing, honest reviews, and assume the next developer is smarter than me.',
     },
   ],
   hobbies: [
     {
       name: 'Gaming',
       blurb:
-        'Long-form RPGs, competitive shooters, anything with a tight feedback loop. The kind of hobby that sharpens pattern recognition and teaches you how to lose well.',
+        'Long-form RPGs, competitive shooters, and anything with a tight feedback loop. It sharpens pattern recognition.',
     },
     {
       name: 'Anime & Manga',
       blurb:
-        'The handle "Araragi" is not an accident. I read widely — shonen, seinen, slice-of-life — and think animation is one of the most under-rated storytelling mediums of the last thirty years.',
+        'The handle "Araragi" is not an accident. I read widely across shonen, seinen, and slice-of-life genres. I think animation is a very under-rated storytelling medium.',
     },
     {
       name: 'Music',
       blurb:
-        'Always something playing while I work. Anything from OSTs to lo-fi to whatever the algorithm surfaces this week. The shuffle is the playlist.',
+        'Always something playing while I work. I listen to anything from OSTs to lo-fi to whatever the algorithm surfaces this week.',
     },
     {
       name: 'Fitness & Outdoors',
       blurb:
-        'Balancing screen time with movement — gym sessions, walks, trips out of the city. The best debugging happens away from the keyboard.',
+        'Balancing screen time with movement. I enjoy gym sessions, walks, and trips out of the city.',
     },
   ],
 }
