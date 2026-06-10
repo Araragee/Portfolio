@@ -1,6 +1,19 @@
 # Phase 9 — QA & Launch
 
-**Status: ⬜ pending** (start after Phase 8 verified)
+**Status: 🔄 in progress (2026-06-11)**
+
+Done automatically:
+- [x] SPA fallback: `postbuild` script copies `dist/index.html` → `dist/404.html` (GitHub Pages)
+- [x] Pre-launch tag: `git tag v1.0.0-pre-launch` (after Phase 8 a11y commit)
+- [x] `npm run type-check` + `npm run build` — green
+- [x] No TODO/placeholder copy in journeyData.ts
+
+Still needs you (real browser + device):
+- [ ] Browser matrix
+- [ ] Device matrix
+- [ ] Lighthouse audit
+- [ ] Host choice + CLAUDE.md update
+- [ ] `HomePage.vue` fate decision (/home → keep or delete)
 
 ## Goal
 

@@ -129,13 +129,15 @@ budgets green; fallback visually coherent.
 
 **Accept:** `/` is the journey; all old routes still resolve; audits clean.
 
-## Phase 9 — QA & launch
+## Phase 9 — QA & launch (in progress)
 
-- [ ] Cross-browser: Chrome, Safari (incl. iOS), Firefox
-- [ ] Devices: mid Android, older iPhone, 4K desktop
-- [ ] 404/SPA fallback works on the chosen host (gh-pages/netlify/vercel configs
-      already in repo — pick one, document it)
-- [ ] Rollback plan: tag pre-launch commit; `/` swap is one revert away
+- [ ] Cross-browser: Chrome, Safari (incl. iOS), Firefox — needs real browser
+- [ ] Devices: mid Android, older iPhone, 4K desktop — needs real devices
+- [x] 404/SPA fallback: `postbuild` copies `dist/404.html` (GitHub Pages compatible)
+- [x] Pre-launch tag: `v1.0.0-pre-launch` created
+- [ ] Choose host (gh-pages / Netlify / Vercel) + document in CLAUDE.md
+- [ ] Lighthouse /journey ≥ 90 perf
+- [ ] Decide: keep `/home` or delete old `HomePage.vue`
 
 ---
 
