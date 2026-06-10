@@ -13,7 +13,7 @@ export const projects: Project[] = [
     role: 'Lead Front-end Developer — PSA Central Office',
     stack: 'Vue 3, TypeScript, Pinia, Vuetify, ECharts, D3, Babylon.js, Laravel',
     timeline: '2022 — Present',
-    liveUrl: undefined,
+    liveUrl: 'https://cbmsportal.psa.gov.ph',
     introStatement:
       'A public-sector analytics portal surfacing CBMS indicators for policymakers and researchers. Built inside the PSA Central Office, the frontend is a typed Vue 3 application that renders millions of rows of municipal survey data through interactive dashboards, geographic layers, and exportable reports.',
     heroImage:
@@ -71,7 +71,7 @@ export function useIndicator(code: string) {
     role: 'Full-stack Developer',
     stack: 'Vue 3, Pinia, TypeScript, FastAPI, PostgreSQL, Docker',
     timeline: '2025 — Present',
-    liveUrl: undefined,
+    liveUrl: 'https://lms-ai-frontend.onrender.com/',
     introStatement:
       'A full-stack LMS platform where AI-driven risk models surface at-risk students in real time, enabling instructors to intervene before dropout occurs. Built with a strict TypeScript architecture and a Vue 3 Composition API throughout.',
     heroImage:
@@ -175,6 +175,7 @@ export const useRiskStore = defineStore('risk', () => {
     role: 'Solo Developer',
     stack: 'Vue 3, TypeScript, Tailwind v4, Pinia, Supabase, Vite PWA',
     timeline: '2025 — Present',
+    liveUrl: 'https://takes22tango.netlify.app/',
     repoUrl: 'https://github.com/Araragee/Tango',
     introStatement:
       'Tango is a couples-first progressive web app built to replace scattered spreadsheets and notes with one shared surface. Budget together, split goal contributions, track todos with handoff logic, and coordinate on a shared calendar — all synced in real time through Supabase channels. A demo mode activates automatically when Supabase is unconfigured, making the app fully presentable without a live backend.',
