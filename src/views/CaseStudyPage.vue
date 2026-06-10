@@ -17,7 +17,7 @@ const { elementRef: introRef } = useScrollAnimation({ threshold: 0.1 })
 
 // SEO
 useSeoMeta({
-  title: computed(() => project.value ? `${project.value.title} — ARCHITECT.VUE` : 'Case Study — ARCHITECT.VUE'),
+  title: computed(() => project.value ? project.value.title + ' — Dave Gonzales' : 'Case Study — Dave Gonzales'),
   description: computed(() => project.value?.introStatement ?? ''),
 })
 </script>

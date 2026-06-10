@@ -1,32 +1,55 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue'
 import { useScrollAnimation, useStaggerAnimation } from '@/composables/useScrollAnimation'
-import { siteConfig } from '@/data/siteConfig'
-import { timeline as aboutTimeline, personalInfo } from '@/data/aboutData'
 
 useSeoMeta({
-  title: `Manifesto — ${siteConfig.brandName}`,
-  description: 'Engineering philosophy, chronology, and technical pillars of a senior Vue.js & TypeScript architect.',
+  title: 'How I work — Dave Gonzales',
+  description: 'Engineering philosophy, chronology, and technical pillars of Dave Gonzales.',
 })
 
 const { elementRef: heroRef } = useScrollAnimation({ threshold: 0.1 })
 const { containerRef: timelineRef } = useStaggerAnimation({ staggerDelay: 120 })
 const { containerRef: pillarsRef } = useStaggerAnimation({ staggerDelay: 100 })
 
-// Map timeline from central aboutData to match page rendering structure
-const timeline = aboutTimeline.map(item => {
-  const periodStr = item.period.end === 'Present'
-    ? `${item.period.start} — PRES.`
-    : `${item.period.start} — ${item.period.end.toUpperCase()}`
-  return {
-    period: periodStr,
-    title: item.title,
-    company: item.organization,
-    description: item.description
+const timeline = [
+  {
+    period: "Oct 2023 — PRES.",
+    title: "Front-end Developer",
+    company: "Philippine Statistics Authority — Central Office",
+    description: "Lead front-end for the CBMS Portal — the analyst-facing surface for Community-Based Monitoring System data across the Philippines. Vue 3 + TypeScript + Tailwind, with Vuetify, ECharts, D3, and a Laravel service backing the data layer."
+  },
+  {
+    period: "Mar 2023 — MAY 2023",
+    title: "Web Designer / UI-UX Junior Intern",
+    company: "iPhitech",
+    description: "Three-month internship focused on web design, UI/UX, and front-end prototyping. Produced marketing pages and interface mockups that informed the production design system."
+  },
+  {
+    period: "2019 — JUL 2023",
+    title: "Bachelor of Science in Computer Science",
+    company: "Tarlac State University",
+    description: "Computer Science degree at Tarlac State University. Graduated July 2023. Completed OJT at iPhitech (Clark, Pampanga) from March to May 2023 as part of the program."
   }
-})
+]
 
-const pillars = siteConfig.manifesto.pillars
+const pillars = [
+  {
+    heading: 'Strict TypeScript',
+    body: 'I use strict mode and explicit types. If the compiler cannot catch it, the runtime will, and I would rather fix it in the editor.',
+  },
+  {
+    heading: 'Deleting code',
+    body: 'The best pull requests are the ones that remove lines. If a piece of logic or a component is no longer used, I delete it. Dead code is technical debt.',
+  },
+  {
+    heading: 'Performance budgets',
+    body: 'I keep an eye on bundle sizes and render times. A fast interface makes users trust the system. Slow apps usually mean someone got lazy with dependencies.',
+  },
+  {
+    heading: 'Composables',
+    body: 'Vue 3 changed how I write front-ends. I prefer to keep state and logic in small, testable composables instead of huge component files.',
+  }
+]
 </script>
 
 <template>
@@ -36,25 +59,25 @@ const pillars = siteConfig.manifesto.pillars
       <!-- Hero Manifesto -->
       <section ref="heroRef" class="mb-20 md:mb-24 text-center" aria-labelledby="manifesto-heading">
         <span class="font-mono text-caption uppercase text-secondary mb-6 md:mb-8 block">
-          Positioning Statement
+          About the work
         </span>
         <h1
           id="manifesto-heading"
           class="font-headline font-semibold text-heading-xl text-primary mb-10 md:mb-12"
         >
-          Engineering Philosophy
+          How I work
         </h1>
         <div class="w-full h-px bg-outline mb-12 md:mb-16"></div>
         <div class="space-y-6 md:space-y-8 text-left">
           <p class="text-body-lg leading-relaxed font-body text-on-surface">
-            System design is the poetry of logic. In the digital realm, we often mistake decoration
-            for substance. My work is a rejection of the superfluous. I build systems where the
-            structure is the interface, and the code is the foundation of the aesthetic.
+            I write code that is meant to be read, debugged, and eventually replaced. I don't believe in clever tricks
+            that save five lines but take an hour to understand. When I build a feature, I assume someone
+            else will have to maintain it.
           </p>
           <p class="text-body leading-relaxed font-body text-secondary">
-            Every pixel must earn its right to exist. Every function must serve a singular,
-            irreducible purpose. We do not build for the continuum — we create architectural
-            patterns that resist the erosion of shifting trends.
+            Over the last few years working on the CBMS Portal, I've learned that consistency is more valuable
+            than adopting the latest framework feature. I stick to established patterns, enforce strict TypeScript
+            rules, and focus on delivering something that works reliably.
           </p>
         </div>
       </section>
@@ -106,33 +129,18 @@ const pillars = siteConfig.manifesto.pillars
         <h2 id="pillars-heading" class="sr-only">Engineering Pillars</h2>
         <div
           v-for="pillar in pillars"
-          :key="pillar.number"
+          :key="pillar.heading"
           data-stagger
           class="bg-surface p-8 md:p-10"
         >
           <span class="font-mono text-caption text-secondary uppercase block mb-4 md:mb-6">
-            {{ pillar.number }}
+
           </span>
           <h3 class="font-headline text-heading font-semibold mb-3 md:mb-4">{{ pillar.heading }}</h3>
           <p class="text-on-surface-variant text-body-sm leading-relaxed font-body">{{ pillar.body }}</p>
         </div>
       </section>
 
-      <!-- Decorative Architecture Image -->
-      <figure class="mb-20 md:mb-24 border border-outline p-1.5 md:p-2 bg-white" aria-label="Architectural reference">
-        <img
-          :src="siteConfig.manifesto.referenceImage.url"
-          :alt="siteConfig.manifesto.referenceImage.alt"
-          class="w-full grayscale contrast-125 brightness-95 hover:grayscale-0 transition-all duration-700"
-          width="1200"
-          height="800"
-          loading="lazy"
-          decoding="async"
-        />
-        <figcaption class="mt-3 md:mt-4 font-mono text-label text-secondary uppercase text-center">
-          {{ siteConfig.manifesto.referenceImage.caption }}
-        </figcaption>
-      </figure>
 
       <!-- CTA -->
       <section class="bg-primary text-surface p-10 md:p-16 text-center" aria-labelledby="manifesto-cta-heading">
@@ -140,15 +148,15 @@ const pillars = siteConfig.manifesto.pillars
           id="manifesto-cta-heading"
           class="font-headline text-heading-xl font-semibold tracking-tighter mb-6 md:mb-8 italic uppercase"
         >
-          Build with Precision
+          Want to work together?
         </h2>
         <a
-          :href="`mailto:${personalInfo.contact.email}`"
+          href="mailto:davxgonzales@gmail.com"
           class="inline-flex items-center gap-4 border-b border-surface pb-2 font-mono text-caption uppercase hover:opacity-70 transition-opacity no-underline text-surface"
           id="manifesto-contact-link"
           aria-label="Contact me"
         >
-          <span>Initiate Contact</span>
+          <span>Email me</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>

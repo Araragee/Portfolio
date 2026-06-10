@@ -1,30 +1,30 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
-import { siteConfig } from '@/data/siteConfig'
+
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
     component: () => import('@/views/HomePage.vue'),
-    meta: { title: siteConfig.seo.defaultTitle }
+    meta: { title: "Dave Gonzales — Vue.js & TypeScript Developer" }
   },
   {
     path: '/manifesto',
     name: 'Manifesto',
     component: () => import('@/views/ManifestoPage.vue'),
-    meta: { title: `Manifesto — ${siteConfig.brandName}` }
+    meta: { title: "How I work — Dave Gonzales" }
   },
   {
     path: '/personal',
     name: 'Personal',
     component: () => import('@/views/PersonalPage.vue'),
-    meta: { title: `Personal — ${siteConfig.brandName}` }
+    meta: { title: "About — Dave Gonzales" }
   },
   {
     path: '/case-study/:slug',
     name: 'CaseStudy',
     component: () => import('@/views/CaseStudyPage.vue'),
-    meta: { title: `Case Study — ${siteConfig.brandName}` }
+    meta: { title: "Case Study — Dave Gonzales" }
   }
 ]
 
@@ -41,7 +41,7 @@ const router = createRouter({
 
 // Update document title on navigation
 router.afterEach((to) => {
-  document.title = (to.meta.title as string) ?? siteConfig.brandName
+  document.title = (to.meta.title as string) ?? 'Dave Gonzales'
 })
 
 export default router

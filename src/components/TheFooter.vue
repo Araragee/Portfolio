@@ -1,8 +1,21 @@
 <script setup lang="ts">
-import { siteConfig } from '@/data/siteConfig'
-import { socialLinks } from '@/data/aboutData'
 
 const currentYear = new Date().getFullYear()
+
+const socialLinks = [
+  {
+    platform: "GitHub",
+    url: "https://github.com/Araragee",
+  },
+  {
+    platform: "LinkedIn",
+    url: "https://linkedin.com/in/davxloper",
+  },
+  {
+    platform: "Email",
+    url: "mailto:davxgonzales@gmail.com",
+  },
+];
 </script>
 
 <template>
@@ -11,7 +24,7 @@ const currentYear = new Date().getFullYear()
     role="contentinfo"
   >
     <div class="text-on-surface font-bold mb-4 md:mb-0">
-      &copy;{{ currentYear }} {{ siteConfig.brandName }}
+      &copy; {{ currentYear }} Dave Gonzales
     </div>
     <div class="flex flex-wrap justify-center gap-6 md:gap-10">
       <a

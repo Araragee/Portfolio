@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { useScrollAnimation, useStaggerAnimation } from "@/composables/useScrollAnimation";
-import { siteConfig } from "@/data/siteConfig";
 
 const router = useRouter();
 const { elementRef: sectionRef } = useScrollAnimation({ threshold: 0.1 });
@@ -11,8 +10,8 @@ function goManifesto() {
   router.push("/manifesto");
 }
 
-const expertise = siteConfig.bento.expertise;
-const technologies = siteConfig.bento.technologies;
+const expertise = [{ label: "Vue 3", years: "2+ YRS" }, { label: "TypeScript", years: "2+ YRS" }, { label: "Node.js Ecosystem", years: "2+ YRS" }, { label: "Design Systems", years: "2+ YRS" }];
+const technologies = ["VUE 3", "TYPESCRIPT", "PINIA", "VITE", "REACT"];
 </script>
 
 <template>
@@ -33,13 +32,13 @@ const technologies = siteConfig.bento.technologies;
         <h2
           id="philosophy-heading"
           class="font-headline font-bold text-heading-xl uppercase leading-none"
-          v-html="siteConfig.bento.philosophyTitle"
         >
+          Code as<br />Architecture
         </h2>
         <p
           class="text-body font-normal text-on-surface/70 leading-relaxed max-w-md font-body"
         >
-          {{ siteConfig.bento.philosophyBody }}
+          I like code that's still readable in three years. Strict TypeScript, small components, no clever tricks.
         </p>
       </div>
       <button
@@ -47,7 +46,7 @@ const technologies = siteConfig.bento.technologies;
         id="view-manifesto-btn"
         @click="goManifesto"
       >
-        View Technical Manifesto
+        How I work
       </button>
     </div>
 
