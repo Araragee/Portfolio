@@ -31,7 +31,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <main class="min-h-screen" id="main-content">
+  <main class="min-h-screen" id="main-content" tabindex="-1">
     <!-- 404 state -->
     <div
       v-if="!project"

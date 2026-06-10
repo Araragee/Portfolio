@@ -13,6 +13,7 @@ const isScrolled = ref(false);
 const isHidden = ref(false);
 let lastScrollY = 0;
 const menuRef = ref<HTMLElement | null>(null);
+const menuTriggerRef = ref<HTMLButtonElement | null>(null);
 
 // On journey: drop "Case Studies" — you're already on it.
 // On other pages: full list, pointing back to '/' (the journey/home).
@@ -39,6 +40,7 @@ function toggleMenu() {
 
 function closeMenu() {
   isMenuOpen.value = false;
+  nextTick(() => menuTriggerRef.value?.focus());
 }
 
 // Lock body scroll when menu is open
@@ -107,6 +109,14 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <!-- Skip to main content — visible on focus only (keyboard users) -->
+  <a
+    href="#main-content"
+    class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-primary focus:px-4 focus:py-2 focus:font-mono focus:text-sm focus:uppercase focus:text-surface"
+  >
+    Skip to content
+  </a>
+
   <header
     class="fixed top-0 left-0 w-full z-50 border-b flex justify-between items-center section-padding py-5 md:py-6 transition-all duration-300"
     :style="{
@@ -123,7 +133,7 @@ onUnmounted(() => {
     <template v-if="isCaseStudy">
       <button
         @click="goBack"
-        class="flex items-center gap-3 text-on-surface hover:opacity-50 transition-opacity duration-200 bg-transparent border-none cursor-pointer p-0"
+        class="flex items-center gap-3 text-on-surface hover:opacity-50 active:opacity-30 transition-opacity duration-200 bg-transparent border-none cursor-pointer p-0"
         aria-label="Back to index"
         id="back-to-index-btn"
       >
@@ -151,7 +161,7 @@ onUnmounted(() => {
     <template v-else>
       <router-link
         to="/"
-        class="text-xl font-black tracking-tighter text-on-surface font-headline no-underline hover:opacity-70 transition-opacity duration-200"
+        class="text-xl font-black tracking-tighter text-on-surface font-headline no-underline hover:opacity-70 active:opacity-50 transition-opacity duration-200"
         id="site-logo-link"
         aria-label="Home"
       >
@@ -166,7 +176,7 @@ onUnmounted(() => {
           v-for="link in navLinks"
           :key="link.to"
           :to="link.to"
-          class="font-headline uppercase text-label font-semibold transition-all duration-300 no-underline relative"
+          class="font-headline uppercase text-label font-semibold transition-all duration-300 no-underline relative active:opacity-60"
           :class="
             route.path === link.to
               ? 'text-on-surface'
@@ -191,7 +201,8 @@ onUnmounted(() => {
 
       <!-- Mobile menu button -->
       <button
-        class="md:hidden flex flex-col justify-center items-center w-10 h-10 z-[60] bg-transparent border-none p-0 cursor-pointer text-on-surface -mr-1"
+        ref="menuTriggerRef"
+        class="md:hidden flex flex-col justify-center items-center w-10 h-10 z-[60] bg-transparent border-none p-0 cursor-pointer text-on-surface -mr-1 active:scale-[0.9] transition-transform duration-100"
         @click="toggleMenu"
         :aria-label="isMenuOpen ? 'Close menu' : 'Open menu'"
         :aria-expanded="isMenuOpen"
@@ -234,7 +245,7 @@ onUnmounted(() => {
         v-for="link in navLinks"
         :key="link.to"
         :to="link.to"
-        class="font-headline uppercase tracking-[0.15em] text-2xl font-semibold transition-all duration-300 no-underline"
+        class="font-headline uppercase tracking-[0.15em] text-2xl font-semibold transition-all duration-300 no-underline active:opacity-60"
         :class="
           route.path === link.to
             ? 'text-on-surface'
@@ -254,12 +265,12 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* Mobile menu transition */
+/* Mobile menu transition — entrance ease-out, exit ease-in (12 principles) */
 .mobile-menu-enter-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
 }
 .mobile-menu-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease-in, transform 0.2s ease-in;
 }
 .mobile-menu-enter-from {
   opacity: 0;

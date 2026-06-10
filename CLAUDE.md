@@ -5,6 +5,8 @@ Personal portfolio for Dave Gonzales (frontend, PSA). Currently mid-redesign:
 
 1. `docs/CONCEPT.md` — the design + every architectural decision (D1–D11)
 2. `docs/PLAN.md` — phased build plan; find the current phase, work its checklist
+3. `docs/PHASES/` — per-phase cold-start files (status, decisions, files, verify commands)
+4. `docs/TWEAKS/` — post phase 1–6 audit fixes (A–D; all ✅ done)
 
 ## Stack
 

@@ -57,17 +57,17 @@ watch(isVisible, (visible) => {
   }
   anime({
     targets,
-    translateY: [30, 0],
+    translateY: [24, 0],
     opacity: [0, 1],
     easing: 'easeOutCubic',
-    duration: 450,
+    duration: 300,
     delay: anime.stagger(40),
   })
 })
 </script>
 
 <template>
-  <section :id="chapter.id" :class="runwayStyle" ref="elementRef">
+  <section :id="chapter.id" :class="runwayStyle" ref="elementRef" :aria-label="chapter.title">
     <div class="sticky top-0 flex h-screen items-center">
       <div class="mx-auto w-full max-w-5xl px-6">
         <!-- Hero layout (prologue) -->
@@ -160,7 +160,7 @@ watch(isVisible, (visible) => {
               v-for="project in projects"
               :key="project.slug"
               :to="`/case-study/${project.slug}`"
-              class="reveal-text group block border-l border-outline-variant/30 pl-4 transition-colors hover:border-primary"
+              class="reveal-text group block border-l border-outline-variant/30 pl-4 transition-colors hover:border-primary active:opacity-60"
             >
               <h3
                 class="font-headline text-xl font-medium tracking-tight text-primary"

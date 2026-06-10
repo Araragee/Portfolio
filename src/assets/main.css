@@ -275,9 +275,11 @@
 }
 
 /* ─── Page transitions ─── */
-.page-enter-active,
+.page-enter-active {
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
 .page-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.25s ease-in, transform 0.25s ease-in;
 }
 
 .page-enter-from {

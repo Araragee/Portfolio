@@ -114,7 +114,7 @@ Everything below exists and is verified working:
 **Accept:** dither on = same fps tier as dither off on a mid mobile device;
 budgets green; fallback visually coherent.
 
-## Phase 8 — Make it the site (partial ✅)
+## Phase 8 — Make it the site ✅ (done 2026-06-11)
 
 **Goal:** journey becomes `/`.
 
@@ -122,8 +122,10 @@ budgets green; fallback visually coherent.
 - [x] Footer hidden on journey; navbar transparent/minimal on journey
 - [x] Case study pages get a lightweight particle echo on their hero
       (`CaseStudyCanvas.vue` + `CaseStudyField.vue`, scatter formation, lazy-loaded)
-- [ ] Full a11y audit (keyboard, headings, contrast, reduced-motion)
-- [ ] 12-principles audit on all DOM animations (`/12-principles-of-animation`)
+- [x] Full a11y audit: skip link, focus trap + restore, ARIA landmarks,
+      `tabindex="-1"` on all `#main-content` targets, reduced-motion honoured
+- [x] 12-principles audit: page/menu easing corrected (ease-out enter / ease-in
+      exit), `:active` feedback on all interactive elements, reveal timing 450→300ms
 
 **Accept:** `/` is the journey; all old routes still resolve; audits clean.
 

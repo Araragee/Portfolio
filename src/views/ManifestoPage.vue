@@ -53,7 +53,7 @@ const pillars = [
 </script>
 
 <template>
-  <main class="pt-28 md:pt-32 pb-24 px-5 sm:px-6" id="main-content">
+  <main class="pt-28 md:pt-32 pb-24 px-5 sm:px-6" id="main-content" tabindex="-1">
     <div class="max-w-[800px] mx-auto">
 
       <!-- Hero Manifesto -->

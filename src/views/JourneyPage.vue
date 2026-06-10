@@ -100,7 +100,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main ref="containerRef" class="relative bg-surface">
+  <main ref="containerRef" class="relative bg-surface" id="main-content" tabindex="-1">
     <SEOHead title="Journey — Dave Gonzales" />
     <JourneyLoader />
     <JourneyCanvas v-if="webglSupported" />
