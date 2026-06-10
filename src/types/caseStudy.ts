@@ -24,6 +24,7 @@ export interface Project {
   stack: string
   timeline: string
   liveUrl?: string
+  repoUrl?: string
   introStatement: string
   heroImage: string
   sections: CaseStudySection[]

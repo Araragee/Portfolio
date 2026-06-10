@@ -5,6 +5,7 @@ import { useSeoMeta } from '@unhead/vue'
 import { getProjectBySlug, getNextProject } from '@/data/projectsData'
 import GrayscaleImage from '@/components/CaseStudy/GrayscaleImage.vue'
 import NextProjectFooter from '@/components/CaseStudy/NextProjectFooter.vue'
+import ProjectBrowser from '@/components/CaseStudy/ProjectBrowser.vue'
 import { useScrollAnimation } from '@/composables/useScrollAnimation'
 
 const route = useRoute()
@@ -70,7 +71,7 @@ useSeoMeta({
               <span class="text-on-surface">{{ project.timeline }}</span>
             </div>
             <div v-if="project.liveUrl" class="grid grid-cols-1 border-t border-outline pt-4 md:pt-5">
-              <span class="text-secondary mb-1.5 md:mb-2">Outcome</span>
+              <span class="text-secondary mb-1.5 md:mb-2">Live</span>
               <a
                 :href="project.liveUrl"
                 target="_blank"
@@ -79,6 +80,27 @@ useSeoMeta({
                 id="case-study-live-link"
               >
                 Live Link
+                <svg
+                  class="w-3 h-3 opacity-40"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                </svg>
+              </a>
+            </div>
+            <div v-if="project.repoUrl" class="grid grid-cols-1 border-t border-outline pt-4 md:pt-5">
+              <span class="text-secondary mb-1.5 md:mb-2">Source</span>
+              <a
+                :href="project.repoUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-on-surface underline decoration-outline underline-offset-4 hover:decoration-on-surface transition-colors inline-flex items-center gap-2"
+              >
+                GitHub
                 <svg
                   class="w-3 h-3 opacity-40"
                   fill="none"
@@ -151,6 +173,12 @@ useSeoMeta({
               :alt="img.alt"
               aspect-ratio="1/1"
             />
+          </div>
+
+          <!-- Live preview -->
+          <div v-if="project.liveUrl" class="mb-16 md:mb-24">
+            <h2 class="font-headline text-heading-lg font-medium mb-6 md:mb-8">Live Preview</h2>
+            <ProjectBrowser :url="project.liveUrl" :title="project.title" />
           </div>
         </article>
       </div>

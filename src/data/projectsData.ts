@@ -163,6 +163,148 @@ export const useRiskStore = defineStore('risk', () => {
       },
     ],
   },
+  {
+    slug: 'tango',
+    index: '04',
+    title: 'Tango',
+    categoryLabel: 'Personal / Progressive Web App',
+    description:
+      'A couples-first PWA for shared budgeting, goal tracking, todos, and a shared calendar — with real-time sync via Supabase channels and a demo mode fallback.',
+    backgroundImage:
+      'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=1200&q=80',
+    role: 'Solo Developer',
+    stack: 'Vue 3, TypeScript, Tailwind v4, Pinia, Supabase, Vite PWA',
+    timeline: '2025 — Present',
+    repoUrl: 'https://github.com/Araragee/Tango',
+    introStatement:
+      'Tango is a couples-first progressive web app built to replace scattered spreadsheets and notes with one shared surface. Budget together, split goal contributions, track todos with handoff logic, and coordinate on a shared calendar — all synced in real time through Supabase channels. A demo mode activates automatically when Supabase is unconfigured, making the app fully presentable without a live backend.',
+    heroImage:
+      'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=1400&q=80',
+    sections: [
+      {
+        heading: 'The Problem',
+        body: 'Couples managing money and shared commitments typically split across multiple apps — a budgeting tool here, a shared note there, a calendar somewhere else. None of these surfaces talk to each other, and none of them are designed for two people operating as a unit. Tango was built to be that single surface.',
+      },
+      {
+        heading: 'Architecture',
+        body: 'The frontend is a strictly typed Vue 3 + Pinia application compiled as a PWA via vite-plugin-pwa. Each domain (budget, goals, todos, calendar) lives in its own Pinia store with typed API contracts against Supabase. Realtime updates are pushed through Supabase channels and merged into store state directly — no polling. A composable-level demo mode layer intercepts all store reads and writes when the app is run without credentials, keeping the full UI exercisable in a presentation context.',
+        code: {
+          filename: 'composables/useDemoMode.ts',
+          content: `import { inject } from 'vue'
+import type { DemoContext } from '@/types/demo'
+
+export function useDemoMode() {
+  const demo = inject<DemoContext>('demo')
+  const isDemo = computed(() => demo?.active ?? false)
+
+  function guard<T>(live: () => T, fallback: T): T {
+    return isDemo.value ? fallback : live()
+  }
+
+  return { isDemo, guard }
+}`,
+        },
+      },
+      {
+        heading: 'Outcomes',
+        body: 'Phase 1–19 of development shipped across 30+ bug fixes and a full feature set: recurring transactions, smart todo handoff, goal contribution splits, and a Vibe Check module. UTC date drift was caught and patched globally via a shared dateUtils composable. The app is installable as a PWA on mobile and desktop.',
+      },
+    ],
+    gallery: [
+      {
+        src: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80',
+        alt: 'Budget dashboard',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=800&q=80',
+        alt: 'Goal tracking view',
+      },
+    ],
+  },
+  {
+    slug: 'accomplisher',
+    index: '05',
+    title: 'Accomplisher',
+    categoryLabel: 'Productivity / Desktop App',
+    description:
+      'A local-first Tauri desktop app for PSA developers to generate semi-monthly payroll accomplishment reports, log WFH output, and track IPCR coverage — no server, no login.',
+    backgroundImage:
+      'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1200&q=80',
+    role: 'Solo Developer — Personal Tool',
+    stack: 'Tauri, React, TypeScript, SQLite',
+    timeline: '2025 — Present',
+    repoUrl: 'https://github.com/Araragee/Accomplisher',
+    introStatement:
+      'Accomplisher is a local-first desktop app that replaces the twice-a-month scramble of writing payroll accomplishment reports from memory. Built with Tauri and React, it runs entirely on-device with no server or login — everything lives in a local SQLite database. The interface is designed for a productive person who is caught up, not one who is behind and panicking.',
+    heroImage:
+      'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1400&q=80',
+    sections: [
+      {
+        heading: 'The Problem',
+        body: 'Government developers at PSA file accomplishment reports every semi-monthly payroll cutoff (11–25 and 26–10). Without tooling, this means reconstructing two weeks of work from memory minutes before the deadline. IPCR target coverage is tracked separately, if at all. WFH logs live in a different place from in-office logs. The accumulation of friction makes every cutoff stressful.',
+      },
+      {
+        heading: 'Design Philosophy',
+        body: 'The interface draws from the aesthetic of a well-kept paper planner — generous whitespace, soft sage-tinted neutrals, one warm terracotta accent for actions and current state. Flat surfaces, hairline borders, no glow, no glass. This was a deliberate inversion of the previous dark-navy-neon-glassmorphism build. Anti-references were explicitly written into the product spec to keep the design honest.',
+      },
+      {
+        heading: 'Implementation',
+        body: 'Three modules ship in the first version: the accomplishment maker (generates formatted report text for both cutoffs and custom ranges), the WFH log (daily output logged against IPCR commitment hours), and the Task Thinker (lightweight on-device suggestions reasoned from each person\'s IPCR targets and recent logged work). The Tauri shell gives native file access and OS-level window chrome without a web server dependency.',
+      },
+    ],
+    gallery: [
+      {
+        src: 'https://images.unsplash.com/photo-1512314889357-e157c22f938d?w=800&q=80',
+        alt: 'Accomplishment report view',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=800&q=80',
+        alt: 'IPCR coverage tracker',
+      },
+    ],
+  },
+  {
+    slug: 'smc',
+    index: '06',
+    title: 'Sernan Music Clinic',
+    categoryLabel: 'Freelance / Business App',
+    description:
+      'A full-stack scheduling and enrollment management app for a music clinic — role-based access for admins, teachers, and students with session booking and attendance tracking.',
+    backgroundImage:
+      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&q=80',
+    role: 'Full-stack Developer — Freelance',
+    stack: 'Vue 3, TypeScript, Pinia, Tailwind, Python, PostgreSQL',
+    timeline: '2025',
+    repoUrl: 'https://github.com/Araragee/SMC',
+    introStatement:
+      'A bespoke web app built for Sernan\'s Music Clinic to replace manual scheduling and paper enrollment records. Three distinct role surfaces — Admin, Teacher, and Student — each scoped to their workflows: the admin manages rosters and clinic settings, teachers view and manage their session schedules, and students browse, enroll, and track their lessons.',
+    heroImage:
+      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1400&q=80',
+    sections: [
+      {
+        heading: 'The Brief',
+        body: 'The clinic was managing schedules via spreadsheets and messaging apps — fragile, manual, and opaque to students. The ask was a web app that gives the admin a single control surface, teachers visibility into their schedules, and students self-service enrollment and session history.',
+      },
+      {
+        heading: 'Role-Based Architecture',
+        body: 'The Vue 3 frontend uses Pinia stores scoped per role, with route guards enforcing access at the router level. Each role loads a different navigation structure and component set on login — admins see the full management suite, teachers see only their schedule and student list, students see only enrollment and their lesson history. The Python backend enforces the same role boundaries at the API layer.',
+      },
+      {
+        heading: 'Outcomes',
+        body: 'Delivered a working multi-role scheduling system with session booking, enrollment management, and attendance tracking. Faculty roster includes multiple teachers with distinct schedules, and the system supports student-level session history queries. Built and handed off as a fully functional freelance engagement.',
+      },
+    ],
+    gallery: [
+      {
+        src: 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=800&q=80',
+        alt: 'Schedule management view',
+      },
+      {
+        src: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&q=80',
+        alt: 'Student enrollment interface',
+      },
+    ],
+  },
 ]
 
 export function getProjectBySlug(slug: string): Project | undefined {
