@@ -138,7 +138,7 @@ void main() {
     pos.z += force * 0.4 * uDriftAmp;
   }
   else if (uChapterIndex == 4) {
-    // CBMS Logo: Rotate slightly on hover
+    // CBMS Logo: Rotate slightly on hover, and explode on click
     float angle = uInteractState * 1.5;
     float s = sin(angle);
     float c = cos(angle);
@@ -146,6 +146,11 @@ void main() {
     float nz = pos.x * s + pos.z * c;
     pos.x = mix(pos.x, nx, uDriftAmp);
     pos.z = mix(pos.z, nz, uDriftAmp);
+
+    vec2 away = pos.xy - uInteractPos.xy;
+    force = smoothstep(3.0, 0.0, length(away));
+    float impulse = sin(uInteractState * 3.14159);
+    pos.xy += normalize(away + vec2(0.0001)) * force * impulse * 1.8 * uDriftAmp;
   }
   else if (uChapterIndex == 5) {
     // Portrait: Flow with cursor

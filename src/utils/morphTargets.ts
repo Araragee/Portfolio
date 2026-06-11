@@ -467,20 +467,29 @@ function createArtifactFallback(count: number): Float32Array {
 }
 
 /** Samples 2D canvas text into particle positions. Browser-only. */
-export function createTextMass(count: number, text: string): Float32Array {
+export function createTextMass(count: number, text: string | string[], options: { fontPx?: number, yOffset?: number, maxWidth?: number } = {}): Float32Array {
   const rng = createRng(6)
   const canvas = document.createElement('canvas')
   canvas.width = 1024
-  canvas.height = 256
+  canvas.height = 512
   const ctx = canvas.getContext('2d')
   if (!ctx) return createScatter(count)
 
   ctx.fillStyle = '#000'
-  // 120px fits "DAVXLOPER" perfectly on 1024 width
-  ctx.font = '700 115px "Space Grotesk", sans-serif'
+  const fontPx = options.fontPx ?? 115
+  ctx.font = `700 ${fontPx}px "Space Grotesk", sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText(text, canvas.width / 2, canvas.height / 2)
+  
+  const lines = Array.isArray(text) ? text : [text]
+  const lineHeight = fontPx * 1.1
+  const totalHeight = lines.length * lineHeight
+  let startY = canvas.height / 2 - totalHeight / 2 + lineHeight / 2
+  
+  for (const line of lines) {
+    ctx.fillText(line, canvas.width / 2, startY)
+    startY += lineHeight
+  }
 
   const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
   const filled: number[] = []
@@ -503,7 +512,7 @@ export function createTextMass(count: number, text: string): Float32Array {
     const px = filled[p]
     const py = filled[p + 1]
     out[i * 3] = (px / canvas.width - 0.5) * 9.0 * fitScale + (rng() - 0.5) * 0.05
-    out[i * 3 + 1] = (0.5 - py / canvas.height) * 2.2 * fitScale + (rng() - 0.5) * 0.05
+    out[i * 3 + 1] = (0.5 - py / canvas.height) * 4.4 * fitScale + (rng() - 0.5) * 0.05
     out[i * 3 + 2] = (rng() - 0.5) * 0.2
   }
   return out

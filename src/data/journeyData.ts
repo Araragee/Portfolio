@@ -20,7 +20,7 @@ export const journeyChapters: JourneyChapter[] = [
     morphState: 'scatter',
     paragraphs: [
       'I came into software the long way around.',
-      'Dave Gonzales. Frontend engineer. I build interfaces for the data of 110 million people.',
+      'Dave Gonzales. Frontend developer. I build interfaces to turn unintersting things interesting.',
     ],
     interactionHint: 'move cursor — the field gives way',
     morphStart: 0.55,
@@ -93,7 +93,7 @@ export const journeyChapters: JourneyChapter[] = [
       'Vue 3, TypeScript, ECharts. Real scale government systems.',
       'I built the thing, and became the developer I wanted to be along the way.',
     ],
-    interactionHint: 'scrub to see the CBMS logo rotate',
+    interactionHint: 'click to explode the logo — scrub to rotate',
     morphStart: 0.55,
     morphEnd: 0.95,
     cameraZ: 7.2,
@@ -114,7 +114,7 @@ export const journeyChapters: JourneyChapter[] = [
     ],
     interactionHint: 'hover to see a 3D portrait form',
     // Late window keeps DAVXLOPER from forming over this chapter's text
-    morphStart: 0.75,
+    morphStart: 0.85,
     morphEnd: 0.98,
     cameraZ: 8,
     textSide: 'left',

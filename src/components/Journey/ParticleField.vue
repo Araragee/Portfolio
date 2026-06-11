@@ -133,13 +133,49 @@ function loadImages(): void {
     targets.colors.cbmsLogo = colors
     updateActiveBuffers('cbmsLogo')
   })
-  loadImageAndSample('/assets/dave-face.png', activeCount, 3.2, {
-    colorScale: true,
-    keyBackground: { tolerance: 30 },
-    weightByDarkness: true,
-    zRelief: 0.3,
-  }).then(({ positions, colors }) => {
+  const faceCount = Math.floor(activeCount * 0.65)
+  const iconCount = Math.floor(activeCount * 0.07)
+  const remainingCount = activeCount - faceCount - 4 * iconCount
+
+  Promise.all([
+    loadImageAndSample('/assets/dave-face.png', faceCount, 3.2, {
+      colorScale: true,
+      keyBackground: { tolerance: 30 },
+      weightByDarkness: true,
+      zRelief: 0.3,
+    }),
+    loadImageAndSample('/assets/tango-icon.png', iconCount, 0.45, {
+      colorScale: true,
+      instances: [{ offset: [-1.6, 1.3], scale: 1, rotation: -0.15, z: 0.2 }],
+    }),
+    loadImageAndSample('/assets/smc-logo.png', iconCount, 0.45, {
+      colorScale: true,
+      instances: [{ offset: [-0.7, 1.9], scale: 1, rotation: -0.05, z: 0.1 }],
+    }),
+    loadImageAndSample('/assets/cbmsportal-favicon.svg', iconCount, 0.45, {
+      colorScale: true,
+      instances: [{ offset: [0.3, 2.1], scale: 1, rotation: 0.05, z: 0.3 }],
+    }),
+    loadImageAndSample('/assets/nutrisipe-logo.svg', iconCount, 0.45, {
+      colorScale: true,
+      instances: [{ offset: [1.2, 1.7], scale: 1, rotation: 0.1, z: 0.1 }],
+    }),
+    loadImageAndSample('/assets/lms-ai-icon.svg', remainingCount, 0.45, {
+      colorScale: true,
+      instances: [{ offset: [1.8, 1.0], scale: 1, rotation: 0.2, z: 0.2 }],
+    }),
+  ]).then(([face, tango, smc, cbms, nutrisipe, lms]) => {
     if (activeCount !== currentCount) return
+    const positions = new Float32Array(activeCount * 3)
+    const colors = new Float32Array(activeCount * 3)
+    
+    let floatOffset = 0
+    for (const res of [face, tango, smc, cbms, nutrisipe, lms]) {
+      positions.set(res.positions, floatOffset)
+      colors.set(res.colors, floatOffset)
+      floatOffset += res.positions.length
+    }
+    
     targets.positions.portrait = positions
     targets.colors.portrait = colors
     updateActiveBuffers('portrait')
@@ -401,10 +437,11 @@ onMounted(() => {
   setTimeout(updateExclusionZones, 200)
 
   document.fonts.ready.then(() => {
-    targets.positions.textMass = createTextMass(currentCount, 'DAVXLOPER')
+    targets.positions.textMass = createTextMass(currentCount, 'DAVXLOPER', { fontPx: 115 })
     const currentGeometry = points.value.geometry
     const positionAttr = currentGeometry.getAttribute('position') as BufferAttribute
     const toAttr = currentGeometry.getAttribute('aPositionTo') as BufferAttribute
+    
     if (store.morphFrom === 'textMass' && positionAttr) {
       ;(positionAttr.array as Float32Array).set(targets.positions.textMass)
       positionAttr.needsUpdate = true
