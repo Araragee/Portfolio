@@ -12,7 +12,8 @@
   → new total 1500vh (≈15.3k px at 1023px viewport)
 - Morph windows: hold own formation through the first half — `morphStart: 0.55`,
   `morphEnd: 0.95` everywhere (epilogue keeps 0.3–0.7; its morph is a no-op,
-  textMass→textMass)
+  textMass→textMass). For chapters with `extraStages` (like `psa-map`), these
+  fractions apply per-segment.
 - Progress rail (JourneyPage): live percent + 7 chapter tick dots (active
   filled), `mix-blend-difference` dropped (extra compositing layer; plain
   `text-primary` now)

@@ -172,6 +172,13 @@ function createGridFallback(count: number): Float32Array {
   return out
 }
 
+function hexToRgb(hex: string): [number, number, number] {
+  const r = parseInt(hex.slice(1, 3), 16) / 255
+  const g = parseInt(hex.slice(3, 5), 16) / 255
+  const b = parseInt(hex.slice(5, 7), 16) / 255
+  return [r, g, b]
+}
+
 function sampleRoundedBox(rng: () => number, w: number, h: number, r: number): [number, number] {
   while (true) {
     const x = (rng() - 0.5) * w
@@ -216,13 +223,6 @@ export function createSdgBentoGrid(count: number): { positions: Float32Array; co
     '#00558A', // SDG 16
     '#1A3668'  // SDG 17
   ]
-  
-  const hexToRgb = (hex: string): [number, number, number] => {
-    const r = parseInt(hex.slice(1, 3), 16) / 255
-    const g = parseInt(hex.slice(3, 5), 16) / 255
-    const b = parseInt(hex.slice(5, 7), 16) / 255
-    return [r, g, b]
-  }
   
   // Grid parameters: 5 columns, 4 rows
   const cols = 5
@@ -279,6 +279,165 @@ export function createSdgBentoGrid(count: number): { positions: Float32Array; co
     globalIdx++
   }
   
+  return { positions, colors }
+}
+
+/** CBMS portal ECharts series palette (see cbmsportal dashboards). */
+const CHART_SERIES_COLORS = ['#35978F', '#DFC27D', '#FBC800', '#DE786A', '#990000', '#4b9ed1', '#DB8D31']
+
+interface BarSpec {
+  cx: number
+  cy: number
+  w: number
+  h: number
+  color: [number, number, number]
+}
+
+/** Fill bars with area-proportional particle quotas plus a thin baseline axis strip. */
+function fillBarSet(
+  rng: () => number,
+  bars: BarSpec[],
+  count: number,
+  axisShare = 0.04,
+  axisY = -1.32,
+  cornerR = 0.02,
+): { positions: Float32Array; colors: Float32Array } {
+  const positions = new Float32Array(count * 3)
+  const colors = new Float32Array(count * 3)
+
+  let minX = Infinity
+  let maxX = -Infinity
+  let totalArea = 0
+  for (const bar of bars) {
+    minX = Math.min(minX, bar.cx - bar.w / 2)
+    maxX = Math.max(maxX, bar.cx + bar.w / 2)
+    totalArea += bar.w * bar.h
+  }
+
+  const nAxis = Math.floor(count * axisShare)
+  let idx = 0
+  for (; idx < nAxis; idx++) {
+    positions[idx * 3] = minX - 0.1 + rng() * (maxX - minX + 0.2)
+    positions[idx * 3 + 1] = axisY + (rng() - 0.5) * 0.03
+    positions[idx * 3 + 2] = (rng() - 0.5) * 0.05
+    colors[idx * 3] = 0.067
+    colors[idx * 3 + 1] = 0.067
+    colors[idx * 3 + 2] = 0.067
+  }
+
+  const nBars = count - nAxis
+  for (let b = 0; b < bars.length; b++) {
+    const bar = bars[b]
+    // Last bar absorbs the rounding remainder so the total stays exact.
+    const quota =
+      b === bars.length - 1 ? count - idx : Math.floor((nBars * bar.w * bar.h) / totalArea)
+    const r = Math.min(cornerR, bar.w / 2, bar.h / 2)
+    for (let p = 0; p < quota && idx < count; p++, idx++) {
+      const [bx, by] = sampleRoundedBox(rng, bar.w, bar.h, r)
+      positions[idx * 3] = bar.cx + bx
+      positions[idx * 3 + 1] = bar.cy + by
+      positions[idx * 3 + 2] = (rng() - 0.5) * 0.05
+      colors[idx * 3] = bar.color[0]
+      colors[idx * 3 + 1] = bar.color[1]
+      colors[idx * 3 + 2] = bar.color[2]
+    }
+  }
+  return { positions, colors }
+}
+
+/** Plain teal bar chart — 10 bars, echoes the portal's indicator charts. */
+function createSdgBarChart(count: number): { positions: Float32Array; colors: Float32Array } {
+  const rng = createRng(778)
+  const teal = hexToRgb('#35978F')
+  const pcts = [75, 69, 67, 60, 58, 58, 51, 50, 49, 42]
+  const bars: BarSpec[] = pcts.map((pct, i) => {
+    const h = pct * 0.032
+    return { cx: -1.71 + 0.38 * i, cy: -1.3 + h / 2, w: 0.26, h, color: teal }
+  })
+  return fillBarSet(rng, bars, count)
+}
+
+/** Grouped bar chart — 6 groups × 7 series, portal series palette. */
+function createSdgGroupedBar(count: number): { positions: Float32Array; colors: Float32Array } {
+  const rng = createRng(779)
+  const palette = CHART_SERIES_COLORS.map(hexToRgb)
+  const bars: BarSpec[] = []
+  for (let g = 0; g < 6; g++) {
+    const xg = -1.9 + 0.6333 * (g + 0.5)
+    for (let s = 0; s < 7; s++) {
+      const pct = 8 + rng() * 30
+      const h = pct * 0.052
+      bars.push({ cx: xg + (s - 3) * 0.082, cy: -1.3 + h / 2, w: 0.07, h, color: palette[s] })
+    }
+  }
+  return fillBarSet(rng, bars, count)
+}
+
+/** 100% stacked bar chart — 6 columns × 6 segments summing to 100. */
+function createSdgStackedBar(count: number): { positions: Float32Array; colors: Float32Array } {
+  const rng = createRng(780)
+  const palette = CHART_SERIES_COLORS.slice(0, 6).map(hexToRgb)
+  const bars: BarSpec[] = []
+  for (let c = 0; c < 6; c++) {
+    const cx = -1.9 + 0.6333 * (c + 0.5)
+    const weights = Array.from({ length: 6 }, () => rng())
+    const sum = weights.reduce((a, b) => a + b, 0)
+    let cum = 0
+    for (let s = 0; s < 6; s++) {
+      const pct = 6 + (64 * weights[s]) / sum // ≥6% each, column sums to 100
+      const y0 = -1.2 + cum * 0.024
+      bars.push({
+        cx,
+        cy: y0 + (pct * 0.024) / 2,
+        w: 0.42,
+        h: pct * 0.024 - 0.015, // shave an inter-segment gap, ECharts look
+        color: palette[s],
+      })
+      cum += pct
+    }
+  }
+  return fillBarSet(rng, bars, count, 0.04, -1.22, 0.012)
+}
+
+/** Philippines as elliptical island point-clusters with a choropleth teal ramp. */
+function createPhMap(count: number): { positions: Float32Array; colors: Float32Array } {
+  const rng = createRng(781)
+  // Portal choropleth ramp, light end darkened to read on the #F9F9F8 bg.
+  const ramp = ['#8FCFCF', '#5FBBB5', '#35978F', '#1A837E', '#006E6F'].map(hexToRgb)
+  // [cx, cy, r, ex, ey, rot, weight]
+  const islands: [number, number, number, number, number, number, number][] = [
+    [-0.55, 1.8, 0.55, 0.8, 1.1, 0, 0.22], // North Luzon
+    [-0.35, 1.0, 0.48, 0.85, 1.05, 0, 0.16], // Central Luzon
+    [0.2, 0.4, 0.35, 0.9, 1.0, 0, 0.08], // Bicol / Samar
+    [0.15, -0.35, 0.5, 1.05, 0.85, 0, 0.16], // Visayas
+    [-1.1, -0.3, 0.32, 0.55, 1.4, -0.6, 0.06], // Palawan
+    [-0.2, -1.4, 0.35, 1.1, 0.75, 0, 0.07], // Zamboanga peninsula
+    [0.7, -1.4, 0.68, 1.0, 0.9, 0, 0.25], // Mindanao
+  ]
+
+  const positions = new Float32Array(count * 3)
+  const colors = new Float32Array(count * 3)
+  let idx = 0
+  for (let n = 0; n < islands.length; n++) {
+    const [cx, cy, r, ex, ey, rot, weight] = islands[n]
+    const [cr, cg, cb] = ramp[Math.floor(rng() * ramp.length)]
+    // Last island absorbs the rounding remainder so the total stays exact.
+    const quota = n === islands.length - 1 ? count - idx : Math.round(weight * count)
+    const cosR = Math.cos(rot)
+    const sinR = Math.sin(rot)
+    for (let p = 0; p < quota && idx < count; p++, idx++) {
+      const theta = rng() * Math.PI * 2
+      const rad = Math.sqrt(rng()) * r
+      const lx = Math.cos(theta) * rad * ex
+      const ly = Math.sin(theta) * rad * ey
+      positions[idx * 3] = cx + lx * cosR - ly * sinR
+      positions[idx * 3 + 1] = cy + lx * sinR + ly * cosR
+      positions[idx * 3 + 2] = (rng() - 0.5) * 0.15
+      colors[idx * 3] = cr
+      colors[idx * 3 + 1] = cg
+      colors[idx * 3 + 2] = cb
+    }
+  }
   return { positions, colors }
 }
 
@@ -587,12 +746,20 @@ export function buildMorphTargets(count: number): MorphTargets {
   
   const { positions: bonsaiPos, parents: bonsaiParents } = createBonsai(count)
   const { positions: sdgPos, colors: sdgCol } = createSdgBentoGrid(count)
-  
+  const { positions: sdgBarsPos, colors: sdgBarsCol } = createSdgBarChart(count)
+  const { positions: sdgGroupPos, colors: sdgGroupCol } = createSdgGroupedBar(count)
+  const { positions: sdgStackPos, colors: sdgStackCol } = createSdgStackedBar(count)
+  const { positions: phMapPos, colors: phMapCol } = createPhMap(count)
+
   const positions: MorphTargetMap = {
     scatter: createScatter(count),
     bonsai: bonsaiPos,
     peso: createGridFallback(count), // Temp grid before image load
     archipelago: sdgPos,
+    sdgBars: sdgBarsPos,
+    sdgGroupedBars: sdgGroupPos,
+    sdgStackedBars: sdgStackPos,
+    phMap: phMapPos,
     cbmsLogo: createGridFallback(count), // Temp grid before image load
     portrait: createArtifactFallback(count), // Temp artifact before image load
     textMass: createTextMass(count, 'DAVXLOPER'),
@@ -603,6 +770,10 @@ export function buildMorphTargets(count: number): MorphTargets {
     bonsai: createDefaultColor(count, 0.067, 0.12, 0.067), // Dark green hue for bonsai branches/leaves
     peso: defaultCol,
     archipelago: sdgCol,
+    sdgBars: sdgBarsCol,
+    sdgGroupedBars: sdgGroupCol,
+    sdgStackedBars: sdgStackCol,
+    phMap: phMapCol,
     cbmsLogo: defaultCol,
     portrait: defaultCol,
     textMass: defaultCol,
@@ -625,6 +796,10 @@ export const MORPH_STATE_IDS: MorphStateId[] = [
   'bonsai',
   'peso',
   'archipelago',
+  'sdgBars',
+  'sdgGroupedBars',
+  'sdgStackedBars',
+  'phMap',
   'cbmsLogo',
   'portrait',
   'textMass',

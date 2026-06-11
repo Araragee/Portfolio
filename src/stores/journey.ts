@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { fieldOffsetFor, journeyChapters } from '@/data/journeyData'
-import type { MorphStateId } from '@/types/journey'
+import type { JourneyChapter, MorphStateId } from '@/types/journey'
 
 /**
  * Scroll-derived journey state, shared between the DOM chapters and the
@@ -47,25 +47,48 @@ export const useJourneyStore = defineStore('journey', () => {
     return Math.min(1, Math.max(0, (scrollProgress.value - start) / span))
   })
 
-  const morphFrom = computed<MorphStateId>(
-    () => journeyChapters[activeChapterIndex.value].morphState,
-  )
+  function stagesFor(chapter: JourneyChapter): MorphStateId[] {
+    return [chapter.morphState, ...(chapter.extraStages ?? [])]
+  }
+
+  /**
+   * Active in-chapter segment. Chapters without extraStages have a single
+   * segment, so sp == chapterProgress and behavior is unchanged. The last
+   * segment's morph target is the next chapter's formation.
+   */
+  const segment = computed(() => {
+    const chapter = journeyChapters[activeChapterIndex.value]
+    const list = stagesFor(chapter)
+    const S = list.length
+    const cp = chapterProgress.value
+    const k = Math.min(S - 1, Math.floor(cp * S))
+    const sp = Math.min(1, Math.max(0, cp * S - k))
+    return { list, S, k, sp }
+  })
+
+  const morphFrom = computed<MorphStateId>(() => segment.value.list[segment.value.k])
 
   const morphTo = computed<MorphStateId>(() => {
+    const { list, S, k } = segment.value
+    if (k + 1 < S) return list[k + 1]
     const next = Math.min(activeChapterIndex.value + 1, journeyChapters.length - 1)
     return journeyChapters[next].morphState
   })
 
-  /** 0 while holding, ramps 0→1 across the morph window. Drives uProgress. */
+  /**
+   * 0 while holding, ramps 0→1 across the morph window. Drives uProgress.
+   * morphStart/morphEnd are fractions of the active SEGMENT (== the whole
+   * runway for single-stage chapters).
+   */
   const morphT = computed(() => {
-    const cp = chapterProgress.value
+    const { sp } = segment.value
     const currentChapter = journeyChapters[activeChapterIndex.value]
     const morphStart = currentChapter?.morphStart ?? 0.1
     const morphEnd = currentChapter?.morphEnd ?? 0.5
-    
-    if (cp <= morphStart) return 0
-    if (cp >= morphEnd) return 1
-    return (cp - morphStart) / (morphEnd - morphStart)
+
+    if (sp <= morphStart) return 0
+    if (sp >= morphEnd) return 1
+    return (sp - morphStart) / (morphEnd - morphStart)
   })
 
   const cameraZ = computed(() => {
@@ -84,8 +107,14 @@ export const useJourneyStore = defineStore('journey', () => {
     fieldOffsetFor(journeyChapters[activeChapterIndex.value]),
   )
 
-  /** Field offset of the next chapter (uOffsetTo) — morph slides toward it. */
+  /**
+   * Field offset the morph slides toward (uOffsetTo). In-chapter stages keep
+   * the chapter's own offset (no slide); the final segment slides to the
+   * next chapter's offset as before.
+   */
   const fieldOffsetTo = computed<[number, number]>(() => {
+    const { S, k } = segment.value
+    if (k + 1 < S) return fieldOffsetFor(journeyChapters[activeChapterIndex.value])
     const next = Math.min(activeChapterIndex.value + 1, journeyChapters.length - 1)
     return fieldOffsetFor(journeyChapters[next])
   })

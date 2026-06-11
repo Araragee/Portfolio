@@ -3,12 +3,16 @@
  * See docs/CONCEPT.md for the full design rationale.
  */
 
-/** Particle formation the field can morph into. One per chapter. */
+/** Particle formation the field can morph into. One per chapter (plus optional in-chapter stages). */
 export type MorphStateId =
   | 'scatter'
   | 'bonsai'
   | 'peso'
   | 'archipelago'
+  | 'sdgBars'
+  | 'sdgGroupedBars'
+  | 'sdgStackedBars'
+  | 'phMap'
   | 'cbmsLogo'
   | 'portrait'
   | 'textMass'
@@ -31,6 +35,12 @@ export interface JourneyChapter {
   heightVh: ChapterHeightVh
   /** Particle formation this chapter holds. */
   morphState: MorphStateId
+  /**
+   * Optional in-chapter formations cycled after morphState; the chapter's
+   * runway is split into equal segments and morphStart/morphEnd apply
+   * within each segment. Entry formation stays morphState.
+   */
+  extraStages?: MorphStateId[]
   /** Story copy. Draft until Phase 4 (copy polish). */
   paragraphs: string[]
   /** Mono label describing the chapter interaction, e.g. 'hover branch → extends'. */

@@ -5,7 +5,8 @@ import type { JourneyChapter } from '@/types/journey'
  * Source of truth for the story: src/data/personalData.ts.
  *
  * Pacing (docs/TWEAKS/D-pacing.md): chapters hold their own formation through
- * the first 55% of the runway, then morph to the next across 55–95%.
+ * the first 55% of the runway, then morph to the next across 55–95%. For chapters
+ * with extra stages (e.g. psa-map), this holding/morphing logic applies per segment.
  * Sides alternate so the field always slides opposite the text
  * (docs/TWEAKS/A-field-offset.md).
  */
@@ -69,12 +70,14 @@ export const journeyChapters: JourneyChapter[] = [
     era: 'Philippine Statistics Authority, Oct 2023 — now',
     heightVh: 300,
     morphState: 'archipelago',
+    extraStages: ['sdgBars', 'sdgGroupedBars', 'sdgStackedBars', 'phMap'],
     paragraphs: [
       'By October 2023 I landed at the Philippine Statistics Authority, building the CBMS Portal — community-based monitoring data for the whole country.',
     ],
-    interactionHint: 'hover a goal — watch the particles lift',
-    morphStart: 0.55,
-    morphEnd: 0.95,
+    interactionHint: 'hover to lift the data — scroll to redraw it',
+    // Within-segment fractions: 5 stages × 60vh, exit morph done at cp 0.98
+    morphStart: 0.5,
+    morphEnd: 0.9,
     cameraZ: 7.2,
     textSide: 'right',
     stat: { value: '110M+', label: "Citizens' Data Handled" },
