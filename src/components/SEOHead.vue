@@ -24,6 +24,12 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // Use unhead for meta tags management
+const resolveUrl = (path: string) => {
+  if (path.startsWith('http://') || path.startsWith('https://')) return path
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path
+  return import.meta.env.BASE_URL + cleanPath
+}
+
 useHead({
   title: props.title,
   meta: [
@@ -41,7 +47,7 @@ useHead({
     { property: 'og:url', content: props.url },
     { property: 'og:title', content: props.title },
     { property: 'og:description', content: props.description },
-    { property: 'og:image', content: props.image },
+    { property: 'og:image', content: resolveUrl(props.image) },
     { property: 'og:image:width', content: '1200' },
     { property: 'og:image:height', content: '630' },
     { property: 'og:site_name', content: 'Dave Gonzales' },
@@ -52,7 +58,7 @@ useHead({
     { name: 'twitter:url', content: props.url },
     { name: 'twitter:title', content: props.title },
     { name: 'twitter:description', content: props.description },
-    { name: 'twitter:image', content: props.image },
+    { name: 'twitter:image', content: resolveUrl(props.image) },
 
     // Theme Color — matches palette
     { name: 'theme-color', content: '#111111' },
@@ -67,13 +73,13 @@ useHead({
     { rel: 'canonical', href: props.url },
 
     // Favicon
-    { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-    { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
-    { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
-    { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+    { rel: 'icon', type: 'image/x-icon', href: resolveUrl('/favicon.ico') },
+    { rel: 'icon', type: 'image/png', sizes: '32x32', href: resolveUrl('/favicon-32x32.png') },
+    { rel: 'icon', type: 'image/png', sizes: '16x16', href: resolveUrl('/favicon-16x16.png') },
+    { rel: 'apple-touch-icon', sizes: '180x180', href: resolveUrl('/apple-touch-icon.png') },
 
     // Web App Manifest
-    { rel: 'manifest', href: '/site.webmanifest' }
+    { rel: 'manifest', href: resolveUrl('/site.webmanifest') }
   ],
   script: [
     // JSON-LD Structured Data
@@ -84,7 +90,7 @@ useHead({
         '@type': 'Person',
         name: props.author,
         url: props.url,
-        image: props.image,
+        image: resolveUrl(props.image),
         jobTitle: 'Vue.js & TypeScript Developer',
         description: props.description,
         sameAs: ["https://github.com/Araragee", "https://linkedin.com/in/davxloper"]

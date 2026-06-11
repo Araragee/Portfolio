@@ -111,9 +111,14 @@ const points = shallowRef(new Points(geometry, material))
 points.value.frustumCulled = false
 
 // Image loading & sampling
+function resolveAssetPath(path: string): string {
+  const clean = path.startsWith('/') ? path.slice(1) : path
+  return import.meta.env.BASE_URL + clean
+}
+
 function loadImages(): void {
   const activeCount = currentCount
-  loadImageAndSample('/assets/peso-1000.png', activeCount, 1.0, {
+  loadImageAndSample(resolveAssetPath('/assets/peso-1000.png'), activeCount, 1.0, {
     colorScale: true,
     maxBrightness: 215,
     instances: PESO_BILL_INSTANCES,
@@ -123,7 +128,7 @@ function loadImages(): void {
     targets.colors.peso = colors
     updateActiveBuffers('peso')
   })
-  loadImageAndSample('/assets/cbms.svg', activeCount, 2.6, {
+  loadImageAndSample(resolveAssetPath('/assets/cbms.svg'), activeCount, 2.6, {
     colorScale: true,
     maxBrightness: 230,
     maxDim: 192,
@@ -138,33 +143,33 @@ function loadImages(): void {
   const remainingCount = activeCount - faceCount - 4 * iconCount
 
   Promise.all([
-    loadImageAndSample('/assets/dave-face.png', faceCount, 3.2, {
+    loadImageAndSample(resolveAssetPath('/assets/dave-face.png'), faceCount, 3.2, {
       colorScale: true,
       keyBackground: { tolerance: 30 },
       weightByDarkness: true,
       zRelief: 0.3,
     }),
-    loadImageAndSample('/assets/tango-icon.png', iconCount, 0.45, {
+    loadImageAndSample(resolveAssetPath('/assets/tango-icon.png'), iconCount, 0.45, {
       colorScale: true,
       instances: [{ offset: [-1.6, 1.3], scale: 1, rotation: -0.15, z: 0.2 }],
       chatBubble: true,
     }),
-    loadImageAndSample('/assets/smc-logo.png', iconCount, 0.45, {
+    loadImageAndSample(resolveAssetPath('/assets/smc-logo.png'), iconCount, 0.45, {
       colorScale: true,
       instances: [{ offset: [-0.7, 1.9], scale: 1, rotation: -0.05, z: 0.1 }],
       chatBubble: true,
     }),
-    loadImageAndSample('/assets/cbmsportal-favicon.svg', iconCount, 0.45, {
+    loadImageAndSample(resolveAssetPath('/assets/cbmsportal-favicon.svg'), iconCount, 0.45, {
       colorScale: true,
       instances: [{ offset: [0.3, 2.1], scale: 1, rotation: 0.05, z: 0.3 }],
       chatBubble: true,
     }),
-    loadImageAndSample('/assets/nutrisipe-logo.svg', iconCount, 0.45, {
+    loadImageAndSample(resolveAssetPath('/assets/nutrisipe-logo.svg'), iconCount, 0.45, {
       colorScale: true,
       instances: [{ offset: [1.2, 1.7], scale: 1, rotation: 0.1, z: 0.1 }],
       chatBubble: true,
     }),
-    loadImageAndSample('/assets/lms-ai-icon.svg', remainingCount, 0.45, {
+    loadImageAndSample(resolveAssetPath('/assets/lms-ai-icon.svg'), remainingCount, 0.45, {
       colorScale: true,
       instances: [{ offset: [1.8, 1.0], scale: 1, rotation: 0.2, z: 0.2 }],
       chatBubble: true,
