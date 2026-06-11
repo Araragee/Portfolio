@@ -6,6 +6,7 @@
 /** Particle formation the field can morph into. One per chapter (plus optional in-chapter stages). */
 export type MorphStateId =
   | 'scatter'
+  | 'daveGonzales'
   | 'bonsai'
   | 'peso'
   | 'archipelago'

@@ -467,7 +467,7 @@ function createArtifactFallback(count: number): Float32Array {
 }
 
 /** Samples 2D canvas text into particle positions. Browser-only. */
-export function createTextMass(count: number, text: string | string[], options: { fontPx?: number, yOffset?: number, maxWidth?: number } = {}): Float32Array {
+export function createTextMass(count: number, text: string | string[], options: { fontPx?: number, yOffset?: number, maxWidth?: number, align?: 'left' | 'center' } = {}): Float32Array {
   const rng = createRng(6)
   const canvas = document.createElement('canvas')
   canvas.width = 1024
@@ -478,7 +478,7 @@ export function createTextMass(count: number, text: string | string[], options: 
   ctx.fillStyle = '#000'
   const fontPx = options.fontPx ?? 115
   ctx.font = `700 ${fontPx}px "Space Grotesk", sans-serif`
-  ctx.textAlign = 'center'
+  ctx.textAlign = options.align ?? 'center'
   ctx.textBaseline = 'middle'
   
   const lines = Array.isArray(text) ? text : [text]
@@ -486,8 +486,9 @@ export function createTextMass(count: number, text: string | string[], options: 
   const totalHeight = lines.length * lineHeight
   let startY = canvas.height / 2 - totalHeight / 2 + lineHeight / 2
   
+  const startX = ctx.textAlign === 'left' ? 220 : canvas.width / 2
   for (const line of lines) {
-    ctx.fillText(line, canvas.width / 2, startY)
+    ctx.fillText(line, startX, startY)
     startY += lineHeight
   }
 
@@ -762,6 +763,7 @@ export function buildMorphTargets(count: number): MorphTargets {
 
   const positions: MorphTargetMap = {
     scatter: createScatter(count),
+    daveGonzales: createTextMass(count, ['Dave', 'Gonzales'], { align: 'left' }),
     bonsai: bonsaiPos,
     peso: createGridFallback(count), // Temp grid before image load
     archipelago: sdgPos,
@@ -776,6 +778,7 @@ export function buildMorphTargets(count: number): MorphTargets {
 
   const colors: MorphColorMap = {
     scatter: defaultCol,
+    daveGonzales: defaultCol,
     bonsai: createDefaultColor(count, 0.067, 0.12, 0.067), // Dark green hue for bonsai branches/leaves
     peso: defaultCol,
     archipelago: sdgCol,

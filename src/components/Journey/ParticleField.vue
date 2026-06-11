@@ -236,10 +236,19 @@ function collectTextRects(chapterId: string | undefined): ScreenRect[] {
 }
 
 function updateExclusionZones(): void {
-  // Active + next chapter: incoming text is protected during cross-chapter morphs.
   const activeIdx = store.activeChapterIndex
+  const activeChapter = journeyChapters[activeIdx]
+
+  // If we are in the prologue or epilogue (where we display large text mass particles),
+  // we do not want text avoidance to distort the text particles.
+  if (activeChapter?.id === 'prologue' || activeChapter?.id === 'epilogue') {
+    exclusionZones.value = []
+    return
+  }
+
+  // Active + next chapter: incoming text is protected during cross-chapter morphs.
   const nextIdx = Math.min(activeIdx + 1, journeyChapters.length - 1)
-  const rects = collectTextRects(journeyChapters[activeIdx]?.id)
+  const rects = collectTextRects(activeChapter?.id)
   if (nextIdx !== activeIdx) {
     rects.push(...collectTextRects(journeyChapters[nextIdx]?.id))
   }
@@ -342,6 +351,9 @@ window.addEventListener('resize', onResize)
 
 const mouseTarget = new Vector3(999, 999, 0)
 let targetInteractState = 0
+let explodeProgress = 0
+let isExploding = false
+const explodeDuration = 1.2 // seconds
 
 function onPointerMove(event: PointerEvent): void {
   const ndcX = (event.clientX / window.innerWidth) * 2 - 1
@@ -351,12 +363,22 @@ function onPointerMove(event: PointerEvent): void {
 }
 
 function onPointerDown(): void {
-  targetInteractState = 1
-  uniforms.uInteractPos.value.copy(mouseTarget)
+  const activeIdx = store.activeChapterIndex
+  if (activeIdx === 4 || activeIdx === 6) {
+    isExploding = true
+    explodeProgress = 0
+    uniforms.uInteractPos.value.copy(mouseTarget)
+  } else {
+    targetInteractState = 1
+    uniforms.uInteractPos.value.copy(mouseTarget)
+  }
 }
 
 function onPointerUp(): void {
-  targetInteractState = 0
+  const activeIdx = store.activeChapterIndex
+  if (activeIdx !== 4 && activeIdx !== 6) {
+    targetInteractState = 0
+  }
 }
 
 window.addEventListener('pointermove', onPointerMove, { passive: true })
@@ -389,7 +411,20 @@ onBeforeRender(({ elapsed, delta }) => {
   uniforms.uMouse.value.lerp(mouseTarget, 0.08)
   
   uniforms.uChapterIndex.value = store.activeChapterIndex
-  uniforms.uInteractState.value += (targetInteractState - uniforms.uInteractState.value) * 0.1
+  if (isExploding) {
+    explodeProgress += delta / explodeDuration
+    if (explodeProgress >= 1) {
+      explodeProgress = 0
+      isExploding = false
+      uniforms.uInteractState.value = 0
+    } else {
+      // Eased progress for punchy explosion and slow return: sin(t^0.4 * PI)
+      const t = explodeProgress
+      uniforms.uInteractState.value = Math.sin(Math.pow(t, 0.4) * Math.PI)
+    }
+  } else {
+    uniforms.uInteractState.value += (targetInteractState - uniforms.uInteractState.value) * 0.1
+  }
 
   const [fromX, fromY] = store.fieldOffsetFrom
   const [toX, toY] = store.fieldOffsetTo
@@ -437,11 +472,20 @@ onMounted(() => {
   setTimeout(updateExclusionZones, 200)
 
   document.fonts.ready.then(() => {
+    targets.positions.daveGonzales = createTextMass(currentCount, ['Dave', 'Gonzales'], { fontPx: 115, align: 'left' })
     targets.positions.textMass = createTextMass(currentCount, 'DAVXLOPER', { fontPx: 115 })
     const currentGeometry = points.value.geometry
     const positionAttr = currentGeometry.getAttribute('position') as BufferAttribute
     const toAttr = currentGeometry.getAttribute('aPositionTo') as BufferAttribute
     
+    if (store.morphFrom === 'daveGonzales' && positionAttr) {
+      ;(positionAttr.array as Float32Array).set(targets.positions.daveGonzales)
+      positionAttr.needsUpdate = true
+    }
+    if (store.morphTo === 'daveGonzales' && toAttr) {
+      ;(toAttr.array as Float32Array).set(targets.positions.daveGonzales)
+      toAttr.needsUpdate = true
+    }
     if (store.morphFrom === 'textMass' && positionAttr) {
       ;(positionAttr.array as Float32Array).set(targets.positions.textMass)
       positionAttr.needsUpdate = true
@@ -496,6 +540,11 @@ watch([morphFrom, morphTo], ([from, to]) => {
 
 watch(() => store.activeChapterIndex, () => {
   setTimeout(updateExclusionZones, 50)
+  // Reset interaction states to avoid carry-over
+  isExploding = false
+  explodeProgress = 0
+  targetInteractState = 0
+  uniforms.uInteractState.value = 0
 })
 
 watch(() => store.scrollProgress, () => {

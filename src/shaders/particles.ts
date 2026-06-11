@@ -113,11 +113,16 @@ void main() {
   float force = 0.0;
   
   if (uChapterIndex == 0) {
-    // Prologue: Repel
+    // Dave Gonzales text: Hover scatter
     vec2 away = pos.xy - uMouse.xy;
     float dist = length(away);
-    force = smoothstep(uRepelRadius, 0.0, dist);
-    pos.xy += normalize(away + vec2(0.0001)) * force * uRepelStrength * uDriftAmp;
+    force = smoothstep(2.0, 0.0, dist);
+    
+    float h = hash(position.xy);
+    float angle = h * 6.28318 + uTime * 2.0;
+    vec2 scatterNoise = vec2(cos(angle), sin(angle)) * 0.5;
+    
+    pos.xy += (normalize(away + vec2(0.0001)) * 1.2 + scatterNoise) * force * uDriftAmp;
   } 
   else if (uChapterIndex == 1) {
     // Bonsai: Hover extend
@@ -149,8 +154,7 @@ void main() {
 
     vec2 away = pos.xy - uInteractPos.xy;
     force = smoothstep(3.0, 0.0, length(away));
-    float impulse = sin(uInteractState * 3.14159);
-    pos.xy += normalize(away + vec2(0.0001)) * force * impulse * 1.8 * uDriftAmp;
+    pos.xy += normalize(away + vec2(0.0001)) * force * uInteractState * 1.8 * uDriftAmp;
   }
   else if (uChapterIndex == 5) {
     // Portrait: Flow with cursor
@@ -162,8 +166,7 @@ void main() {
     // DAVXLOPER: Explode on click
     vec2 away = pos.xy - uInteractPos.xy;
     force = smoothstep(3.0, 0.0, length(away));
-    float impulse = sin(uInteractState * 3.14159);
-    pos.xy += normalize(away + vec2(0.0001)) * force * impulse * 1.8 * uDriftAmp;
+    pos.xy += normalize(away + vec2(0.0001)) * force * uInteractState * 1.8 * uDriftAmp;
   }
 
   // Dynamic Text Avoidance — every chapter, last so nothing re-enters a zone

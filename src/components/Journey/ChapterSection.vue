@@ -80,7 +80,7 @@ watch(isVisible, (visible) => {
               {{ chapter.index }} / {{ chapter.era }}
             </span>
             <h1
-              class="reveal-text font-headline text-display-lg font-bold uppercase leading-[0.85] tracking-tight text-primary"
+              class="reveal-text font-headline text-display-lg font-bold uppercase leading-[0.85] tracking-tight text-primary sr-only"
             >
               Dave Gonzales
             </h1>
@@ -89,6 +89,10 @@ watch(isVisible, (visible) => {
             >
               Frontend Engineer
             </p>
+            
+            <!-- Spacer for the "Dave Gonzales" particles -->
+            <div class="h-60 md:h-[18rem] my-4"></div>
+
             <div class="mt-8 max-w-xl space-y-4">
               <p
                 v-for="(paragraph, i) in chapter.paragraphs"
