@@ -550,6 +550,8 @@ export interface ImageSampleOptions {
   maxDim?: number
   /** Seed for the sampling PRNG. */
   seed?: number
+  /** Wrap the sampled image inside an outline chat bubble. */
+  chatBubble?: boolean
 }
 
 interface SampledPoint {
@@ -598,8 +600,14 @@ export function loadImageAndSample(
           h = maxDim
         }
       }
-      canvas.width = w
-      canvas.height = h
+
+      const pad = options.chatBubble ? 18 : 0
+      const tailH = options.chatBubble ? 14 : 0
+      const cw = w + pad * 2
+      const ch = h + pad * 2 + tailH
+
+      canvas.width = cw
+      canvas.height = ch
       const ctx = canvas.getContext('2d')
       if (!ctx) {
         resolve({
@@ -608,15 +616,53 @@ export function loadImageAndSample(
         })
         return
       }
-      ctx.drawImage(img, 0, 0, w, h)
-      const data = ctx.getImageData(0, 0, w, h).data
+
+      if (options.chatBubble) {
+        // Draw outline chat bubble
+        const rx = 4
+        const ry = 4
+        const rw = cw - 8
+        const rh = ch - 8 - tailH
+        const radius = Math.min(16, rw / 2, rh / 2)
+
+        ctx.strokeStyle = '#111111'
+        ctx.lineWidth = 6.0
+        ctx.lineJoin = 'round'
+        ctx.lineCap = 'round'
+
+        ctx.beginPath()
+        ctx.moveTo(rx + radius, ry)
+        ctx.lineTo(rx + rw - radius, ry)
+        ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius)
+        ctx.lineTo(rx + rw, ry + rh - radius)
+        ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - radius, ry + rh)
+
+        // Tail at bottom pointing down
+        const tailW = Math.min(18, rw / 3)
+        ctx.lineTo(rx + rw / 2 + tailW / 2, ry + rh)
+        ctx.lineTo(rx + rw / 2, ry + rh + tailH)
+        ctx.lineTo(rx + rw / 2 - tailW / 2, ry + rh)
+
+        ctx.lineTo(rx + radius, ry + rh)
+        ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - radius)
+        ctx.lineTo(rx, ry + radius)
+        ctx.quadraticCurveTo(rx, ry, rx + radius, ry)
+        ctx.stroke()
+
+        // Draw image centered inside the bubble
+        ctx.drawImage(img, pad, pad, w, h)
+      } else {
+        ctx.drawImage(img, 0, 0, w, h)
+      }
+
+      const data = ctx.getImageData(0, 0, cw, ch).data
 
       // Average opaque corner pixels for background keying.
       let bgR = 0
       let bgG = 0
       let bgB = 0
       if (options.keyBackground) {
-        const corners = [0, (w - 1) * 4, (h - 1) * w * 4, ((h - 1) * w + w - 1) * 4]
+        const corners = [0, (cw - 1) * 4, (ch - 1) * cw * 4, ((ch - 1) * cw + cw - 1) * 4]
         let n = 0
         for (const idx of corners) {
           if (data[idx + 3] > 40) {
@@ -635,9 +681,9 @@ export function loadImageAndSample(
 
       const points: SampledPoint[] = []
 
-      for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-          const idx = (y * w + x) * 4
+      for (let y = 0; y < ch; y++) {
+        for (let x = 0; x < cw; x++) {
+          const idx = (y * cw + x) * 4
           const r = data[idx]
           const g = data[idx + 1]
           const b = data[idx + 2]
@@ -689,7 +735,7 @@ export function loadImageAndSample(
       const positions = new Float32Array(count * 3)
       const colors = new Float32Array(count * 3)
       const rng = createRng(options.seed ?? 123)
-      const aspect = w / h
+      const aspect = cw / ch
       const zRelief = options.zRelief ?? 0
 
       // Single implicit instance preserves the original one-copy behavior.
@@ -702,8 +748,8 @@ export function loadImageAndSample(
         // Remainder particles fold into the last instance so the total stays exact.
         const inst = instances[Math.min(Math.floor(i / per), instances.length - 1)]
         const pt = pickPoint(rng)
-        const nx = (pt.x / w - 0.5) * aspect
-        const ny = 0.5 - pt.y / h
+        const nx = (pt.x / cw - 0.5) * aspect
+        const ny = 0.5 - pt.y / ch
 
         const s = scale * inst.scale
         const c = Math.cos(inst.rotation)

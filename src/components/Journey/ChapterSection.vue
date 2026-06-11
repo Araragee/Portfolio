@@ -1,14 +1,63 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import anime from 'animejs'
 import type { JourneyChapter } from '@/types/journey'
 import { useIntersectionObserver } from '@/composables/useIntersectionObserver'
 import { useReducedMotion } from '@/composables/useReducedMotion'
 import { projects } from '@/data/projectsData'
+import { useJourneyStore } from '@/stores/journey'
+import { journeyChapters } from '@/data/journeyData'
 
 const props = defineProps<{
   chapter: JourneyChapter
 }>()
+
+const store = useJourneyStore()
+const chapterIdx = journeyChapters.findIndex((c) => c.id === props.chapter.id)
+
+const textDivRef = ref<HTMLElement | null>(null)
+const textHeight = ref(0)
+
+function measureTextHeight() {
+  if (textDivRef.value) {
+    textHeight.value = textDivRef.value.offsetHeight
+  }
+}
+
+const opacity = computed(() => {
+  const p = store.getChapterProgress(chapterIdx)
+  const isLast = chapterIdx === journeyChapters.length - 1
+  if (p <= 0) return 0
+  if (p >= 1) return isLast ? 0.9 : 0
+
+  // Fade in to 0.9 over first 15% of the runway
+  if (p < 0.15) return (p / 0.15) * 0.9
+
+  // Calculate progress at which the chapter starts unpinning and scrolling up
+  const heightVh = props.chapter.heightVh
+  const unpinProgress = 1 - 100 / heightVh
+
+  if (p > unpinProgress) {
+    if (isLast) return 0.9
+
+    // Relative progress in the unpinned 100vh scroll region (t goes from 0 to 1)
+    const t = (p - unpinProgress) / (1 - unpinProgress)
+
+    // Calculate when the bottom of the text div reaches the middle of the viewport
+    // bottom = window.innerHeight * (0.5 - t) + textHeight / 2
+    // bottom <= window.innerHeight * 0.5  =>  t >= textHeight / (2 * window.innerHeight)
+    // Delay the fade-out start by 12vh (0.12 in t space) after crossing the midpoint
+    const tFadeStart = Math.min(0.85, (textHeight.value / (2 * window.innerHeight)) + 0.12)
+
+    if (t > tFadeStart) {
+      // Fade to 0 over a smoother 18vh (0.18 in t space)
+      const fadeProgress = (t - tFadeStart) / 0.18
+      return Math.max(0, 0.9 * (1 - fadeProgress))
+    }
+  }
+
+  return 0.9
+})
 
 const { elementRef, isVisible } = useIntersectionObserver({
   threshold: 0.2,
@@ -38,12 +87,19 @@ const textColumnStyle = computed(
 )
 
 onMounted(() => {
+  measureTextHeight()
+  window.addEventListener('resize', measureTextHeight, { passive: true })
+
   if (elementRef.value && !prefersReducedMotion.value) {
     const targets = elementRef.value.querySelectorAll('.reveal-text')
     targets.forEach((el) => {
       ;(el as HTMLElement).style.opacity = '0'
     })
   }
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', measureTextHeight)
 })
 
 watch(isVisible, (visible) => {
@@ -68,8 +124,11 @@ watch(isVisible, (visible) => {
 
 <template>
   <section :id="chapter.id" :class="runwayStyle" ref="elementRef" :aria-label="chapter.title">
-    <div class="sticky top-0 flex h-screen items-center">
-      <div class="mx-auto w-full max-w-5xl px-6">
+    <div
+      class="sticky top-0 flex h-screen items-center transition-opacity duration-75"
+      :style="{ opacity: opacity }"
+    >
+      <div class="mx-auto w-full max-w-5xl px-6" ref="textDivRef">
         <!-- Hero layout (prologue) -->
         <div
           v-if="chapter.layout === 'hero'"

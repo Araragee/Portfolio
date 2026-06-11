@@ -48,11 +48,11 @@ let targets = buildMorphTargets(currentCount)
 const geometry = new BufferGeometry()
 geometry.setAttribute(
   'position',
-  new BufferAttribute(targets.positions[morphFrom.value].slice(), 3),
+  new BufferAttribute(targets.positions[morphFrom.value as MorphStateId].slice(), 3),
 )
 geometry.setAttribute(
   'aPositionTo',
-  new BufferAttribute(targets.positions[morphTo.value].slice(), 3),
+  new BufferAttribute(targets.positions[morphTo.value as MorphStateId].slice(), 3),
 )
 geometry.setAttribute(
   'aBonsaiParent',
@@ -60,11 +60,11 @@ geometry.setAttribute(
 )
 geometry.setAttribute(
   'aColorFrom',
-  new BufferAttribute(targets.colors[morphFrom.value].slice(), 3),
+  new BufferAttribute(targets.colors[morphFrom.value as MorphStateId].slice(), 3),
 )
 geometry.setAttribute(
   'aColorTo',
-  new BufferAttribute(targets.colors[morphTo.value].slice(), 3),
+  new BufferAttribute(targets.colors[morphTo.value as MorphStateId].slice(), 3),
 )
 
 const uniforms = {
@@ -147,22 +147,27 @@ function loadImages(): void {
     loadImageAndSample('/assets/tango-icon.png', iconCount, 0.45, {
       colorScale: true,
       instances: [{ offset: [-1.6, 1.3], scale: 1, rotation: -0.15, z: 0.2 }],
+      chatBubble: true,
     }),
     loadImageAndSample('/assets/smc-logo.png', iconCount, 0.45, {
       colorScale: true,
       instances: [{ offset: [-0.7, 1.9], scale: 1, rotation: -0.05, z: 0.1 }],
+      chatBubble: true,
     }),
     loadImageAndSample('/assets/cbmsportal-favicon.svg', iconCount, 0.45, {
       colorScale: true,
       instances: [{ offset: [0.3, 2.1], scale: 1, rotation: 0.05, z: 0.3 }],
+      chatBubble: true,
     }),
     loadImageAndSample('/assets/nutrisipe-logo.svg', iconCount, 0.45, {
       colorScale: true,
       instances: [{ offset: [1.2, 1.7], scale: 1, rotation: 0.1, z: 0.1 }],
+      chatBubble: true,
     }),
     loadImageAndSample('/assets/lms-ai-icon.svg', remainingCount, 0.45, {
       colorScale: true,
       instances: [{ offset: [1.8, 1.0], scale: 1, rotation: 0.2, z: 0.2 }],
+      chatBubble: true,
     }),
   ]).then(([face, tango, smc, cbms, nutrisipe, lms]) => {
     if (activeCount !== currentCount) return
@@ -304,11 +309,11 @@ function updateParticleCount(newCount: number): void {
   const newGeometry = new BufferGeometry()
   newGeometry.setAttribute(
     'position',
-    new BufferAttribute(targets.positions[morphFrom.value].slice(), 3),
+    new BufferAttribute(targets.positions[morphFrom.value as MorphStateId].slice(), 3),
   )
   newGeometry.setAttribute(
     'aPositionTo',
-    new BufferAttribute(targets.positions[morphTo.value].slice(), 3),
+    new BufferAttribute(targets.positions[morphTo.value as MorphStateId].slice(), 3),
   )
   newGeometry.setAttribute(
     'aBonsaiParent',
@@ -316,11 +321,11 @@ function updateParticleCount(newCount: number): void {
   )
   newGeometry.setAttribute(
     'aColorFrom',
-    new BufferAttribute(targets.colors[morphFrom.value].slice(), 3),
+    new BufferAttribute(targets.colors[morphFrom.value as MorphStateId].slice(), 3),
   )
   newGeometry.setAttribute(
     'aColorTo',
-    new BufferAttribute(targets.colors[morphTo.value].slice(), 3),
+    new BufferAttribute(targets.colors[morphTo.value as MorphStateId].slice(), 3),
   )
 
   const oldGeometry = points.value.geometry
@@ -515,20 +520,20 @@ watch([morphFrom, morphTo], ([from, to]) => {
   const colorToAttr = currentGeometry.getAttribute('aColorTo') as BufferAttribute
 
   if (positionAttr && toAttr) {
-    if (positionAttr.count === targets.positions[from].length / 3 &&
-        toAttr.count === targets.positions[to].length / 3) {
-      ;(positionAttr.array as Float32Array).set(targets.positions[from])
-      ;(toAttr.array as Float32Array).set(targets.positions[to])
+    if (positionAttr.count === targets.positions[from as MorphStateId].length / 3 &&
+        toAttr.count === targets.positions[to as MorphStateId].length / 3) {
+      ;(positionAttr.array as Float32Array).set(targets.positions[from as MorphStateId])
+      ;(toAttr.array as Float32Array).set(targets.positions[to as MorphStateId])
       positionAttr.needsUpdate = true
       toAttr.needsUpdate = true
     }
   }
 
   if (colorFromAttr && colorToAttr) {
-    if (colorFromAttr.count === targets.colors[from].length / 3 &&
-        colorToAttr.count === targets.colors[to].length / 3) {
-      ;(colorFromAttr.array as Float32Array).set(targets.colors[from])
-      ;(colorToAttr.array as Float32Array).set(targets.colors[to])
+    if (colorFromAttr.count === targets.colors[from as MorphStateId].length / 3 &&
+        colorToAttr.count === targets.colors[to as MorphStateId].length / 3) {
+      ;(colorFromAttr.array as Float32Array).set(targets.colors[from as MorphStateId])
+      ;(colorToAttr.array as Float32Array).set(targets.colors[to as MorphStateId])
       colorFromAttr.needsUpdate = true
       colorToAttr.needsUpdate = true
     }

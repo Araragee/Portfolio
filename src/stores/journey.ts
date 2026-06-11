@@ -154,6 +154,24 @@ export const useJourneyStore = defineStore('journey', () => {
     fontsLoaded.value = true
   }
 
+  const getChapterProgress = (index: number): number => {
+    const start = starts[index]
+    const end = index + 1 < starts.length ? starts[index + 1] : 1
+    const span = end - start
+    if (span <= 0) return 0
+    return Math.min(1, Math.max(0, (scrollProgress.value - start) / span))
+  }
+
+  const getChapterOpacity = (index: number): number => {
+    const p = getChapterProgress(index)
+    const isLast = index === journeyChapters.length - 1
+    if (p <= 0) return 0
+    if (p >= 1) return isLast ? 1 : 0
+    if (p < 0.15) return p / 0.15
+    if (p > 0.85) return isLast ? 1 : (1 - p) / 0.15
+    return 1
+  }
+
   function setScrollProgress(value: number): void {
     scrollProgress.value = Math.min(1, Math.max(0, value))
   }
@@ -177,5 +195,7 @@ export const useJourneyStore = defineStore('journey', () => {
     degradeTier,
     ditherEnabled,
     advanceDegradeLevel,
+    getChapterOpacity,
+    getChapterProgress,
   }
 })
