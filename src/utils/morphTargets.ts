@@ -332,13 +332,19 @@ export function createTextMass(count: number, text: string): Float32Array {
   }
   if (filled.length === 0) return createScatter(count)
 
+  // Clamp word width to the camera frustum (z=8, fov 45°) so the text fits
+  // narrow viewports instead of clipping off both edges.
+  const frustumWidth =
+    2 * Math.tan(Math.PI / 8) * 8 * (window.innerWidth / window.innerHeight)
+  const fitScale = Math.min(1, (frustumWidth * 0.92) / 9.0)
+
   const out = new Float32Array(count * 3)
   for (let i = 0; i < count; i++) {
     const p = Math.floor(rng() * (filled.length / 2)) * 2
     const px = filled[p]
     const py = filled[p + 1]
-    out[i * 3] = (px / canvas.width - 0.5) * 9.0 + (rng() - 0.5) * 0.05
-    out[i * 3 + 1] = (0.5 - py / canvas.height) * 2.2 + (rng() - 0.5) * 0.05
+    out[i * 3] = (px / canvas.width - 0.5) * 9.0 * fitScale + (rng() - 0.5) * 0.05
+    out[i * 3 + 1] = (0.5 - py / canvas.height) * 2.2 * fitScale + (rng() - 0.5) * 0.05
     out[i * 3 + 2] = (rng() - 0.5) * 0.2
   }
   return out
@@ -346,17 +352,72 @@ export function createTextMass(count: number, text: string): Float32Array {
 
 const imageCache = new Map<string, HTMLImageElement>()
 
+/** One replicated copy of a sampled image formation. */
+export interface ImageInstance {
+  /** World-space center of this copy. */
+  offset: [number, number]
+  /** Multiplier on the base sample scale. */
+  scale: number
+  /** Z-rotation in radians. */
+  rotation: number
+  /** Depth layer for parallax. */
+  z: number
+}
+
+export interface ImageSampleOptions {
+  /** Take particle colors from the image instead of the default ink. */
+  colorScale?: boolean
+  /** Drop pixels whose luminance is >= this (0–255). */
+  maxBrightness?: number
+  /** Drop pixels within RGB distance `tolerance` of the averaged corner color. */
+  keyBackground?: { tolerance: number }
+  /** Darker pixels get a higher pick probability (legible faces/ink). */
+  weightByDarkness?: boolean
+  /** Max |z| offset derived from luminance; darker = toward camera. */
+  zRelief?: number
+  /** Replicate the formation N times; `count` is split across instances. */
+  instances?: ImageInstance[]
+  /** Rasterization cap for the sampling canvas. */
+  maxDim?: number
+  /** Seed for the sampling PRNG. */
+  seed?: number
+}
+
+interface SampledPoint {
+  x: number
+  y: number
+  r: number
+  g: number
+  b: number
+  lum: number
+}
+
+/**
+ * Bills for the "First paid pixels" chapter — hand-placed so the cluster sits
+ * left of center (the chapter's +2.1 field offset pushes it right of the text).
+ * Bill world-width ≈ 2.35 × scale; z spread gives parallax under camera drift.
+ */
+export const PESO_BILL_INSTANCES: ImageInstance[] = [
+  { offset: [-2.6, 1.5], scale: 1.05, rotation: 0.3, z: -0.45 },
+  { offset: [0.2, 1.8], scale: 0.9, rotation: -0.22, z: -0.25 },
+  { offset: [-3.0, -0.2], scale: 1.2, rotation: -0.38, z: 0.1 },
+  { offset: [0.6, 0.1], scale: 1.35, rotation: 0.12, z: 0.35 },
+  { offset: [-1.2, -1.6], scale: 1.0, rotation: 0.42, z: -0.1 },
+  { offset: [1.4, -1.4], scale: 0.85, rotation: -0.3, z: 0.2 },
+  { offset: [-1.4, 0.6], scale: 0.95, rotation: 0.18, z: 0.5 },
+]
+
 /** Load an image and extract particle coordinates + colors asynchronously in browser. */
 export function loadImageAndSample(
   src: string,
   count: number,
   scale: number,
-  colorScale = false
+  options: ImageSampleOptions = {}
 ): Promise<{ positions: Float32Array; colors: Float32Array }> {
   return new Promise((resolve) => {
     const sample = (img: HTMLImageElement) => {
       const canvas = document.createElement('canvas')
-      const maxDim = 128
+      const maxDim = options.maxDim ?? 128
       let w = img.width
       let h = img.height
       if (w > maxDim || h > maxDim) {
@@ -381,9 +442,30 @@ export function loadImageAndSample(
       ctx.drawImage(img, 0, 0, w, h)
       const data = ctx.getImageData(0, 0, w, h).data
 
-      const points: { x: number; y: number; r: number; g: number; b: number }[] = []
-      const isPeso = src.includes('peso')
-      
+      // Average opaque corner pixels for background keying.
+      let bgR = 0
+      let bgG = 0
+      let bgB = 0
+      if (options.keyBackground) {
+        const corners = [0, (w - 1) * 4, (h - 1) * w * 4, ((h - 1) * w + w - 1) * 4]
+        let n = 0
+        for (const idx of corners) {
+          if (data[idx + 3] > 40) {
+            bgR += data[idx]
+            bgG += data[idx + 1]
+            bgB += data[idx + 2]
+            n++
+          }
+        }
+        if (n > 0) {
+          bgR /= n
+          bgG /= n
+          bgB /= n
+        }
+      }
+
+      const points: SampledPoint[] = []
+
       for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
           const idx = (y * w + x) * 4
@@ -391,16 +473,16 @@ export function loadImageAndSample(
           const g = data[idx + 1]
           const b = data[idx + 2]
           const a = data[idx + 3]
-          if (a > 40) {
-            if (isPeso) {
-              const brightness = (r * 299 + g * 587 + b * 114) / 1000
-              if (brightness < 215) {
-                points.push({ x, y, r, g, b })
-              }
-            } else {
-              points.push({ x, y, r, g, b })
-            }
+          if (a <= 40) continue
+          const lum = (r * 299 + g * 587 + b * 114) / 1000
+          if (options.maxBrightness !== undefined && lum >= options.maxBrightness) continue
+          if (options.keyBackground) {
+            const dr = r - bgR
+            const dg = g - bgG
+            const db = b - bgB
+            if (Math.sqrt(dr * dr + dg * dg + db * db) < options.keyBackground.tolerance) continue
           }
+          points.push({ x, y, r, g, b, lum })
         }
       }
 
@@ -412,21 +494,60 @@ export function loadImageAndSample(
         return
       }
 
+      // Optional darkness-weighted pick via prefix sums + binary search.
+      let prefix: Float64Array | null = null
+      if (options.weightByDarkness) {
+        prefix = new Float64Array(points.length)
+        let total = 0
+        for (let i = 0; i < points.length; i++) {
+          total += Math.pow((255 - points[i].lum) / 255, 1.5)
+          prefix[i] = total
+        }
+      }
+      const pickPoint = (rng: () => number): SampledPoint => {
+        if (!prefix) return points[Math.floor(rng() * points.length)]
+        const target = rng() * prefix[prefix.length - 1]
+        let lo = 0
+        let hi = prefix.length - 1
+        while (lo < hi) {
+          const mid = (lo + hi) >> 1
+          if (prefix[mid] < target) lo = mid + 1
+          else hi = mid
+        }
+        return points[lo]
+      }
+
       const positions = new Float32Array(count * 3)
       const colors = new Float32Array(count * 3)
-      const rng = createRng(123)
+      const rng = createRng(options.seed ?? 123)
+      const aspect = w / h
+      const zRelief = options.zRelief ?? 0
+
+      // Single implicit instance preserves the original one-copy behavior.
+      const instances: ImageInstance[] = options.instances ?? [
+        { offset: [0, 0], scale: 1, rotation: 0, z: 0 },
+      ]
+      const per = Math.floor(count / instances.length)
 
       for (let i = 0; i < count; i++) {
-        const pt = points[Math.floor(rng() * points.length)]
-        const aspect = w / h
+        // Remainder particles fold into the last instance so the total stays exact.
+        const inst = instances[Math.min(Math.floor(i / per), instances.length - 1)]
+        const pt = pickPoint(rng)
         const nx = (pt.x / w - 0.5) * aspect
         const ny = 0.5 - pt.y / h
-        
-        positions[i * 3] = nx * scale + (rng() - 0.5) * 0.02
-        positions[i * 3 + 1] = ny * scale + (rng() - 0.5) * 0.02
-        positions[i * 3 + 2] = (rng() - 0.5) * 0.05
 
-        if (colorScale) {
+        const s = scale * inst.scale
+        const c = Math.cos(inst.rotation)
+        const sn = Math.sin(inst.rotation)
+        const rx = nx * s
+        const ry = ny * s
+
+        positions[i * 3] = rx * c - ry * sn + inst.offset[0] + (rng() - 0.5) * 0.02
+        positions[i * 3 + 1] = rx * sn + ry * c + inst.offset[1] + (rng() - 0.5) * 0.02
+        positions[i * 3 + 2] =
+          inst.z + (rng() - 0.5) * 0.05 + zRelief * (0.5 - pt.lum / 255) * 2
+
+        if (options.colorScale) {
           colors[i * 3] = pt.r / 255
           colors[i * 3 + 1] = pt.g / 255
           colors[i * 3 + 2] = pt.b / 255

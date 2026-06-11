@@ -18,6 +18,7 @@ import {
   particleCountForViewport,
   createTextMass,
   loadImageAndSample,
+  PESO_BILL_INSTANCES,
 } from '@/utils/morphTargets'
 import type { MorphStateId } from '@/types/journey'
 import { journeyChapters } from '@/data/journeyData'
@@ -37,6 +38,9 @@ const props = withDefaults(
 const store = useJourneyStore()
 const { morphFrom, morphTo, morphT, ditherEnabled } = storeToRefs(store)
 const { prefersReducedMotion } = useReducedMotion()
+
+// Must match the GLSL array size in particles.ts — a mismatch fails silently.
+const MAX_EXCLUSION_ZONES = 8
 
 let currentCount = particleCountForViewport(window.innerWidth)
 let targets = buildMorphTargets(currentCount)
@@ -78,16 +82,13 @@ const uniforms = {
   uInteractPos: { value: new Vector3() },
   uOffsetFrom: { value: new Vector2() },
   uOffsetTo: { value: new Vector2() },
-  uOffsetScale: { value: window.innerWidth < 768 ? 0 : 1 },
+  // x disables side-slides on mobile; y stays live so explicit vertical
+  // offsets (epilogue) keep working on small screens.
+  uOffsetScale: { value: new Vector2(window.innerWidth < 768 ? 0 : 1, 1) },
   uFormationScale: { value: formationScaleForViewport() },
   uExclusionCount: { value: 0 },
   uExclusionZones: {
-    value: [
-      new Vector4(),
-      new Vector4(),
-      new Vector4(),
-      new Vector4(),
-    ]
+    value: Array.from({ length: MAX_EXCLUSION_ZONES }, () => new Vector4()),
   }
 }
 
@@ -112,19 +113,32 @@ points.value.frustumCulled = false
 // Image loading & sampling
 function loadImages(): void {
   const activeCount = currentCount
-  loadImageAndSample('/assets/peso-1000.png', activeCount, 7.2, true).then(({ positions, colors }) => {
+  loadImageAndSample('/assets/peso-1000.png', activeCount, 1.0, {
+    colorScale: true,
+    maxBrightness: 215,
+    instances: PESO_BILL_INSTANCES,
+  }).then(({ positions, colors }) => {
     if (activeCount !== currentCount) return
     targets.positions.peso = positions
     targets.colors.peso = colors
     updateActiveBuffers('peso')
   })
-  loadImageAndSample('/assets/cbms-logo.png', activeCount, 2.5, true).then(({ positions, colors }) => {
+  loadImageAndSample('/assets/cbms.svg', activeCount, 2.6, {
+    colorScale: true,
+    maxBrightness: 230,
+    maxDim: 192,
+  }).then(({ positions, colors }) => {
     if (activeCount !== currentCount) return
     targets.positions.cbmsLogo = positions
     targets.colors.cbmsLogo = colors
     updateActiveBuffers('cbmsLogo')
   })
-  loadImageAndSample('/assets/dave-face.png', activeCount, 3.2, true).then(({ positions, colors }) => {
+  loadImageAndSample('/assets/dave-face.png', activeCount, 3.2, {
+    colorScale: true,
+    keyBackground: { tolerance: 30 },
+    weightByDarkness: true,
+    zRelief: 0.3,
+  }).then(({ positions, colors }) => {
     if (activeCount !== currentCount) return
     targets.positions.portrait = positions
     targets.colors.portrait = colors
@@ -136,37 +150,76 @@ function loadImages(): void {
 const HALF_HEIGHT = Math.tan((45 / 2) * (Math.PI / 180)) * 8
 const exclusionZones = ref<[number, number, number, number][]>([])
 
+interface ScreenRect {
+  left: number
+  top: number
+  right: number
+  bottom: number
+}
+
+/**
+ * Union vertically-adjacent rects (gap < gapPx, x-ranges overlapping) so a
+ * title block or paragraph stack costs one zone instead of one per line.
+ */
+function mergeRects(rects: ScreenRect[], gapPx: number): ScreenRect[] {
+  const sorted = [...rects].sort((a, b) => a.top - b.top)
+  const groups: ScreenRect[] = []
+  for (const r of sorted) {
+    const last = groups[groups.length - 1]
+    if (
+      last &&
+      r.left < last.right &&
+      r.right > last.left &&
+      r.top - last.bottom < gapPx
+    ) {
+      last.left = Math.min(last.left, r.left)
+      last.top = Math.min(last.top, r.top)
+      last.right = Math.max(last.right, r.right)
+      last.bottom = Math.max(last.bottom, r.bottom)
+    } else {
+      groups.push({ ...r })
+    }
+  }
+  return groups
+}
+
+/** On-screen .reveal-text rects for one chapter container. */
+function collectTextRects(chapterId: string | undefined): ScreenRect[] {
+  if (!chapterId) return []
+  const container = document.getElementById(chapterId)
+  if (!container) return []
+  const rects: ScreenRect[] = []
+  container.querySelectorAll('.reveal-text').forEach((el) => {
+    const rect = el.getBoundingClientRect()
+    if (rect.width <= 0 || rect.height <= 0) return
+    if (rect.bottom < 0 || rect.top > window.innerHeight) return
+    if (rect.right < 0 || rect.left > window.innerWidth) return
+    rects.push({ left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom })
+  })
+  return rects
+}
+
 function updateExclusionZones(): void {
-  const activeChapterId = journeyChapters[store.activeChapterIndex]?.id
-  const activeContainer = document.getElementById(activeChapterId)
-  if (!activeContainer) {
-    exclusionZones.value = []
-    return
+  // Active + next chapter: incoming text is protected during cross-chapter morphs.
+  const activeIdx = store.activeChapterIndex
+  const nextIdx = Math.min(activeIdx + 1, journeyChapters.length - 1)
+  const rects = collectTextRects(journeyChapters[activeIdx]?.id)
+  if (nextIdx !== activeIdx) {
+    rects.push(...collectTextRects(journeyChapters[nextIdx]?.id))
   }
 
-  const textElements = activeContainer.querySelectorAll('.reveal-text')
-  const zones: [number, number, number, number][] = []
   const halfH = HALF_HEIGHT
   const aspect = window.innerWidth / window.innerHeight
   const halfW = halfH * aspect
 
-  textElements.forEach((el) => {
-    const rect = el.getBoundingClientRect()
-    if (rect.width > 0 && rect.height > 0) {
-      const ndcMinX = (rect.left / window.innerWidth) * 2 - 1
-      const ndcMaxX = (rect.right / window.innerWidth) * 2 - 1
-      const ndcMinY = -((rect.bottom / window.innerHeight) * 2 - 1)
-      const ndcMaxY = -((rect.top / window.innerHeight) * 2 - 1)
-
-      zones.push([
-        ndcMinX * halfW,
-        ndcMinY * halfH,
-        ndcMaxX * halfW,
-        ndcMaxY * halfH
-      ])
-    }
+  const zones: [number, number, number, number][] = mergeRects(rects, 40).map((r) => {
+    const ndcMinX = (r.left / window.innerWidth) * 2 - 1
+    const ndcMaxX = (r.right / window.innerWidth) * 2 - 1
+    const ndcMinY = -((r.bottom / window.innerHeight) * 2 - 1)
+    const ndcMaxY = -((r.top / window.innerHeight) * 2 - 1)
+    return [ndcMinX * halfW, ndcMinY * halfH, ndcMaxX * halfW, ndcMaxY * halfH]
   })
-  exclusionZones.value = zones.slice(0, 4)
+  exclusionZones.value = zones.slice(0, MAX_EXCLUSION_ZONES)
 }
 
 function updateActiveBuffers(stateId: MorphStateId): void {
@@ -240,7 +293,7 @@ function formationScaleForViewport(): number {
 }
 
 function onResize(): void {
-  uniforms.uOffsetScale.value = window.innerWidth < 768 ? 0 : 1
+  uniforms.uOffsetScale.value.set(window.innerWidth < 768 ? 0 : 1, 1)
   uniforms.uFormationScale.value = formationScaleForViewport()
   const newCount = particleCountForViewport(window.innerWidth)
   if (newCount !== currentCount) {
@@ -310,7 +363,7 @@ onBeforeRender(({ elapsed, delta }) => {
   // Update text avoidance zones
   const zones = exclusionZones.value
   uniforms.uExclusionCount.value = zones.length
-  for (let j = 0; j < 4; j++) {
+  for (let j = 0; j < MAX_EXCLUSION_ZONES; j++) {
     if (j < zones.length) {
       uniforms.uExclusionZones.value[j].set(
         zones[j][0],

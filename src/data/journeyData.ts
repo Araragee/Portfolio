@@ -110,8 +110,9 @@ export const journeyChapters: JourneyChapter[] = [
       'Each project is a station on the road. Step into one to see the case study.',
     ],
     interactionHint: 'hover to see a 3D portrait form',
-    morphStart: 0.55,
-    morphEnd: 0.95,
+    // Late window keeps DAVXLOPER from forming over this chapter's text
+    morphStart: 0.75,
+    morphEnd: 0.98,
     cameraZ: 8,
     textSide: 'left',
     showProjects: true,
@@ -132,7 +133,7 @@ export const journeyChapters: JourneyChapter[] = [
     morphEnd: 0.7,
     cameraZ: 8,
     textSide: 'center',
-    fieldOffset: [0, -1.7],
+    fieldOffset: [0, -1.9],
   },
 ]
 

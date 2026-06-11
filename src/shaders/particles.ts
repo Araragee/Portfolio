@@ -21,13 +21,15 @@ uniform float uInteractState;
 uniform vec3 uInteractPos;
 
 // Exclusion zones for text avoidance: [minX, minY, maxX, maxY]
-uniform vec4 uExclusionZones[4];
+// Array size must match MAX_EXCLUSION_ZONES in ParticleField.vue.
+uniform vec4 uExclusionZones[8];
 uniform int uExclusionCount;
 
-// Counter-side field offset
+// Counter-side field offset; scale.x gates side-slides (0 on mobile),
+// scale.y keeps explicit vertical offsets alive everywhere.
 uniform vec2 uOffsetFrom;
 uniform vec2 uOffsetTo;
-uniform float uOffsetScale;
+uniform vec2 uOffsetScale;
 uniform float uFormationScale;
 
 varying float vAlpha;
@@ -159,26 +161,24 @@ void main() {
     pos.xy += normalize(away + vec2(0.0001)) * force * impulse * 1.8 * uDriftAmp;
   }
 
-  // Dynamic Text Avoidance (applied in prologue and internship chapters only)
-  if (uChapterIndex == 0 || uChapterIndex == 2) {
-    for (int j = 0; j < 4; j++) {
-      if (j >= uExclusionCount) break;
-      vec4 box = uExclusionZones[j]; // [minX, minY, maxX, maxY]
-      vec2 center = (box.xy + box.zw) * 0.5;
-      vec2 halfSize = (box.zw - box.xy) * 0.5 + vec2(0.28); // padded boundary
-      
-      vec2 d = pos.xy - center;
-      vec2 absD = abs(d);
-      
-      if (absD.x < halfSize.x && absD.y < halfSize.y) {
-        vec2 overlap = halfSize - absD;
-        vec2 dir = sign(d);
-        // Push out along the shallower overlap direction
-        if (overlap.x < overlap.y) {
-          pos.x += dir.x * overlap.x;
-        } else {
-          pos.y += dir.y * overlap.y;
-        }
+  // Dynamic Text Avoidance — every chapter, last so nothing re-enters a zone
+  for (int j = 0; j < 8; j++) {
+    if (j >= uExclusionCount) break;
+    vec4 box = uExclusionZones[j]; // [minX, minY, maxX, maxY]
+    vec2 center = (box.xy + box.zw) * 0.5;
+    vec2 halfSize = (box.zw - box.xy) * 0.5 + vec2(0.28); // padded boundary
+
+    vec2 d = pos.xy - center;
+    vec2 absD = abs(d);
+
+    if (absD.x < halfSize.x && absD.y < halfSize.y) {
+      vec2 overlap = halfSize - absD;
+      vec2 dir = sign(d);
+      // Push out along the shallower overlap direction
+      if (overlap.x < overlap.y) {
+        pos.x += dir.x * overlap.x;
+      } else {
+        pos.y += dir.y * overlap.y;
       }
     }
   }
