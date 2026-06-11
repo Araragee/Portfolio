@@ -1,14 +1,12 @@
 /**
- * GLSL for the journey particle field, exported as template strings
- * (no vite glsl plugin needed — keeps the toolchain stock).
- *
- * Morphing happens entirely on the GPU: `position` holds the FROM state,
- * `aPositionTo` the TO state, and `uProgress` (0–1) scrubs between them.
- * The CPU only swaps attribute buffers at chapter boundaries.
+ * GLSL for the journey particle field, exported as template strings.
  */
 
 export const particleVertexShader = /* glsl */ `
 attribute vec3 aPositionTo;
+attribute vec3 aBonsaiParent;
+attribute vec3 aColorFrom;
+attribute vec3 aColorTo;
 
 uniform float uTime;
 uniform float uProgress;
@@ -22,16 +20,18 @@ uniform int uChapterIndex;
 uniform float uInteractState;
 uniform vec3 uInteractPos;
 
-// Counter-side field offset (docs/TWEAKS/A-field-offset.md):
-// slides the whole formation away from the chapter's text column,
-// interpolated with the same eased t as the morph so it travels with it.
+// Exclusion zones for text avoidance: [minX, minY, maxX, maxY]
+uniform vec4 uExclusionZones[4];
+uniform int uExclusionCount;
+
+// Counter-side field offset
 uniform vec2 uOffsetFrom;
 uniform vec2 uOffsetTo;
 uniform float uOffsetScale;
-// Shrinks formations on narrow viewports so half a screen fits them
 uniform float uFormationScale;
 
 varying float vAlpha;
+varying vec3 vColor;
 
 float easeInOutCubic(float t) {
   return t < 0.5
@@ -48,7 +48,58 @@ void main() {
   float stagger = h * 0.05;
   float rawT = clamp((uProgress - stagger) / 0.95, 0.0, 1.0);
   float t = easeInOutCubic(rawT);
-  vec3 pos = mix(position, aPositionTo, t);
+  
+  vec3 pos;
+  if (uChapterIndex == 0) {
+    // Transition to Bonsai: Dropping like a sand timer
+    float h1 = hash(position.xy + vec2(0.123, 0.456));
+    float h2 = hash(position.yx + vec2(0.789, 0.111));
+    float h3 = hash(position.xy + vec2(0.222, 0.333));
+    
+    // Sand timer neck/nozzle source (above the tree)
+    vec3 posNozzle = vec3((h1 - 0.5) * 0.2, 2.8 + (h2 - 0.5) * 0.15, (h3 - 0.5) * 0.2);
+    vec3 posTarget = aPositionTo;
+    
+    // Normalise tree Y (-2.3 to 1.2)
+    float targetY = posTarget.y;
+    float heightNorm = clamp((targetY + 2.3) / 3.5, 0.0, 1.0);
+    
+    // Higher points land first, lower points land last
+    float startVal = (1.0 - heightNorm) * 0.5;
+    float endVal = startVal + 0.5;
+    
+    // Add jitter to create organic particle streams
+    float jitter = (h1 - 0.5) * 0.08;
+    startVal = clamp(startVal + jitter, 0.0, 0.5);
+    endVal = clamp(endVal + jitter, 0.5, 1.0);
+    
+    float pT = clamp((uProgress - startVal) / (endVal - startVal), 0.0, 1.0);
+    float easePT = easeInOutCubic(pT);
+    
+    if (easePT < 0.35) {
+      // Phase 1: Converge from initial position to nozzle
+      float t1 = clamp(easePT / 0.35, 0.0, 1.0);
+      pos = mix(position, posNozzle, easeInOutCubic(t1));
+    } else {
+      // Phase 2: Drop from nozzle to target on the tree
+      float t2 = clamp((easePT - 0.35) / 0.65, 0.0, 1.0);
+      float tVert = clamp(t2 / 0.7, 0.0, 1.0);
+      float tHoriz = clamp((t2 - 0.55) / 0.45, 0.0, 1.0);
+      
+      float easeVert = tVert * tVert;
+      
+      pos.y = mix(posNozzle.y, posTarget.y, easeVert);
+      pos.x = mix(posNozzle.x, posTarget.x, easeInOutCubic(tHoriz));
+      pos.z = mix(posNozzle.z, posTarget.z, easeInOutCubic(tHoriz));
+    }
+    vColor = mix(aColorFrom, aColorTo, easePT);
+  } else {
+    // Standard linear mix for other chapters
+    pos = mix(position, aPositionTo, t);
+    vColor = mix(aColorFrom, aColorTo, t);
+  }
+  
+  // Apply scaling and offsets
   pos.xy *= uFormationScale;
   pos.xy += mix(uOffsetFrom, uOffsetTo, t) * uOffsetScale;
 
@@ -67,27 +118,25 @@ void main() {
     pos.xy += normalize(away + vec2(0.0001)) * force * uRepelStrength * uDriftAmp;
   } 
   else if (uChapterIndex == 1) {
-    // Tree: Hover extend (push slightly outwards from origin)
+    // Bonsai: Hover extend
     vec2 away = pos.xy - uMouse.xy;
     force = smoothstep(1.5, 0.0, length(away));
-    pos.xy += normalize(pos.xy + vec2(0.0, 2.5)) * force * 0.15 * uDriftAmp;
+    pos.xy += normalize(pos.xy + vec2(0.0, 2.3)) * force * 0.1 * uDriftAmp;
   }
   else if (uChapterIndex == 2) {
-    // Grid: Drag displace
+    // Peso: Drag ripple/wave
     vec2 away = pos.xy - uInteractPos.xy;
-    force = smoothstep(2.0, 0.0, length(away));
-    vec2 dragDelta = uMouse.xy - uInteractPos.xy;
-    pos.xy += dragDelta * force * uInteractState * uDriftAmp;
+    force = smoothstep(2.5, 0.0, length(away));
+    pos.xy += sin(uTime * 5.0 - length(away) * 3.0) * normalize(away + vec2(0.0001)) * force * uInteractState * 0.35 * uDriftAmp;
   }
   else if (uChapterIndex == 3) {
-    // Archipelago: Lift Z
+    // SDGs: Lift Z
     vec2 away = pos.xy - uMouse.xy;
     force = smoothstep(0.8, 0.0, length(away));
     pos.z += force * 0.4 * uDriftAmp;
   }
   else if (uChapterIndex == 4) {
-    // PSA Logo: Spin Globe slightly on hover
-    // Rotate around Y axis based on interact state
+    // CBMS Logo: Rotate slightly on hover
     float angle = uInteractState * 1.5;
     float s = sin(angle);
     float c = cos(angle);
@@ -97,35 +146,59 @@ void main() {
     pos.z = mix(pos.z, nz, uDriftAmp);
   }
   else if (uChapterIndex == 5) {
-    // Artifact: Converge on click
-    pos = mix(pos, vec3(0.0), uInteractState * 0.8 * uDriftAmp);
+    // Portrait: Flow with cursor
+    vec2 away = pos.xy - uMouse.xy;
+    force = smoothstep(1.8, 0.0, length(away));
+    pos.xy += away * force * 0.15 * uDriftAmp;
   }
   else if (uChapterIndex == 6) {
-    // TALK: Radial impulse
+    // DAVXLOPER: Explode on click
     vec2 away = pos.xy - uInteractPos.xy;
-    force = smoothstep(2.5, 0.0, length(away));
+    force = smoothstep(3.0, 0.0, length(away));
     float impulse = sin(uInteractState * 3.14159);
-    pos.xy += normalize(away + vec2(0.0001)) * force * impulse * 1.5 * uDriftAmp;
+    pos.xy += normalize(away + vec2(0.0001)) * force * impulse * 1.8 * uDriftAmp;
+  }
+
+  // Dynamic Text Avoidance (applied in prologue and internship chapters only)
+  if (uChapterIndex == 0 || uChapterIndex == 2) {
+    for (int j = 0; j < 4; j++) {
+      if (j >= uExclusionCount) break;
+      vec4 box = uExclusionZones[j]; // [minX, minY, maxX, maxY]
+      vec2 center = (box.xy + box.zw) * 0.5;
+      vec2 halfSize = (box.zw - box.xy) * 0.5 + vec2(0.28); // padded boundary
+      
+      vec2 d = pos.xy - center;
+      vec2 absD = abs(d);
+      
+      if (absD.x < halfSize.x && absD.y < halfSize.y) {
+        vec2 overlap = halfSize - absD;
+        vec2 dir = sign(d);
+        // Push out along the shallower overlap direction
+        if (overlap.x < overlap.y) {
+          pos.x += dir.x * overlap.x;
+        } else {
+          pos.y += dir.y * overlap.y;
+        }
+      }
+    }
   }
 
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mvPosition;
   gl_PointSize = uPointSize * (8.0 / -mvPosition.z);
 
-  vAlpha = 1.0 - force * 0.5;
+  vAlpha = 1.0 - force * 0.3;
 }
 `
 
 export const particleFragmentShader = /* glsl */ `
-uniform vec3 uColor;
 uniform float uOpacity;
 uniform float uDither;
 
 varying float vAlpha;
+varying vec3 vColor;
 
-// Bayer 4×4 ordered dither using float comparisons only (avoids constant
-// array literals which are unsupported in WebKit GLSL ES 3.0).
-// Returns threshold in [0,1] for the given screen-space position.
+// Bayer 4×4 ordered dither
 float bayerThreshold(vec2 fragCoord) {
   float x = mod(floor(fragCoord.x), 4.0);
   float y = mod(floor(fragCoord.y), 4.0);
@@ -157,9 +230,8 @@ float bayerThreshold(vec2 fragCoord) {
 void main() {
   float alpha = uOpacity * vAlpha;
   if (uDither > 0.5) {
-    // 1-bit ordered dither — quantise alpha to 0 or 1 per screen pixel
     alpha = step(bayerThreshold(gl_FragCoord.xy), alpha);
   }
-  gl_FragColor = vec4(uColor, alpha);
+  gl_FragColor = vec4(vColor, alpha);
 }
 `

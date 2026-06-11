@@ -7,6 +7,7 @@ import {
   ShaderMaterial,
   Vector2,
   Vector3,
+  Vector4,
 } from 'three'
 import { onBeforeUnmount, shallowRef } from 'vue'
 import { useLoop } from '@tresjs/core'
@@ -21,8 +22,11 @@ const count = Math.min(particleCountForViewport(window.innerWidth), 1500)
 const targets = buildMorphTargets(count)
 
 const geometry = new BufferGeometry()
-geometry.setAttribute('position', new BufferAttribute(targets.scatter.slice(), 3))
-geometry.setAttribute('aPositionTo', new BufferAttribute(targets.scatter.slice(), 3))
+geometry.setAttribute('position', new BufferAttribute(targets.positions.scatter.slice(), 3))
+geometry.setAttribute('aPositionTo', new BufferAttribute(targets.positions.scatter.slice(), 3))
+geometry.setAttribute('aBonsaiParent', new BufferAttribute(targets.bonsaiParents.slice(), 3))
+geometry.setAttribute('aColorFrom', new BufferAttribute(targets.colors.scatter.slice(), 3))
+geometry.setAttribute('aColorTo', new BufferAttribute(targets.colors.scatter.slice(), 3))
 
 const uniforms = {
   uTime: { value: 0 },
@@ -42,6 +46,15 @@ const uniforms = {
   uOffsetTo: { value: new Vector2() },
   uOffsetScale: { value: 0 },
   uFormationScale: { value: 0.85 },
+  uExclusionCount: { value: 0 },
+  uExclusionZones: {
+    value: [
+      new Vector4(),
+      new Vector4(),
+      new Vector4(),
+      new Vector4(),
+    ]
+  }
 }
 
 const material = new ShaderMaterial({

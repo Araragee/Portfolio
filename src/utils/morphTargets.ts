@@ -1,23 +1,19 @@
-import type { MorphStateId, MorphTargetMap } from '@/types/journey'
-
-/**
- * Generates one Float32Array (count * 3) per morph state.
- * All states must use the SAME particle count so the shader can lerp 1:1.
- *
- * World space assumes the fixed journey camera (z = 8, fov 45):
- * visible area at z = 0 is roughly x ∈ [-5.5, 5.5], y ∈ [-3.3, 3.3] on desktop.
- * Keep formations inside x ±4.5, y ±2.5 to survive narrow viewports.
- *
- * Deterministic: seeded PRNG, so reloads render the same field.
- * NOTE: 'archipelago' is a placeholder (gaussian island clusters) until
- * Phase 6 swaps in real PH geo points.
- */
+import type { MorphStateId } from '@/types/journey'
 
 const SPREAD_X = 4.5
 const SPREAD_Y = 2.5
 
+export type MorphTargetMap = Record<MorphStateId, Float32Array>
+export type MorphColorMap = Record<MorphStateId, Float32Array>
+
+export interface MorphTargets {
+  positions: MorphTargetMap
+  colors: MorphColorMap
+  bonsaiParents: Float32Array
+}
+
 /** mulberry32 — tiny seeded PRNG, good enough for layout jitter. */
-function createRng(seed: number): () => number {
+export function createRng(seed: number): () => number {
   let a = seed >>> 0
   return () => {
     a |= 0
@@ -39,56 +35,127 @@ function createScatter(count: number): Float32Array {
   return out
 }
 
-interface Segment {
-  x0: number
-  y0: number
-  x1: number
-  y1: number
-  length: number
-}
-
-/** Recursive binary tree silhouette, points distributed along branch segments. */
-function createTree(count: number): Float32Array {
-  const rng = createRng(2)
-  const segments: Segment[] = []
-
-  const grow = (x: number, y: number, angle: number, length: number, depth: number): void => {
-    if (depth === 0 || length < 0.05) return
-    const x1 = x + Math.cos(angle) * length
-    const y1 = y + Math.sin(angle) * length
-    segments.push({ x0: x, y0: y, x1, y1, length })
-    const spread = 0.45 + rng() * 0.25
-    grow(x1, y1, angle + spread, length * 0.72, depth - 1)
-    grow(x1, y1, angle - spread, length * 0.72, depth - 1)
-  }
-  grow(0, -2.5, Math.PI / 2, 1.4, 8)
-
-  const totalLength = segments.reduce((sum, s) => sum + s.length, 0)
+function createDefaultColor(count: number, r = 0.067, g = 0.067, b = 0.067): Float32Array {
   const out = new Float32Array(count * 3)
-  let i = 0
-  for (const s of segments) {
-    const quota = Math.round((s.length / totalLength) * count)
-    for (let k = 0; k < quota && i < count; k++, i++) {
-      const t = rng()
-      out[i * 3] = s.x0 + (s.x1 - s.x0) * t + (rng() - 0.5) * 0.04
-      out[i * 3 + 1] = s.y0 + (s.y1 - s.y0) * t + (rng() - 0.5) * 0.04
-      out[i * 3 + 2] = (rng() - 0.5) * 0.3
-    }
-  }
-  // Fill rounding remainder onto random segments
-  while (i < count) {
-    const s = segments[Math.floor(rng() * segments.length)]
-    const t = rng()
-    out[i * 3] = s.x0 + (s.x1 - s.x0) * t
-    out[i * 3 + 1] = s.y0 + (s.y1 - s.y0) * t
-    out[i * 3 + 2] = (rng() - 0.5) * 0.3
-    i++
+  for (let i = 0; i < count; i++) {
+    out[i * 3] = r
+    out[i * 3 + 1] = g
+    out[i * 3 + 2] = b
   }
   return out
 }
 
-/** Flat pixel grid with a gentle z-wave — the wireframe era. */
-function createGrid(count: number): Float32Array {
+/** Organic curved Bonsai tree silhouette with foliage pads. */
+export function createBonsai(count: number): { positions: Float32Array; parents: Float32Array } {
+  const rng = createRng(42)
+  const positions = new Float32Array(count * 3)
+  const parents = new Float32Array(count * 3)
+  
+  // Winding trunk curve
+  const trunkX = (y: number) => 0.5 * Math.sin(1.6 * y) - 0.2 * y
+  
+  const wTrunk = 0.2
+  const wBranches = 0.3
+  
+  const nTrunk = Math.floor(count * wTrunk)
+  const nBranches = Math.floor(count * wBranches)
+  const nFoliage = count - nTrunk - nBranches
+  
+  let i = 0
+  
+  // 1. Trunk
+  for (; i < nTrunk; i++) {
+    const t = i / nTrunk
+    const y = -2.3 + t * 2.5
+    const x = trunkX(y)
+    positions[i * 3] = x + (rng() - 0.5) * 0.08
+    positions[i * 3 + 1] = y + (rng() - 0.5) * 0.08
+    positions[i * 3 + 2] = (rng() - 0.5) * 0.15
+    
+    const prevY = -2.3 + Math.max(0, t - 0.1) * 2.5
+    parents[i * 3] = trunkX(prevY)
+    parents[i * 3 + 1] = prevY
+    parents[i * 3 + 2] = 0
+  }
+  
+  // 2. Main branches
+  const branchStarts = [
+    { y: -1.3, length: 1.4, angle: Math.PI * 0.85 }, // Low-left
+    { y: -0.7, length: 1.2, angle: Math.PI * 0.15 }, // Low-right
+    { y: -0.1, length: 1.1, angle: Math.PI * 0.8 },  // Mid-left
+    { y: 0.3, length: 0.9, angle: Math.PI * 0.2 },   // Mid-right
+    { y: 0.7, length: 0.75, angle: Math.PI * 0.5 }   // Top-center
+  ]
+  
+  const branchCountPerStart = Math.floor(nBranches / branchStarts.length)
+  for (let b = 0; b < branchStarts.length; b++) {
+    const bs = branchStarts[b]
+    const startX = trunkX(bs.y)
+    const startY = bs.y
+    
+    for (let k = 0; k < branchCountPerStart && i < nBranches + nTrunk; k++, i++) {
+      const t = k / branchCountPerStart
+      const len = bs.length * (0.85 + rng() * 0.3)
+      const angle = bs.angle + (rng() - 0.5) * 0.2
+      
+      const x = startX + Math.cos(angle) * len * t
+      const y = startY + Math.sin(angle) * len * t - (1 - t) * t * 0.15
+      
+      positions[i * 3] = x + (rng() - 0.5) * 0.05
+      positions[i * 3 + 1] = y + (rng() - 0.5) * 0.05
+      positions[i * 3 + 2] = (rng() - 0.5) * 0.1
+      
+      const prevT = Math.max(0, t - 0.1)
+      parents[i * 3] = startX + Math.cos(angle) * len * prevT
+      parents[i * 3 + 1] = startY + Math.sin(angle) * len * prevT
+      parents[i * 3 + 2] = 0
+    }
+  }
+  
+  // 3. Foliage Pads
+  const leafCountPerStart = Math.floor(nFoliage / branchStarts.length)
+  for (let b = 0; b < branchStarts.length; b++) {
+    const bs = branchStarts[b]
+    const startX = trunkX(bs.y)
+    const startY = bs.y
+    const len = bs.length
+    const angle = bs.angle
+    
+    const tipX = startX + Math.cos(angle) * len
+    const tipY = startY + Math.sin(angle) * len
+    
+    for (let k = 0; k < leafCountPerStart && i < count; k++, i++) {
+      const theta = rng() * Math.PI * 2
+      const radius = Math.pow(rng(), 0.75) * 0.65
+      const px = tipX + Math.cos(theta) * radius
+      const py = tipY + Math.sin(theta) * radius * 0.55 + 0.08
+      const pz = (rng() - 0.5) * 0.35
+      
+      positions[i * 3] = px
+      positions[i * 3 + 1] = py
+      positions[i * 3 + 2] = pz
+      
+      parents[i * 3] = tipX
+      parents[i * 3 + 1] = tipY
+      parents[i * 3 + 2] = 0
+    }
+  }
+  
+  while (i < count) {
+    positions[i * 3] = 0
+    positions[i * 3 + 1] = 0.5
+    positions[i * 3 + 2] = 0
+    parents[i * 3] = 0
+    parents[i * 3 + 1] = 0.5
+    parents[i * 3 + 2] = 0
+    i++
+  }
+  
+  return { positions, parents }
+}
+
+/** Flat pixel grid fallback. */
+function createGridFallback(count: number): Float32Array {
   const rng = createRng(3)
   const cols = Math.ceil(Math.sqrt(count * (SPREAD_X / SPREAD_Y)))
   const rows = Math.ceil(count / cols)
@@ -105,107 +172,118 @@ function createGrid(count: number): Float32Array {
   return out
 }
 
-/** Detailed PH silhouette using dense bounding circles. */
-function createArchipelago(count: number): Float32Array {
-  const rng = createRng(4)
-  const islands = [
-    { x: -1.2, y: 1.8, r: 0.6, weight: 0.2 },   // North Luzon
-    { x: -0.6, y: 1.0, r: 0.5, weight: 0.15 },  // Central Luzon
-    { x: 0.0,  y: 0.4, r: 0.4, weight: 0.1 },   // Bicol / Samar
-    { x: 0.0,  y: -0.2, r: 0.5, weight: 0.15 }, // Visayas
-    { x: -1.4, y: 0.0, r: 0.3, weight: 0.05 },  // Palawan
-    { x: 0.8,  y: -1.2, r: 0.8, weight: 0.3 },  // Mindanao
-    { x: 0.1,  y: -1.5, r: 0.4, weight: 0.05 }, // Zamboanga pen
-  ]
-  const out = new Float32Array(count * 3)
-  let i = 0
-  for (const isle of islands) {
-    const quota = Math.round(isle.weight * count)
-    for (let k = 0; k < quota && i < count; k++, i++) {
-      const angle = rng() * Math.PI * 2
-      const radius = Math.pow(rng(), 0.5) * isle.r
-      out[i * 3] = isle.x + Math.cos(angle) * radius
-      out[i * 3 + 1] = isle.y + Math.sin(angle) * radius * 0.8
-      out[i * 3 + 2] = (rng() - 0.5) * 0.15
+function sampleRoundedBox(rng: () => number, w: number, h: number, r: number): [number, number] {
+  while (true) {
+    const x = (rng() - 0.5) * w
+    const y = (rng() - 0.5) * h
+    const borderX = w / 2 - r
+    const borderY = h / 2 - r
+    if (Math.abs(x) > borderX && Math.abs(y) > borderY) {
+      const dx = Math.abs(x) - borderX
+      const dy = Math.abs(y) - borderY
+      if (dx * dx + dy * dy > r * r) {
+        continue
+      }
     }
+    return [x, y]
   }
-  while (i < count) {
-    out[i * 3] = (rng() * 2 - 1) * SPREAD_X
-    out[i * 3 + 1] = (rng() * 2 - 1) * SPREAD_Y
-    out[i * 3 + 2] = (rng() - 0.5) * 0.15
-    i++
-  }
-  return out
 }
 
-/** 3D PSA Logo (Wireframe Globe + 3 Sweeping Arrows) */
-function createPsaLogo(count: number): Float32Array {
-  const rng = createRng(9)
-  const out = new Float32Array(count * 3)
+export function createSdgBentoGrid(count: number): { positions: Float32Array; colors: Float32Array } {
+  const rng = createRng(777)
+  const positions = new Float32Array(count * 3)
+  const colors = new Float32Array(count * 3)
   
-  const wGlobe = 0.6
-  const globeCount = Math.floor(count * wGlobe)
-  const arrowCount = count - globeCount
+  const numSdgs = 17
+  const countPerSdg = Math.floor(count / numSdgs)
   
-  let i = 0
-  const R = 1.3
-  
-  // Globe Wireframe
-  for (; i < globeCount; i++) {
-    // 5 latitudes, 12 longitudes
-    if (rng() > 0.5) {
-      // Latitudes
-      const latIndex = Math.floor(rng() * 5) - 2
-      const phi = latIndex * (Math.PI / 6) // -pi/3 to pi/3
-      const theta = rng() * Math.PI * 2
-      
-      out[i*3] = Math.cos(theta) * Math.cos(phi) * R + (rng()-0.5)*0.04
-      out[i*3+1] = Math.sin(phi) * R + (rng()-0.5)*0.04
-      out[i*3+2] = Math.sin(theta) * Math.cos(phi) * R + (rng()-0.5)*0.04
-    } else {
-      // Longitudes
-      const lonIndex = Math.floor(rng() * 12)
-      const theta = lonIndex * (Math.PI / 6)
-      const phi = (rng() - 0.5) * Math.PI
-      
-      out[i*3] = Math.cos(theta) * Math.cos(phi) * R + (rng()-0.5)*0.04
-      out[i*3+1] = Math.sin(phi) * R + (rng()-0.5)*0.04
-      out[i*3+2] = Math.sin(theta) * Math.cos(phi) * R + (rng()-0.5)*0.04
-    }
-  }
-  
-  // 3 Sweeping Arrows
-  const arrows = [
-    { r: R + 0.5, start: Math.PI * 1.3, end: Math.PI * 0.6, width: 0.15 }, // Outer
-    { r: R + 0.25, start: Math.PI * 1.2, end: Math.PI * 0.7, width: 0.12 }, // Middle
-    { r: R + 0.0, start: Math.PI * 1.1, end: Math.PI * 0.8, width: 0.09 }, // Inner
+  const SDG_COLORS = [
+    '#EA1D2D', // SDG 1
+    '#D19F2A', // SDG 2
+    '#2D9A47', // SDG 3
+    '#C22033', // SDG 4
+    '#EF412A', // SDG 5
+    '#00ADD8', // SDG 6
+    '#FDB714', // SDG 7
+    '#8F1838', // SDG 8
+    '#F36E24', // SDG 9
+    '#E01A83', // SDG 10
+    '#F99D25', // SDG 11
+    '#CD8B2A', // SDG 12
+    '#48773C', // SDG 13
+    '#007DBB', // SDG 14
+    '#40AE49', // SDG 15
+    '#00558A', // SDG 16
+    '#1A3668'  // SDG 17
   ]
   
-  for (let k = 0; k < arrowCount; k++, i++) {
-    const aIdx = Math.floor((k / arrowCount) * 3)
-    const arrow = arrows[aIdx]
-    
-    let r = arrow.r + (rng()-0.5) * arrow.width
-    let theta = arrow.start + rng() * (arrow.end - arrow.start)
-    
-    // Arrowhead (15% chance)
-    if (rng() < 0.15) {
-      const ht = rng()
-      theta = arrow.end + ht * (-0.15)
-      const headWidth = arrow.width * 3 * (1 - ht)
-      r = arrow.r + (rng()-0.5) * headWidth
-    }
-    
-    out[i*3] = Math.cos(theta) * r
-    out[i*3+1] = Math.sin(theta) * r
-    out[i*3+2] = Math.max(0.5, R) + (rng()-0.5)*0.1 // Place arrows on front hemisphere
+  const hexToRgb = (hex: string): [number, number, number] => {
+    const r = parseInt(hex.slice(1, 3), 16) / 255
+    const g = parseInt(hex.slice(3, 5), 16) / 255
+    const b = parseInt(hex.slice(5, 7), 16) / 255
+    return [r, g, b]
   }
   
-  return out
+  // Grid parameters: 5 columns, 4 rows
+  const cols = 5
+  const colWidth = 0.72
+  const rowHeight = 0.60
+  
+  const boxW = 0.58
+  const boxH = 0.46
+  const boxR = 0.1
+  
+  let globalIdx = 0
+  for (let g = 0; g < numSdgs; g++) {
+    const colorHex = SDG_COLORS[g]
+    const [cr, cg, cb] = hexToRgb(colorHex)
+    
+    const row = Math.floor(g / cols)
+    const col = g % cols
+    
+    // Center the last row (2 items)
+    let offsetX = 0
+    if (row === 3) {
+      offsetX = 1.5 * colWidth
+    }
+    
+    // Center grid in local coordinates
+    const gridX = (col - 2.0) * colWidth + offsetX
+    const gridY = (1.5 - row) * rowHeight
+    
+    for (let p = 0; p < countPerSdg; p++) {
+      const [bx, by] = sampleRoundedBox(rng, boxW, boxH, boxR)
+      
+      positions[globalIdx * 3] = gridX + bx
+      positions[globalIdx * 3 + 1] = gridY + by
+      positions[globalIdx * 3 + 2] = (rng() - 0.5) * 0.05
+      
+      colors[globalIdx * 3] = cr
+      colors[globalIdx * 3 + 1] = cg
+      colors[globalIdx * 3 + 2] = cb
+      
+      globalIdx++
+    }
+  }
+  
+  // Hide remainder particles
+  while (globalIdx < count) {
+    positions[globalIdx * 3] = 999
+    positions[globalIdx * 3 + 1] = 999
+    positions[globalIdx * 3 + 2] = 0
+    
+    colors[globalIdx * 3] = 0
+    colors[globalIdx * 3 + 1] = 0
+    colors[globalIdx * 3 + 2] = 0
+    
+    globalIdx++
+  }
+  
+  return { positions, colors }
 }
 
-/** Tilted ring with a dense core — the abstract project artifact. */
-function createArtifact(count: number): Float32Array {
+/** Tilted ring with a dense core — the abstract project artifact fallback. */
+function createArtifactFallback(count: number): Float32Array {
   const rng = createRng(5)
   const out = new Float32Array(count * 3)
   const ringShare = Math.floor(count * 0.75)
@@ -233,13 +311,14 @@ function createArtifact(count: number): Float32Array {
 export function createTextMass(count: number, text: string): Float32Array {
   const rng = createRng(6)
   const canvas = document.createElement('canvas')
-  canvas.width = 512
-  canvas.height = 128
+  canvas.width = 1024
+  canvas.height = 256
   const ctx = canvas.getContext('2d')
   if (!ctx) return createScatter(count)
 
   ctx.fillStyle = '#000'
-  ctx.font = '700 96px "Space Grotesk", sans-serif'
+  // 120px fits "DAVXLOPER" perfectly on 1024 width
+  ctx.font = '700 115px "Space Grotesk", sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(text, canvas.width / 2, canvas.height / 2)
@@ -258,23 +337,160 @@ export function createTextMass(count: number, text: string): Float32Array {
     const p = Math.floor(rng() * (filled.length / 2)) * 2
     const px = filled[p]
     const py = filled[p + 1]
-    out[i * 3] = (px / canvas.width - 0.5) * 7.5 + (rng() - 0.5) * 0.05
-    out[i * 3 + 1] = (0.5 - py / canvas.height) * 1.9 + (rng() - 0.5) * 0.05
+    out[i * 3] = (px / canvas.width - 0.5) * 9.0 + (rng() - 0.5) * 0.05
+    out[i * 3 + 1] = (0.5 - py / canvas.height) * 2.2 + (rng() - 0.5) * 0.05
     out[i * 3 + 2] = (rng() - 0.5) * 0.2
   }
   return out
 }
 
+const imageCache = new Map<string, HTMLImageElement>()
+
+/** Load an image and extract particle coordinates + colors asynchronously in browser. */
+export function loadImageAndSample(
+  src: string,
+  count: number,
+  scale: number,
+  colorScale = false
+): Promise<{ positions: Float32Array; colors: Float32Array }> {
+  return new Promise((resolve) => {
+    const sample = (img: HTMLImageElement) => {
+      const canvas = document.createElement('canvas')
+      const maxDim = 128
+      let w = img.width
+      let h = img.height
+      if (w > maxDim || h > maxDim) {
+        if (w > h) {
+          h = Math.round((h * maxDim) / w)
+          w = maxDim
+        } else {
+          w = Math.round((w * maxDim) / h)
+          h = maxDim
+        }
+      }
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        resolve({
+          positions: createScatter(count),
+          colors: createDefaultColor(count)
+        })
+        return
+      }
+      ctx.drawImage(img, 0, 0, w, h)
+      const data = ctx.getImageData(0, 0, w, h).data
+
+      const points: { x: number; y: number; r: number; g: number; b: number }[] = []
+      const isPeso = src.includes('peso')
+      
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const idx = (y * w + x) * 4
+          const r = data[idx]
+          const g = data[idx + 1]
+          const b = data[idx + 2]
+          const a = data[idx + 3]
+          if (a > 40) {
+            if (isPeso) {
+              const brightness = (r * 299 + g * 587 + b * 114) / 1000
+              if (brightness < 215) {
+                points.push({ x, y, r, g, b })
+              }
+            } else {
+              points.push({ x, y, r, g, b })
+            }
+          }
+        }
+      }
+
+      if (points.length === 0) {
+        resolve({
+          positions: createScatter(count),
+          colors: createDefaultColor(count)
+        })
+        return
+      }
+
+      const positions = new Float32Array(count * 3)
+      const colors = new Float32Array(count * 3)
+      const rng = createRng(123)
+
+      for (let i = 0; i < count; i++) {
+        const pt = points[Math.floor(rng() * points.length)]
+        const aspect = w / h
+        const nx = (pt.x / w - 0.5) * aspect
+        const ny = 0.5 - pt.y / h
+        
+        positions[i * 3] = nx * scale + (rng() - 0.5) * 0.02
+        positions[i * 3 + 1] = ny * scale + (rng() - 0.5) * 0.02
+        positions[i * 3 + 2] = (rng() - 0.5) * 0.05
+
+        if (colorScale) {
+          colors[i * 3] = pt.r / 255
+          colors[i * 3 + 1] = pt.g / 255
+          colors[i * 3 + 2] = pt.b / 255
+        } else {
+          colors[i * 3] = 0.067
+          colors[i * 3 + 1] = 0.067
+          colors[i * 3 + 2] = 0.067
+        }
+      }
+      resolve({ positions, colors })
+    }
+
+    if (imageCache.has(src)) {
+      sample(imageCache.get(src)!)
+      return
+    }
+
+    const img = new Image()
+    img.src = src
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      imageCache.set(src, img)
+      sample(img)
+    }
+    img.onerror = () => {
+      resolve({
+        positions: createScatter(count),
+        colors: createDefaultColor(count)
+      })
+    }
+  })
+}
+
 /** Build every morph state at the same particle count. Call once, client-side. */
-export function buildMorphTargets(count: number): MorphTargetMap {
-  return {
+export function buildMorphTargets(count: number): MorphTargets {
+  const defaultCol = createDefaultColor(count)
+  
+  const { positions: bonsaiPos, parents: bonsaiParents } = createBonsai(count)
+  const { positions: sdgPos, colors: sdgCol } = createSdgBentoGrid(count)
+  
+  const positions: MorphTargetMap = {
     scatter: createScatter(count),
-    tree: createTree(count),
-    grid: createGrid(count),
-    archipelago: createArchipelago(count),
-    psaLogo: createPsaLogo(count),
-    artifact: createArtifact(count),
-    textMass: createTextMass(count, 'TALK'),
+    bonsai: bonsaiPos,
+    peso: createGridFallback(count), // Temp grid before image load
+    archipelago: sdgPos,
+    cbmsLogo: createGridFallback(count), // Temp grid before image load
+    portrait: createArtifactFallback(count), // Temp artifact before image load
+    textMass: createTextMass(count, 'DAVXLOPER'),
+  }
+
+  const colors: MorphColorMap = {
+    scatter: defaultCol,
+    bonsai: createDefaultColor(count, 0.067, 0.12, 0.067), // Dark green hue for bonsai branches/leaves
+    peso: defaultCol,
+    archipelago: sdgCol,
+    cbmsLogo: defaultCol,
+    portrait: defaultCol,
+    textMass: defaultCol,
+  }
+
+  return {
+    positions,
+    colors,
+    bonsaiParents
   }
 }
 
@@ -285,10 +501,10 @@ export function particleCountForViewport(width: number): number {
 
 export const MORPH_STATE_IDS: MorphStateId[] = [
   'scatter',
-  'tree',
-  'grid',
+  'bonsai',
+  'peso',
   'archipelago',
-  'psaLogo',
-  'artifact',
+  'cbmsLogo',
+  'portrait',
   'textMass',
 ]

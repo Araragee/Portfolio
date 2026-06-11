@@ -6,11 +6,11 @@
 /** Particle formation the field can morph into. One per chapter. */
 export type MorphStateId =
   | 'scatter'
-  | 'tree'
-  | 'grid'
+  | 'bonsai'
+  | 'peso'
   | 'archipelago'
-  | 'psaLogo'
-  | 'artifact'
+  | 'cbmsLogo'
+  | 'portrait'
   | 'textMass'
 
 /** Allowed scroll-runway heights. Constrained so Tailwind classes stay static. */

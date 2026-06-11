@@ -3,17 +3,24 @@ import { storeToRefs } from 'pinia'
 import {
   BufferAttribute,
   BufferGeometry,
-  Color,
   Points,
   ShaderMaterial,
   Vector2,
   Vector3,
+  Vector4,
 } from 'three'
-import { onBeforeUnmount, onMounted, shallowRef, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { useLoop } from '@tresjs/core'
 import { useJourneyStore } from '@/stores/journey'
 import { useReducedMotion } from '@/composables/useReducedMotion'
-import { buildMorphTargets, particleCountForViewport, createTextMass } from '@/utils/morphTargets'
+import {
+  buildMorphTargets,
+  particleCountForViewport,
+  createTextMass,
+  loadImageAndSample,
+} from '@/utils/morphTargets'
+import type { MorphStateId } from '@/types/journey'
+import { journeyChapters } from '@/data/journeyData'
 import { particleFragmentShader, particleVertexShader } from '@/shaders/particles'
 
 const props = withDefaults(
@@ -37,11 +44,23 @@ let targets = buildMorphTargets(currentCount)
 const geometry = new BufferGeometry()
 geometry.setAttribute(
   'position',
-  new BufferAttribute(targets[morphFrom.value].slice(), 3),
+  new BufferAttribute(targets.positions[morphFrom.value].slice(), 3),
 )
 geometry.setAttribute(
   'aPositionTo',
-  new BufferAttribute(targets[morphTo.value].slice(), 3),
+  new BufferAttribute(targets.positions[morphTo.value].slice(), 3),
+)
+geometry.setAttribute(
+  'aBonsaiParent',
+  new BufferAttribute(targets.bonsaiParents.slice(), 3),
+)
+geometry.setAttribute(
+  'aColorFrom',
+  new BufferAttribute(targets.colors[morphFrom.value].slice(), 3),
+)
+geometry.setAttribute(
+  'aColorTo',
+  new BufferAttribute(targets.colors[morphTo.value].slice(), 3),
 )
 
 const uniforms = {
@@ -50,7 +69,6 @@ const uniforms = {
   uMouse: { value: new Vector3(999, 999, 0) },
   uPointSize: { value: 3.5 },
   uDriftAmp: { value: 1 },
-  uColor: { value: new Color('#111111') },
   uOpacity: { value: 0.7 },
   uDither: { value: 1.0 },
   uRepelRadius: { value: props.repelRadius },
@@ -60,9 +78,17 @@ const uniforms = {
   uInteractPos: { value: new Vector3() },
   uOffsetFrom: { value: new Vector2() },
   uOffsetTo: { value: new Vector2() },
-  // Mobile keeps the field centered behind the text — no counter-side slide
   uOffsetScale: { value: window.innerWidth < 768 ? 0 : 1 },
   uFormationScale: { value: formationScaleForViewport() },
+  uExclusionCount: { value: 0 },
+  uExclusionZones: {
+    value: [
+      new Vector4(),
+      new Vector4(),
+      new Vector4(),
+      new Vector4(),
+    ]
+  }
 }
 
 watch(() => props.repelRadius, (val) => {
@@ -83,7 +109,96 @@ const material = new ShaderMaterial({
 const points = shallowRef(new Points(geometry, material))
 points.value.frustumCulled = false
 
-// Rebuild targets & geometry when count changes (resize or FPS guard)
+// Image loading & sampling
+function loadImages(): void {
+  const activeCount = currentCount
+  loadImageAndSample('/assets/peso-1000.png', activeCount, 7.2, true).then(({ positions, colors }) => {
+    if (activeCount !== currentCount) return
+    targets.positions.peso = positions
+    targets.colors.peso = colors
+    updateActiveBuffers('peso')
+  })
+  loadImageAndSample('/assets/cbms-logo.png', activeCount, 2.5, true).then(({ positions, colors }) => {
+    if (activeCount !== currentCount) return
+    targets.positions.cbmsLogo = positions
+    targets.colors.cbmsLogo = colors
+    updateActiveBuffers('cbmsLogo')
+  })
+  loadImageAndSample('/assets/dave-face.png', activeCount, 3.2, true).then(({ positions, colors }) => {
+    if (activeCount !== currentCount) return
+    targets.positions.portrait = positions
+    targets.colors.portrait = colors
+    updateActiveBuffers('portrait')
+  })
+}
+
+// Bounding box text avoidance zones
+const HALF_HEIGHT = Math.tan((45 / 2) * (Math.PI / 180)) * 8
+const exclusionZones = ref<[number, number, number, number][]>([])
+
+function updateExclusionZones(): void {
+  const activeChapterId = journeyChapters[store.activeChapterIndex]?.id
+  const activeContainer = document.getElementById(activeChapterId)
+  if (!activeContainer) {
+    exclusionZones.value = []
+    return
+  }
+
+  const textElements = activeContainer.querySelectorAll('.reveal-text')
+  const zones: [number, number, number, number][] = []
+  const halfH = HALF_HEIGHT
+  const aspect = window.innerWidth / window.innerHeight
+  const halfW = halfH * aspect
+
+  textElements.forEach((el) => {
+    const rect = el.getBoundingClientRect()
+    if (rect.width > 0 && rect.height > 0) {
+      const ndcMinX = (rect.left / window.innerWidth) * 2 - 1
+      const ndcMaxX = (rect.right / window.innerWidth) * 2 - 1
+      const ndcMinY = -((rect.bottom / window.innerHeight) * 2 - 1)
+      const ndcMaxY = -((rect.top / window.innerHeight) * 2 - 1)
+
+      zones.push([
+        ndcMinX * halfW,
+        ndcMinY * halfH,
+        ndcMaxX * halfW,
+        ndcMaxY * halfH
+      ])
+    }
+  })
+  exclusionZones.value = zones.slice(0, 4)
+}
+
+function updateActiveBuffers(stateId: MorphStateId): void {
+  const currentGeometry = points.value.geometry
+  const positionAttr = currentGeometry.getAttribute('position') as BufferAttribute
+  const toAttr = currentGeometry.getAttribute('aPositionTo') as BufferAttribute
+  const colorFromAttr = currentGeometry.getAttribute('aColorFrom') as BufferAttribute
+  const colorToAttr = currentGeometry.getAttribute('aColorTo') as BufferAttribute
+
+  if (morphFrom.value === stateId && positionAttr) {
+    if (positionAttr.count === targets.positions[stateId].length / 3) {
+      ;(positionAttr.array as Float32Array).set(targets.positions[stateId])
+      positionAttr.needsUpdate = true
+    }
+    if (colorFromAttr && colorFromAttr.count === targets.colors[stateId].length / 3) {
+      ;(colorFromAttr.array as Float32Array).set(targets.colors[stateId])
+      colorFromAttr.needsUpdate = true
+    }
+  }
+  if (morphTo.value === stateId && toAttr) {
+    if (toAttr.count === targets.positions[stateId].length / 3) {
+      ;(toAttr.array as Float32Array).set(targets.positions[stateId])
+      toAttr.needsUpdate = true
+    }
+    if (colorToAttr && colorToAttr.count === targets.colors[stateId].length / 3) {
+      ;(colorToAttr.array as Float32Array).set(targets.colors[stateId])
+      colorToAttr.needsUpdate = true
+    }
+  }
+}
+
+// Rebuild targets & geometry when count changes
 function updateParticleCount(newCount: number): void {
   currentCount = newCount
   targets = buildMorphTargets(newCount)
@@ -91,42 +206,52 @@ function updateParticleCount(newCount: number): void {
   const newGeometry = new BufferGeometry()
   newGeometry.setAttribute(
     'position',
-    new BufferAttribute(targets[morphFrom.value].slice(), 3),
+    new BufferAttribute(targets.positions[morphFrom.value].slice(), 3),
   )
   newGeometry.setAttribute(
     'aPositionTo',
-    new BufferAttribute(targets[morphTo.value].slice(), 3),
+    new BufferAttribute(targets.positions[morphTo.value].slice(), 3),
+  )
+  newGeometry.setAttribute(
+    'aBonsaiParent',
+    new BufferAttribute(targets.bonsaiParents.slice(), 3),
+  )
+  newGeometry.setAttribute(
+    'aColorFrom',
+    new BufferAttribute(targets.colors[morphFrom.value].slice(), 3),
+  )
+  newGeometry.setAttribute(
+    'aColorTo',
+    new BufferAttribute(targets.colors[morphTo.value].slice(), 3),
   )
 
   const oldGeometry = points.value.geometry
   points.value.geometry = newGeometry
   oldGeometry.dispose()
+
+  loadImages()
+  updateExclusionZones()
 }
 
-// Narrow viewports: shrink the formation so it fits the half-screen it owns
-// (offset pushes it opposite the text — docs/TWEAKS/A-field-offset.md)
 function formationScaleForViewport(): number {
   if (window.innerWidth < 768) return 0.85
   const aspect = window.innerWidth / window.innerHeight
   return Math.min(1, Math.max(0.62, aspect / 1.5))
 }
 
-// Window resize handler: rebuild targets when crossing the 768px count breakpoint
 function onResize(): void {
   uniforms.uOffsetScale.value = window.innerWidth < 768 ? 0 : 1
   uniforms.uFormationScale.value = formationScaleForViewport()
   const newCount = particleCountForViewport(window.innerWidth)
   if (newCount !== currentCount) {
     updateParticleCount(newCount)
+  } else {
+    updateExclusionZones()
   }
 }
 window.addEventListener('resize', onResize)
 
-// Pointer → world xy on the z=0 plane. Camera is fixed (z=8, fov 45), so the
-// projection is a constant — no raycaster needed for plain repulsion.
-const HALF_HEIGHT = Math.tan((45 / 2) * (Math.PI / 180)) * 8
 const mouseTarget = new Vector3(999, 999, 0)
-
 let targetInteractState = 0
 
 function onPointerMove(event: PointerEvent): void {
@@ -138,7 +263,6 @@ function onPointerMove(event: PointerEvent): void {
 
 function onPointerDown(): void {
   targetInteractState = 1
-  // Capture where interaction started
   uniforms.uInteractPos.value.copy(mouseTarget)
 }
 
@@ -151,17 +275,9 @@ window.addEventListener('pointerdown', onPointerDown, { passive: true })
 window.addEventListener('pointerup', onPointerUp, { passive: true })
 
 let slowFrameCount = 0
-// Degrade ladder uses the store tier; each FPS violation advances one step.
-// Tier 0 → 1: dither off (fill-rate win)
-// Tier 1 → 2: DPR 1 (handled by JourneyCanvas reading store.degradeTier)
-// Tier 2 → 3: halve particles
-
 const { onBeforeRender, stop, start } = useLoop()
-
 let hasRenderedFirstFrame = false
 
-// No idle timeout: the field's drift is intentional ambient motion — freezing
-// it while the visitor reads looks broken. Only a hidden tab stops the loop.
 function onVisibilityChange(): void {
   if (document.hidden) {
     stop()
@@ -179,7 +295,6 @@ onBeforeRender(({ elapsed, delta }) => {
   }
   uniforms.uTime.value = elapsed
   const t = morphT.value
-  // Reduced motion: snap between formations instead of tweening
   uniforms.uProgress.value = prefersReducedMotion.value ? (t > 0.5 ? 1 : 0) : t
   uniforms.uDriftAmp.value = prefersReducedMotion.value ? 0 : 1
   uniforms.uMouse.value.lerp(mouseTarget, 0.08)
@@ -187,15 +302,29 @@ onBeforeRender(({ elapsed, delta }) => {
   uniforms.uChapterIndex.value = store.activeChapterIndex
   uniforms.uInteractState.value += (targetInteractState - uniforms.uInteractState.value) * 0.1
 
-  // Counter-side offsets: field slides away from the text column
   const [fromX, fromY] = store.fieldOffsetFrom
   const [toX, toY] = store.fieldOffsetTo
   uniforms.uOffsetFrom.value.set(fromX, fromY)
   uniforms.uOffsetTo.value.set(toX, toY)
 
-  // Adaptive degrade ladder — advances store tier after 60 sustained slow frames
+  // Update text avoidance zones
+  const zones = exclusionZones.value
+  uniforms.uExclusionCount.value = zones.length
+  for (let j = 0; j < 4; j++) {
+    if (j < zones.length) {
+      uniforms.uExclusionZones.value[j].set(
+        zones[j][0],
+        zones[j][1],
+        zones[j][2],
+        zones[j][3]
+      )
+    } else {
+      uniforms.uExclusionZones.value[j].set(0, 0, 0, 0)
+    }
+  }
+
   if (store.degradeTier < 3 && elapsed > 2) {
-    if (delta > 0.034) { // < ~30fps
+    if (delta > 0.034) {
       slowFrameCount++
       if (slowFrameCount > 60) {
         slowFrameCount = 0
@@ -213,18 +342,22 @@ onBeforeRender(({ elapsed, delta }) => {
 })
 
 onMounted(() => {
+  loadImages()
+  
+  // Wait slightly for DOM to settle and reveal-text to render before measuring text boxes
+  setTimeout(updateExclusionZones, 200)
+
   document.fonts.ready.then(() => {
-    // Re-sample textMass target with current font and re-upload active buffer
-    targets.textMass = createTextMass(currentCount, 'TALK')
+    targets.positions.textMass = createTextMass(currentCount, 'DAVXLOPER')
     const currentGeometry = points.value.geometry
     const positionAttr = currentGeometry.getAttribute('position') as BufferAttribute
     const toAttr = currentGeometry.getAttribute('aPositionTo') as BufferAttribute
     if (store.morphFrom === 'textMass' && positionAttr) {
-      ;(positionAttr.array as Float32Array).set(targets.textMass)
+      ;(positionAttr.array as Float32Array).set(targets.positions.textMass)
       positionAttr.needsUpdate = true
     }
     if (store.morphTo === 'textMass' && toAttr) {
-      ;(toAttr.array as Float32Array).set(targets.textMass)
+      ;(toAttr.array as Float32Array).set(targets.positions.textMass)
       toAttr.needsUpdate = true
     }
   })
@@ -240,17 +373,43 @@ onBeforeUnmount(() => {
   material.dispose()
 })
 
-// Chapter boundary crossed: swap FROM/TO buffers; the GPU lerps everything else
 watch([morphFrom, morphTo], ([from, to]) => {
   const currentGeometry = points.value.geometry
   const positionAttr = currentGeometry.getAttribute('position') as BufferAttribute
   const toAttr = currentGeometry.getAttribute('aPositionTo') as BufferAttribute
+  const colorFromAttr = currentGeometry.getAttribute('aColorFrom') as BufferAttribute
+  const colorToAttr = currentGeometry.getAttribute('aColorTo') as BufferAttribute
+
   if (positionAttr && toAttr) {
-    ;(positionAttr.array as Float32Array).set(targets[from])
-    ;(toAttr.array as Float32Array).set(targets[to])
-    positionAttr.needsUpdate = true
-    toAttr.needsUpdate = true
+    if (positionAttr.count === targets.positions[from].length / 3 &&
+        toAttr.count === targets.positions[to].length / 3) {
+      ;(positionAttr.array as Float32Array).set(targets.positions[from])
+      ;(toAttr.array as Float32Array).set(targets.positions[to])
+      positionAttr.needsUpdate = true
+      toAttr.needsUpdate = true
+    }
   }
+
+  if (colorFromAttr && colorToAttr) {
+    if (colorFromAttr.count === targets.colors[from].length / 3 &&
+        colorToAttr.count === targets.colors[to].length / 3) {
+      ;(colorFromAttr.array as Float32Array).set(targets.colors[from])
+      ;(colorToAttr.array as Float32Array).set(targets.colors[to])
+      colorFromAttr.needsUpdate = true
+      colorToAttr.needsUpdate = true
+    }
+  }
+
+  // Update text zones for the new chapter
+  setTimeout(updateExclusionZones, 50)
+})
+
+watch(() => store.activeChapterIndex, () => {
+  setTimeout(updateExclusionZones, 50)
+})
+
+watch(() => store.scrollProgress, () => {
+  updateExclusionZones()
 })
 </script>
 
