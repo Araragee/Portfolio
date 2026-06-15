@@ -66,6 +66,8 @@ export const useJourneyStore = defineStore('journey', () => {
     return { list, S, k, sp }
   })
 
+  const activeStageIndex = computed(() => segment.value.k)
+
   const morphFrom = computed<MorphStateId>(() => segment.value.list[segment.value.k])
 
   const morphTo = computed<MorphStateId>(() => {
@@ -179,6 +181,7 @@ export const useJourneyStore = defineStore('journey', () => {
   return {
     scrollProgress,
     activeChapterIndex,
+    activeStageIndex,
     chapterProgress,
     morphFrom,
     morphTo,

@@ -19,7 +19,7 @@ export type MorphStateId =
   | 'textMass'
 
 /** Allowed scroll-runway heights. Constrained so Tailwind classes stay static. */
-export type ChapterHeightVh = 150 | 200 | 300
+export type ChapterHeightVh = 150 | 200 | 300 | 500
 
 /** Which side the DOM text column sits on (desktop). Field slides opposite. */
 export type TextSide = 'left' | 'right' | 'center'
@@ -42,8 +42,14 @@ export interface JourneyChapter {
    * within each segment. Entry formation stays morphState.
    */
   extraStages?: MorphStateId[]
-  /** Story copy. Draft until Phase 4 (copy polish). */
+  /** Story copy. Used when stageParagraphs is absent. */
   paragraphs: string[]
+  /**
+   * Per-stage copy. stageParagraphs[k] is shown while stage k is active.
+   * Chapters with extraStages switch by morph-stage index; chapters without
+   * switch by scroll-progress bands (equal division).
+   */
+  stageParagraphs?: string[][]
   /** Mono label describing the chapter interaction, e.g. 'hover branch → extends'. */
   interactionHint: string
   /** Fraction of runway where morph begins (e.g. 0.55) */

@@ -69,11 +69,21 @@ export const journeyChapters: JourneyChapter[] = [
     index: '003',
     title: 'The portal',
     era: 'Philippine Statistics Authority, Oct 2023 — now',
-    heightVh: 200,
+    heightVh: 300,
     morphState: 'cbmsLogo',
     paragraphs: [
-      'Vue 3, TypeScript, ECharts. Real scale government systems.',
+      'Vue 3, TypeScript, ECharts. Real-scale government systems.',
       'I built the thing, and became the developer I wanted to be along the way.',
+    ],
+    stageParagraphs: [
+      [
+        'Vue 3, TypeScript, ECharts. Real-scale government systems.',
+        'I built the thing, and became the developer I wanted to be along the way.',
+      ],
+      [
+        'College gave me the theory — data structures, algorithms, design patterns. Applying that to a real system that had to actually work was a different problem entirely.',
+        'My first capstone shipped before AI assistants existed. Every bug meant reading documentation, tracing source code, earning every fix the hard way. That friction became fluency.',
+      ],
     ],
     interactionHint: 'move cursor — the logo ripples',
     morphStart: 0.65,
@@ -88,14 +98,40 @@ export const journeyChapters: JourneyChapter[] = [
     index: '003',
     title: 'The portal',
     era: 'Philippine Statistics Authority, Oct 2023 — now',
-    heightVh: 300,
+    heightVh: 500,
     morphState: 'archipelago',
     extraStages: ['sdgBars', 'sdgGroupedBars', 'sdgStackedBars', 'phMap'],
     paragraphs: [
       'By October 2023 I landed at the Philippine Statistics Authority, building the CBMS Portal — community-based monitoring data for the whole country.',
     ],
+    stageParagraphs: [
+      // Stage 0 — archipelago: intro
+      [
+        'By October 2023 I landed at the Philippine Statistics Authority, building the CBMS Portal — community-based monitoring data for the whole country.',
+      ],
+      // Stage 1 — sdgBars: learning Vue / TS from vanilla
+      [
+        'Coming from vanilla HTML, CSS, and JavaScript, adopting Vue 3 and TypeScript demanded more than learning syntax — it meant rethinking how UI is structured.',
+        'Components, reactivity, typed contracts. Each pattern had to be earned through use, not just read.',
+      ],
+      // Stage 2 — sdgGroupedBars: libraries and best practices
+      [
+        'Best practices in web development are not abstract rules. They are solutions to problems you eventually encounter anyway — and it is better to know them before the problem arrives.',
+        'ECharts, Pinia, composables — building the Portal meant learning when each tool earns its place, and when it does not.',
+      ],
+      // Stage 3 — sdgStackedBars: CBMS data pipeline grind
+      [
+        'The CBMS data pipeline runs deep: field surveys, collection protocols, tabulation, encoding — before I could visualize anything, I had to understand the whole chain.',
+        'I sat with data scientists. I read documentation I was not supposed to need. I shipped visualizations that had to be analytically correct, not just visually clean.',
+      ],
+      // Stage 4 — phMap: impact on LGUs and researchers
+      [
+        'The end users are local government units, researchers, data analysts — people making decisions that affect communities. The interface had to be intuitive without being shallow.',
+        'Data at this scale, made legible to non-technical audiences without sacrificing the rigor underneath — that is the hardest design problem I have solved.',
+      ],
+    ],
     interactionHint: 'hover to lift the data — scroll to redraw it',
-    // 5 stages × 60vh each; morphStart 0.67 → 40vh hold per segment
+    // 5 stages × 100vh each; morphStart 0.67 → 67vh hold per segment
     morphStart: 0.67,
     morphEnd: 0.92,
     cameraZ: 7.2,

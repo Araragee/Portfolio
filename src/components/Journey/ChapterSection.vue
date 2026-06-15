@@ -72,8 +72,33 @@ const runwayStyle = computed(
       150: 'h-[150vh]',
       200: 'h-[200vh]',
       300: 'h-[300vh]',
+      500: 'h-[500vh]',
     })[props.chapter.heightVh],
 )
+
+// Which stageParagraphs[] index to show.
+// Chapters with extraStages switch by morph-stage (store.activeStageIndex).
+// Chapters without switch by scroll-progress bands.
+const textStageIndex = computed(() => {
+  const sp = props.chapter.stageParagraphs
+  if (!sp?.length) return 0
+  const N = sp.length
+  if (props.chapter.extraStages?.length) {
+    if (chapterIdx === store.activeChapterIndex) {
+      return Math.min(N - 1, store.activeStageIndex)
+    }
+    const p = store.getChapterProgress(chapterIdx)
+    return p < 0.5 ? 0 : N - 1
+  }
+  const p = store.getChapterProgress(chapterIdx)
+  return Math.min(N - 1, Math.floor(p * N))
+})
+
+const activeParagraphs = computed(() => {
+  const sp = props.chapter.stageParagraphs
+  if (sp?.length) return sp[textStageIndex.value] ?? props.chapter.paragraphs
+  return props.chapter.paragraphs
+})
 
 // Text column sits on chapter.textSide; the particle field slides opposite
 // (docs/TWEAKS/A-field-offset.md) — no id-based special-casing
@@ -213,14 +238,22 @@ watch(isVisible, (visible) => {
             </p>
           </div>
 
-          <div class="mt-8 max-w-xl space-y-4" :class="{ 'md:mx-auto': chapter.textSide === 'center' }">
-            <p
-              v-for="(paragraph, i) in chapter.paragraphs"
-              :key="i"
-              class="reveal-text font-body text-base leading-relaxed text-on-surface"
-            >
-              {{ paragraph }}
-            </p>
+          <div class="relative mt-8">
+            <Transition name="stage">
+              <div
+                :key="textStageIndex"
+                class="max-w-xl space-y-4"
+                :class="{ 'md:mx-auto': chapter.textSide === 'center' }"
+              >
+                <p
+                  v-for="(paragraph, i) in activeParagraphs"
+                  :key="i"
+                  class="reveal-text font-body text-base leading-relaxed text-on-surface"
+                >
+                  {{ paragraph }}
+                </p>
+              </div>
+            </Transition>
           </div>
 
           <p class="reveal-text mt-6 md:mt-10 font-mono text-xs text-outline-variant">
@@ -252,3 +285,24 @@ watch(isVisible, (visible) => {
     </div>
   </section>
 </template>
+
+<style scoped>
+.stage-enter-active {
+  transition: opacity 0.5s ease;
+}
+.stage-leave-active {
+  transition: opacity 0.3s ease;
+  position: absolute;
+  width: 100%;
+}
+.stage-enter-from,
+.stage-leave-to {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage-enter-active,
+  .stage-leave-active {
+    transition: none;
+  }
+}
+</style>
