@@ -4,7 +4,7 @@ Nutrisipe is a modern, social recipe-sharing platform designed for home cooks. I
 
 ## What is it for?
 
-The core job of Nutrisipe is to answer the daily question: **"What should I cook tonight?"** 
+The core job of Nutrisipe is to answer the daily question: **"What should I cook tonight?"**
 It gives everyday cooks a relaxed, playful space to find recipe ideas, save them for later, and recreate them with their own spin. The tone is encouraging—food is treated as a pleasure rather than strict optimization.
 
 ## Key Features & Selling Points
