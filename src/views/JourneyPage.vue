@@ -112,11 +112,12 @@ onBeforeUnmount(() => {
     />
 
     <!-- Progress rail: live %, chapter ticks (docs/TWEAKS/D-pacing.md) -->
+    <!-- Mobile: ticks only, hugging the edge — labels overlap chapter text -->
     <div
-      class="pointer-events-none fixed right-6 top-1/2 z-50 flex -translate-y-1/2 flex-col items-center gap-3 opacity-50 md:opacity-100"
+      class="pointer-events-none fixed right-1.5 md:right-6 top-1/2 z-50 flex -translate-y-1/2 flex-col items-center gap-3 opacity-50 md:opacity-100"
       aria-hidden="true"
     >
-      <span class="font-mono text-xs tabular-nums tracking-widest text-primary">
+      <span class="hidden md:block font-mono text-xs tabular-nums tracking-widest text-primary">
         {{ scrollPercent }}%
       </span>
       <div class="flex flex-col items-center gap-2">
@@ -127,7 +128,7 @@ onBeforeUnmount(() => {
           :class="i === store.activeChapterIndex ? 'bg-primary' : 'bg-transparent'"
         />
       </div>
-      <span class="font-mono text-xs tracking-widest text-secondary">
+      <span class="hidden md:block font-mono text-xs tracking-widest text-secondary">
         {{ activeIndexStr }}—{{ totalStr }}
       </span>
     </div>

@@ -120,40 +120,56 @@ export const useRiskStore = defineStore('risk', () => {
   {
     slug: 'nutrisipe',
     index: '03',
-    title: 'OfficialNutrisipe',
+    title: 'Nutrisipe',
     categoryLabel: 'Social / Recipe Platform',
     description:
-      'A social recipe and nutrition platform with real-time messaging, OAuth login, and a Sanity-backed content pipeline. Live on Cloudflare Pages.',
+      'A food-first social recipe platform with recipe forking, automatic macro calculations, meal planning, and a real-time social feed. Live on Cloudflare Pages.',
     backgroundImage: new URL('@/assets/projects/nutrisipe-hero.png', import.meta.url).href,
     role: 'Front-end Developer',
     stack: 'React 17, Sanity CMS, Socket.io, Google OAuth, Tailwind',
     timeline: '2023',
     liveUrl: 'https://officialnutrisipe.pages.dev/',
     introStatement:
-      'A Pinterest-style social platform for recipes and nutrition content. Users publish, save, and discuss recipes in real time. The React client talks to a Sanity-managed content layer and a Socket.io service for live interactions.',
+      'Nutrisipe answers one question — what to cook tonight — with a visual, social-first feed instead of text-heavy blog posts. Recipes are treated as social objects: saveable, remixable, and nutritionally transparent. Users can fork existing recipes into their own variations, plan weekly meals on a drag-and-drop calendar, and generate grocery lists automatically.',
     heroImage: new URL('@/assets/projects/nutrisipe-hero.png', import.meta.url).href,
     sections: [
       {
-        heading: 'Recipes as social objects',
-        body: 'Most recipe sites treat content as static. Nutrisipe frames recipes as saveable, remixable, and discussable objects. The goal was combining structured nutrition metadata with the low-friction browsing of a social feed.',
+        heading: 'The daily dinner question',
+        body: 'Most recipe platforms are built for discovery but not for follow-through. Nutrisipe was designed to answer one question — what to cook tonight — with a visual, social-first feed rather than text-heavy blog posts. The framing treats recipes as social objects: saveable, remixable, and discussable, with food photography as the hero rather than advertising.',
       },
       {
-        heading: 'Stack notes',
-        body: 'Sanity provides the structured schema for recipes, ingredients, and author profiles, with image assets served through its CDN. A lightweight Socket.io service handles presence and live comment threads. Authentication is federated through Google OAuth.',
+        heading: 'Recipe forking and nutrition math',
+        body: "The platform's signature mechanic is recipe forking: users take an existing recipe, swap ingredients, and save a derivative with a credit trail back to the original. Every fork inherits and recalculates the nutrition profile automatically. Macros — calories, protein, fats, carbs — are computed per serving from a managed ingredient database, so no manual entry is required. Users can drag saved recipes into a weekly meal planner and generate a grocery list from it.",
       },
       {
-        heading: 'Shipped',
-        body: 'Shipped to production at officialnutrisipe.pages.dev with a masonry feed, authenticated publishing, and real-time commenting. The Sanity schema has absorbed multiple content-model changes without migrations on the client.',
+        heading: 'Admin and content layer',
+        body: 'An admin suite provides real-time platform analytics, user management, and a database editor for the global ingredient records that power macro calculations. Authentication is federated through Google OAuth. The content layer is managed through Sanity CMS with image assets served from its CDN, absorbing content-model changes without migrations on the client.',
       },
     ],
     gallery: [
       {
         src: new URL('@/assets/projects/nutrisipe-01.png', import.meta.url).href,
-        alt: 'Nutrisipe recipe feed view',
+        alt: 'Home feed with recipe cards',
       },
       {
         src: new URL('@/assets/projects/nutrisipe-02.png', import.meta.url).href,
-        alt: 'Nutrisipe recipe detail with nutrition info',
+        alt: 'Explore recipes view',
+      },
+      {
+        src: new URL('@/assets/projects/nutrisipe-03.png', import.meta.url).href,
+        alt: 'Weekly meal planner',
+      },
+      {
+        src: new URL('@/assets/projects/nutrisipe-04.png', import.meta.url).href,
+        alt: 'Admin analytics dashboard',
+      },
+      {
+        src: new URL('@/assets/projects/nutrisipe-05.png', import.meta.url).href,
+        alt: 'Admin user management',
+      },
+      {
+        src: new URL('@/assets/projects/nutrisipe-06.png', import.meta.url).href,
+        alt: 'Ingredient database editor',
       },
     ],
   },
@@ -206,11 +222,35 @@ export function useDemoMode() {
     gallery: [
       {
         src: new URL('@/assets/projects/tango-01.png', import.meta.url).href,
-        alt: 'Tango budget dashboard',
+        alt: 'Budget dashboard — desktop',
       },
       {
         src: new URL('@/assets/projects/tango-02.png', import.meta.url).href,
-        alt: 'Tango goal tracking view',
+        alt: 'Savings goals and plans — desktop',
+      },
+      {
+        src: new URL('@/assets/projects/tango-03.png', import.meta.url).href,
+        alt: 'Shared todos with handoff logic — desktop',
+      },
+      {
+        src: new URL('@/assets/projects/tango-04.png', import.meta.url).href,
+        alt: 'Shared calendar — desktop',
+      },
+      {
+        src: new URL('@/assets/projects/tango-05.png', import.meta.url).href,
+        alt: 'Budget dashboard — mobile',
+      },
+      {
+        src: new URL('@/assets/projects/tango-06.png', import.meta.url).href,
+        alt: 'Plans — mobile',
+      },
+      {
+        src: new URL('@/assets/projects/tango-07.png', import.meta.url).href,
+        alt: 'Todos — mobile',
+      },
+      {
+        src: new URL('@/assets/projects/tango-08.png', import.meta.url).href,
+        alt: 'Calendar — mobile',
       },
     ],
   },
@@ -257,40 +297,68 @@ export function useDemoMode() {
   {
     slug: 'smc',
     index: '06',
-    title: 'Sernan Music Clinic',
+    title: "Sernan's Music Clinic",
     categoryLabel: 'Freelance / Business App',
     description:
-      'A full-stack scheduling and enrollment management app for a music clinic. Includes role-based access for admins, teachers, and students with session booking and attendance tracking.',
+      "A full-stack scheduling and enrollment platform for a music school. Three role-scoped surfaces — Admin, Teacher, Student — with a negotiation-based booking engine, HMAC-signed uploads, and Docker-containerized deployment.",
     backgroundImage: new URL('@/assets/projects/smc-hero.png', import.meta.url).href,
     role: 'Full-stack Developer',
-    stack: 'Vue 3, TypeScript, Pinia, Tailwind, Python, PostgreSQL',
+    stack: 'Vue 3, TypeScript, Pinia, Tailwind, FastAPI, PostgreSQL, Docker',
     timeline: '2025',
     repoUrl: 'https://github.com/Araragee/SMC',
     introStatement:
-      'A bespoke web app built for Sernan\'s Music Clinic to replace manual scheduling and paper enrollment records. Three distinct role surfaces: Admin, Teacher, and Student. Each is scoped to their workflows. The admin manages rosters and clinic settings, teachers view and manage their session schedules, and students browse, enroll, and track their lessons.',
+      "A bespoke web app built for Sernan's Music Clinic to replace manual scheduling and paper enrollment records. Three distinct role surfaces — Admin, Teacher, and Student — each scoped to their own workflows. The admin manages rosters, schedules, and clinic settings. Teachers view and confirm their sessions. Students browse lesson packages, enroll, and track their history. Backed by a FastAPI service, PostgreSQL, and fully containerized via Docker.",
     heroImage: new URL('@/assets/projects/smc-hero.png', import.meta.url).href,
     sections: [
       {
         heading: 'Moving off spreadsheets',
-        body: 'The clinic was managing schedules via spreadsheets and messaging apps: fragile, manual, and opaque to students. The ask was a web app that gives the admin a single control surface, teachers visibility into their schedules, and students self-service enrollment and session history.',
+        body: "The clinic was managing lesson bookings, teacher assignments, and student enrollment across spreadsheets and messaging apps — fragile, manual, and opaque to everyone involved. The ask was a web app that gives the admin a single control surface, teachers visibility into their schedule, and students a self-service layer for enrollment and session history.",
       },
       {
-        heading: 'Role-based boundaries',
-        body: 'The Vue 3 frontend uses Pinia stores scoped per role, with route guards enforcing access at the router level. Each role loads a different navigation structure and component set on login. Admins see the full management suite, teachers see only their schedule and student list, students see only enrollment and their lesson history. The Python backend enforces the same role boundaries at the API layer.',
+        heading: 'Scheduling negotiation engine',
+        body: 'Bookings go through a structured negotiation: students propose a time, teachers can counter-propose, and the system caps counter-proposals at three rounds before escalating deadlocked sessions to an admin. Operating-hours enforcement blocks non-admin users from scheduling outside clinic hours. Admins get a drag-and-drop calendar with day, week, and month views. All participants can self-cancel up to 24 hours before a session.',
       },
       {
-        heading: 'Delivery',
-        body: 'Delivered a working multi-role scheduling system with session booking, enrollment management, and attendance tracking. The faculty roster includes multiple teachers with distinct schedules, and the system supports student-level session history queries. Built and handed off as a fully functional freelance engagement.',
+        heading: 'Security hardening',
+        body: 'HMAC-signed upload URLs expire after one hour, keeping homework submissions and lesson proof files out of unauthorized hands. JWT refresh tokens live in HttpOnly cookies rather than JavaScript storage. A first-login gate forces newly created accounts to change their password immediately. All endpoints enforce strict character limits, range constraints, and password strength requirements. Uploaded images are automatically stripped of EXIF metadata, converted to WebP, and downscaled to a 2000px max edge before storage.',
       },
     ],
     gallery: [
       {
         src: new URL('@/assets/projects/smc-01.png', import.meta.url).href,
-        alt: 'SMC schedule management view',
+        alt: 'Login page',
       },
       {
         src: new URL('@/assets/projects/smc-02.png', import.meta.url).href,
-        alt: 'SMC student enrollment interface',
+        alt: 'Admin schedule management',
+      },
+      {
+        src: new URL('@/assets/projects/smc-03.png', import.meta.url).href,
+        alt: 'Admin student roster',
+      },
+      {
+        src: new URL('@/assets/projects/smc-04.png', import.meta.url).href,
+        alt: 'Teacher dashboard',
+      },
+      {
+        src: new URL('@/assets/projects/smc-05.png', import.meta.url).href,
+        alt: 'Teacher schedule view',
+      },
+      {
+        src: new URL('@/assets/projects/smc-06.png', import.meta.url).href,
+        alt: 'Teacher shop',
+      },
+      {
+        src: new URL('@/assets/projects/smc-07.png', import.meta.url).href,
+        alt: 'Student dashboard',
+      },
+      {
+        src: new URL('@/assets/projects/smc-08.png', import.meta.url).href,
+        alt: 'Student schedule view',
+      },
+      {
+        src: new URL('@/assets/projects/smc-09.png', import.meta.url).href,
+        alt: 'Student shop — lesson packages',
       },
     ],
   },

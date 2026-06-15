@@ -17,6 +17,7 @@ import {
   buildMorphTargets,
   particleCountForViewport,
   createTextMass,
+  formationScaleForViewport,
   loadImageAndSample,
   PESO_BILL_INSTANCES,
 } from '@/utils/morphTargets'
@@ -251,7 +252,13 @@ function updateExclusionZones(): void {
 
   // If we are in the prologue or epilogue (where we display large text mass particles),
   // we do not want text avoidance to distort the text particles.
-  if (activeChapter?.id === 'prologue' || activeChapter?.id === 'epilogue') {
+  // Mobile exception: once the prologue morph is underway the name has
+  // dissolved, and the incoming formation lands on top of the full-width hero
+  // copy — protect it (no side column to slide to on phones).
+  const prologueHoldsName =
+    activeChapter?.id === 'prologue' &&
+    (window.innerWidth >= 768 || store.morphT < 0.3)
+  if (prologueHoldsName || activeChapter?.id === 'epilogue') {
     exclusionZones.value = []
     return
   }
@@ -341,12 +348,6 @@ function updateParticleCount(newCount: number): void {
   updateExclusionZones()
 }
 
-function formationScaleForViewport(): number {
-  if (window.innerWidth < 768) return 0.85
-  const aspect = window.innerWidth / window.innerHeight
-  return Math.min(1, Math.max(0.62, aspect / 1.5))
-}
-
 function onResize(): void {
   uniforms.uOffsetScale.value.set(window.innerWidth < 768 ? 0 : 1, 1)
   uniforms.uFormationScale.value = formationScaleForViewport()
@@ -374,7 +375,7 @@ function onPointerMove(event: PointerEvent): void {
 
 function onPointerDown(): void {
   const activeIdx = store.activeChapterIndex
-  if (activeIdx === 4 || activeIdx === 6) {
+  if (activeIdx === 6) {
     isExploding = true
     explodeProgress = 0
     uniforms.uInteractPos.value.copy(mouseTarget)
@@ -386,7 +387,7 @@ function onPointerDown(): void {
 
 function onPointerUp(): void {
   const activeIdx = store.activeChapterIndex
-  if (activeIdx !== 4 && activeIdx !== 6) {
+  if (activeIdx !== 6) {
     targetInteractState = 0
   }
 }

@@ -130,31 +130,18 @@ void main() {
     force = smoothstep(1.5, 0.0, length(away));
     pos.xy += normalize(pos.xy + vec2(0.0, 2.3)) * force * 0.1 * uDriftAmp;
   }
-  else if (uChapterIndex == 2) {
-    // Peso: Drag ripple/wave
+  else if (uChapterIndex == 2 || uChapterIndex == 3) {
+    // Peso / CBMS Logo: Drag ripple/wave
     vec2 away = pos.xy - uInteractPos.xy;
     force = smoothstep(2.5, 0.0, length(away));
     pos.xy += sin(uTime * 5.0 - length(away) * 3.0) * normalize(away + vec2(0.0001)) * force * uInteractState * 0.35 * uDriftAmp;
   }
-  else if (uChapterIndex == 3) {
+  else if (uChapterIndex == 4) {
     // SDGs: Lift Z
     vec2 away = pos.xy - uMouse.xy;
     force = smoothstep(0.8, 0.0, length(away));
     pos.z += force * 0.4 * uDriftAmp;
   }
-  else if (uChapterIndex == 4) {
-    // CBMS Logo: Rotate slightly on hover, and explode on click
-    float angle = uInteractState * 1.5;
-    float s = sin(angle);
-    float c = cos(angle);
-    float nx = pos.x * c - pos.z * s;
-    float nz = pos.x * s + pos.z * c;
-    pos.x = mix(pos.x, nx, uDriftAmp);
-    pos.z = mix(pos.z, nz, uDriftAmp);
-
-    vec2 away = pos.xy - uInteractPos.xy;
-    force = smoothstep(3.0, 0.0, length(away));
-    pos.xy += normalize(away + vec2(0.0001)) * force * uInteractState * 1.8 * uDriftAmp;
   }
   else if (uChapterIndex == 5) {
     // Portrait: Flow with cursor

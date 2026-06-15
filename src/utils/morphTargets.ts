@@ -12,6 +12,16 @@ export interface MorphTargets {
   bonsaiParents: Float32Array
 }
 
+/**
+ * Shader-side uniform scale applied to every formation (uFormationScale).
+ * Lives here so frustum-fitting samplers can compensate for it.
+ */
+export function formationScaleForViewport(): number {
+  if (window.innerWidth < 768) return 0.85
+  const aspect = window.innerWidth / window.innerHeight
+  return Math.min(1, Math.max(0.62, aspect / 1.5))
+}
+
 /** mulberry32 — tiny seeded PRNG, good enough for layout jitter. */
 export function createRng(seed: number): () => number {
   let a = seed >>> 0
@@ -502,18 +512,25 @@ export function createTextMass(count: number, text: string | string[], options: 
   if (filled.length === 0) return createScatter(count)
 
   // Clamp word width to the camera frustum (z=8, fov 45°) so the text fits
-  // narrow viewports instead of clipping off both edges.
+  // narrow viewports instead of clipping off both edges. The shader multiplies
+  // every formation by uFormationScale — divide it out so frustum-fitted text
+  // isn't shrunk twice (illegible on phones otherwise).
   const frustumWidth =
     2 * Math.tan(Math.PI / 8) * 8 * (window.innerWidth / window.innerHeight)
-  const fitScale = Math.min(1, (frustumWidth * 0.92) / 9.0)
+  const fitScale = Math.min(
+    1,
+    (frustumWidth * 0.92) / 9.0 / formationScaleForViewport(),
+  )
 
+  // Jitter scales with the glyphs — fixed world jitter blurs small text
+  const jitter = 0.05 * fitScale
   const out = new Float32Array(count * 3)
   for (let i = 0; i < count; i++) {
     const p = Math.floor(rng() * (filled.length / 2)) * 2
     const px = filled[p]
     const py = filled[p + 1]
-    out[i * 3] = (px / canvas.width - 0.5) * 9.0 * fitScale + (rng() - 0.5) * 0.05
-    out[i * 3 + 1] = (0.5 - py / canvas.height) * 4.4 * fitScale + (rng() - 0.5) * 0.05
+    out[i * 3] = (px / canvas.width - 0.5) * 9.0 * fitScale + (rng() - 0.5) * jitter
+    out[i * 3 + 1] = (0.5 - py / canvas.height) * 4.4 * fitScale + (rng() - 0.5) * jitter
     out[i * 3 + 2] = (rng() - 0.5) * 0.2
   }
   return out
