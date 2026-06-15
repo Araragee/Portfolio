@@ -142,7 +142,6 @@ void main() {
     force = smoothstep(0.8, 0.0, length(away));
     pos.z += force * 0.4 * uDriftAmp;
   }
-  }
   else if (uChapterIndex == 5) {
     // Portrait: Flow with cursor
     vec2 away = pos.xy - uMouse.xy;
