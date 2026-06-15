@@ -86,6 +86,14 @@ const textColumnStyle = computed(
     })[props.chapter.textSide],
 )
 
+// Project-list chapters overflow a phone viewport when vertically centered
+// (title clips off the top) — top-align on mobile, center from md up
+const stickyAlignStyle = computed(() =>
+  props.chapter.showProjects
+    ? 'items-start pt-20 pb-8 md:items-center md:pt-0 md:pb-0'
+    : 'items-center',
+)
+
 onMounted(() => {
   measureTextHeight()
   window.addEventListener('resize', measureTextHeight, { passive: true })
@@ -125,7 +133,8 @@ watch(isVisible, (visible) => {
 <template>
   <section :id="chapter.id" :class="runwayStyle" ref="elementRef" :aria-label="chapter.title">
     <div
-      class="sticky top-0 flex h-screen items-center transition-opacity duration-75"
+      class="sticky top-0 flex h-screen transition-opacity duration-75"
+      :class="stickyAlignStyle"
       :style="{ opacity: opacity }"
     >
       <div class="mx-auto w-full max-w-5xl px-6" ref="textDivRef">
@@ -214,11 +223,11 @@ watch(isVisible, (visible) => {
             </p>
           </div>
 
-          <p class="reveal-text mt-10 font-mono text-xs text-outline-variant">
+          <p class="reveal-text mt-6 md:mt-10 font-mono text-xs text-outline-variant">
             ↳ {{ chapter.interactionHint }}
           </p>
 
-          <div v-if="chapter.showProjects" class="mt-12 space-y-6">
+          <div v-if="chapter.showProjects" class="mt-6 space-y-3 md:mt-12 md:space-y-6">
             <RouterLink
               v-for="project in projects"
               :key="project.slug"
@@ -226,14 +235,14 @@ watch(isVisible, (visible) => {
               class="reveal-text group block border-l border-outline-variant/30 pl-4 transition-colors hover:border-primary active:opacity-60"
             >
               <h3
-                class="font-headline text-xl font-medium tracking-tight text-primary"
+                class="font-headline text-lg md:text-xl font-medium tracking-tight text-primary"
               >
                 {{ project.title }}
               </h3>
               <p class="mt-1 font-mono text-xs uppercase tracking-widest text-secondary">
                 {{ project.role }}
               </p>
-              <p class="mt-2 font-body text-sm text-outline-variant">
+              <p class="mt-1 md:mt-2 font-body text-xs md:text-sm text-outline-variant">
                 {{ project.stack }}
               </p>
             </RouterLink>
