@@ -55,6 +55,16 @@ const opacity = computed(() => {
     if (s < fadeInEnd) {
       return smoothstep((s - fadeInStart) / ENTRANCE_VH) * 0.9
     }
+  } else {
+    // Prologue has no previous chapter to morph from — hold blank for the
+    // "first land" so the page reads before any text appears, then fade in
+    // with the same entrance curve every other chapter uses.
+    const FIRST_LAND_VH = 30
+    const fadeInEnd = FIRST_LAND_VH + ENTRANCE_VH
+    if (s < FIRST_LAND_VH) return 0
+    if (s < fadeInEnd) {
+      return smoothstep((s - FIRST_LAND_VH) / ENTRANCE_VH) * 0.9
+    }
   }
 
   // 2. Fade out during transition to next chapter

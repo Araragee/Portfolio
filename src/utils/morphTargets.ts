@@ -476,6 +476,75 @@ function createArtifactFallback(count: number): Float32Array {
   return out
 }
 
+/** Rubber duck silhouette — body, tilted head, beak, eye. The "How I work" formation. */
+function createDuck(count: number): { positions: Float32Array; colors: Float32Array } {
+  const rng = createRng(909)
+  const positions = new Float32Array(count * 3)
+  const colors = new Float32Array(count * 3)
+
+  const YELLOW = hexToRgb('#FFC93C')
+  const ORANGE = hexToRgb('#F2891D')
+  const INK = hexToRgb('#111111')
+
+  const bodyCx = -0.15
+  const bodyCy = -0.35
+  const bodyRx = 1.45
+  const bodyRy = 1.05
+  const headCx = 0.95
+  const headCy = 0.95
+  const headR = 0.62
+  const beakCx = 1.75
+  const beakCy = 0.78
+
+  const nBody = Math.floor(count * 0.55)
+  const nHead = Math.floor(count * 0.32)
+  const nBeak = Math.floor(count * 0.09)
+
+  let i = 0
+  for (; i < nBody; i++) {
+    const theta = rng() * Math.PI * 2
+    const rad = Math.sqrt(rng())
+    positions[i * 3] = bodyCx + Math.cos(theta) * rad * bodyRx
+    positions[i * 3 + 1] = bodyCy + Math.sin(theta) * rad * bodyRy
+    positions[i * 3 + 2] = (rng() - 0.5) * 0.4
+    colors[i * 3] = YELLOW[0]
+    colors[i * 3 + 1] = YELLOW[1]
+    colors[i * 3 + 2] = YELLOW[2]
+  }
+  for (; i < nBody + nHead; i++) {
+    const theta = rng() * Math.PI * 2
+    const rad = Math.sqrt(rng()) * headR
+    positions[i * 3] = headCx + Math.cos(theta) * rad
+    positions[i * 3 + 1] = headCy + Math.sin(theta) * rad
+    positions[i * 3 + 2] = (rng() - 0.5) * 0.4
+    colors[i * 3] = YELLOW[0]
+    colors[i * 3 + 1] = YELLOW[1]
+    colors[i * 3 + 2] = YELLOW[2]
+  }
+  for (; i < nBody + nHead + nBeak; i++) {
+    const t = rng()
+    const spread = (rng() - 0.5) * (1 - t) * 0.5
+    positions[i * 3] = beakCx + t * 0.4
+    positions[i * 3 + 1] = beakCy + spread
+    positions[i * 3 + 2] = (rng() - 0.5) * 0.2
+    colors[i * 3] = ORANGE[0]
+    colors[i * 3 + 1] = ORANGE[1]
+    colors[i * 3 + 2] = ORANGE[2]
+  }
+  for (; i < count; i++) {
+    const theta = rng() * Math.PI * 2
+    const rad = Math.sqrt(rng()) * 0.07
+    positions[i * 3] = headCx + 0.22 + Math.cos(theta) * rad
+    positions[i * 3 + 1] = headCy + 0.12 + Math.sin(theta) * rad
+    positions[i * 3 + 2] = (rng() - 0.5) * 0.1 + 0.2
+    colors[i * 3] = INK[0]
+    colors[i * 3 + 1] = INK[1]
+    colors[i * 3 + 2] = INK[2]
+  }
+
+  return { positions, colors }
+}
+
 /** Samples 2D canvas text into particle positions. Browser-only. */
 export function createTextMass(count: number, text: string | string[], options: { fontPx?: number, yOffset?: number, maxWidth?: number, align?: 'left' | 'center' } = {}): Float32Array {
   const rng = createRng(6)
@@ -823,6 +892,7 @@ export function buildMorphTargets(count: number): MorphTargets {
   const { positions: sdgGroupPos, colors: sdgGroupCol } = createSdgGroupedBar(count)
   const { positions: sdgStackPos, colors: sdgStackCol } = createSdgStackedBar(count)
   const { positions: phMapPos, colors: phMapCol } = createPhMap(count)
+  const { positions: duckPos, colors: duckCol } = createDuck(count)
 
   const positions: MorphTargetMap = {
     scatter: createScatter(count),
@@ -843,6 +913,7 @@ export function buildMorphTargets(count: number): MorphTargets {
     proj_4: createArtifactFallback(count),
     proj_5: createArtifactFallback(count),
     textMass: createTextMass(count, 'DAVXLOPER'),
+    duck: duckPos,
   }
 
   const colors: MorphColorMap = {
@@ -864,6 +935,7 @@ export function buildMorphTargets(count: number): MorphTargets {
     proj_4: defaultCol,
     proj_5: defaultCol,
     textMass: defaultCol,
+    duck: duckCol,
   }
 
   return {

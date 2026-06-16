@@ -47,12 +47,29 @@ onScroll(updateProgress)
 
 // Snap-to-station removed for now (was useJourneySnap) — free scroll only.
 
-const activeIndexStr = computed(
-  () => journeyChapters[store.activeChapterIndex]?.index || '000',
-)
-const maxIndex = Math.max(...journeyChapters.map((c) => parseInt(c.index, 10)))
+// Numbered chapters only — "AUX" entries (e.g. how-i-work) sit outside the
+// 000-005 sequence and get their own rail icon instead of a tick/number.
+const numberedChapters = journeyChapters
+  .map((chapter, idx) => ({ chapter, idx }))
+  .filter(({ chapter }) => /^\d+$/.test(chapter.index))
+const activeIndexStr = computed(() => {
+  for (let i = store.activeChapterIndex; i >= 0; i--) {
+    if (/^\d+$/.test(journeyChapters[i].index)) return journeyChapters[i].index
+  }
+  return '000'
+})
+const maxIndex = Math.max(...numberedChapters.map(({ chapter }) => parseInt(chapter.index, 10)))
 const totalStr = `00${maxIndex}`
 const scrollPercent = computed(() => Math.round(store.scrollProgress * 100))
+
+const howIWorkChapterId = 'how-i-work'
+const isHowIWorkActive = computed(
+  () => journeyChapters[store.activeChapterIndex]?.id === howIWorkChapterId,
+)
+
+function goToHowIWork(): void {
+  lenis.value?.scrollTo(`#${howIWorkChapterId}`, { offset: 0 })
+}
 
 function startJourney(): void {
   lenis.value?.start()
@@ -113,26 +130,56 @@ onBeforeUnmount(() => {
       aria-hidden="true"
     />
 
-    <!-- Progress rail: live %, chapter ticks (docs/TWEAKS/D-pacing.md) -->
-    <!-- Mobile: ticks only, hugging the edge — labels overlap chapter text -->
+    <!-- Sidebar: progress rail + site nav (journey has no top header — D1) -->
     <div
-      class="pointer-events-none fixed right-1.5 md:right-6 top-1/2 z-50 flex -translate-y-1/2 flex-col items-center gap-3 opacity-50 md:opacity-100"
-      aria-hidden="true"
+      class="fixed right-1.5 md:right-6 top-1/2 z-50 flex -translate-y-1/2 flex-col items-center gap-3 opacity-50 md:opacity-100"
     >
-      <span class="hidden md:block font-mono text-xs tabular-nums tracking-widest text-primary">
-        {{ scrollPercent }}%
-      </span>
-      <div class="flex flex-col items-center gap-2">
-        <span
-          v-for="(chapter, i) in journeyChapters"
-          :key="chapter.id"
-          class="h-1.5 w-1.5 border border-primary transition-colors duration-200"
-          :class="i === store.activeChapterIndex ? 'bg-primary' : 'bg-transparent'"
-        />
+      <!-- Progress rail: live %, chapter ticks (docs/TWEAKS/D-pacing.md) -->
+      <!-- Mobile: ticks only, hugging the edge — labels overlap chapter text -->
+      <div
+        class="pointer-events-none flex flex-col items-center gap-3"
+        aria-hidden="true"
+      >
+        <span class="hidden md:block font-mono text-xs tabular-nums tracking-widest text-primary">
+          {{ scrollPercent }}%
+        </span>
+        <div class="flex flex-col items-center gap-2">
+          <span
+            v-for="{ chapter, idx } in numberedChapters"
+            :key="chapter.id"
+            class="h-1.5 w-1.5 border border-primary transition-colors duration-200"
+            :class="idx === store.activeChapterIndex ? 'bg-primary' : 'bg-transparent'"
+          />
+        </div>
+        <span class="hidden md:block font-mono text-xs tracking-widest text-secondary">
+          {{ activeIndexStr }}—{{ totalStr }}
+        </span>
       </div>
-      <span class="hidden md:block font-mono text-xs tracking-widest text-secondary">
-        {{ activeIndexStr }}—{{ totalStr }}
-      </span>
+
+      <!-- Site nav, folded into the sidebar (no top header on the journey page) -->
+      <nav class="pointer-events-auto mt-3 flex flex-col items-center" aria-label="Site navigation">
+        <router-link
+          to="/personal"
+          class="hidden md:block font-mono text-[10px] uppercase tracking-widest text-secondary transition-colors hover:text-primary [writing-mode:vertical-rl]"
+        >
+          Personal
+        </router-link>
+
+        <!-- How I work → the journey's rubber-duck particle chapter -->
+        <button
+          type="button"
+          class="mt-8 flex h-24 w-4 items-center justify-center transition-colors hover:text-primary"
+          :class="isHowIWorkActive ? 'text-primary' : 'text-secondary'"
+          aria-label="How I work"
+          @click="goToHowIWork"
+        >
+          <svg viewBox="0 0 32 32" class="h-4 w-4" fill="currentColor" aria-hidden="true">
+            <circle cx="14" cy="20" r="10" />
+            <circle cx="20" cy="10" r="7" />
+            <path d="M26 9 L31 10 L26 13 Z" />
+          </svg>
+        </button>
+      </nav>
     </div>
 
     <div class="relative z-10">

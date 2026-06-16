@@ -14,10 +14,9 @@ const routes: Array<RouteRecordRaw> = [
     redirect: '/'
   },
   {
+    // Folded into the journey as the "how-i-work" chapter (rubber duck formation)
     path: '/manifesto',
-    name: 'Manifesto',
-    component: () => import('@/views/ManifestoPage.vue'),
-    meta: { title: "How I work — Dave Gonzales" }
+    redirect: '/#how-i-work'
   },
   {
     path: '/personal',

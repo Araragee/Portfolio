@@ -23,6 +23,7 @@ export type MorphStateId =
   | 'proj_4'
   | 'proj_5'
   | 'textMass'
+  | 'duck'
 
 /** Allowed scroll-runway heights. Constrained so Tailwind classes stay static. */
 export type ChapterHeightVh = number

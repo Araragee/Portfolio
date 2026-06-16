@@ -10,7 +10,8 @@ const isJourney = computed(() => route.name === 'Journey')
 </script>
 
 <template>
-  <TheNavbar />
+  <!-- Journey owns its own sidebar nav (progress rail) — no top header there -->
+  <TheNavbar v-if="!isJourney" />
   <router-view v-slot="{ Component }">
     <Transition name="page" mode="out-in">
       <component :is="Component" :key="routeKey" />

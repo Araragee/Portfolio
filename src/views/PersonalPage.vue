@@ -21,6 +21,11 @@ const { containerRef: hobbiesRef } = useStaggerAnimation({ staggerDelay: 100 })
 
       <!-- Hero -->
       <section ref="heroRef" class="mb-20 md:mb-24 text-center" aria-labelledby="personal-heading">
+        <div
+          class="mx-auto mb-8 h-28 w-28 border border-outline bg-outline/10"
+          role="img"
+          aria-label="Profile photo placeholder"
+        ></div>
         <span class="font-mono text-caption uppercase text-secondary mb-6 md:mb-8 block">
           Off-Hours
         </span>

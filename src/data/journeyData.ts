@@ -177,6 +177,41 @@ export const journeyChapters: JourneyChapter[] = [
     showProjects: true,
   },
   {
+    id: 'how-i-work',
+    index: 'AUX',
+    title: 'How I work',
+    era: 'Engineering philosophy',
+    heightVh: 300,
+    morphState: 'duck',
+    paragraphs: [
+      "I write code that's meant to be read, debugged, and eventually replaced — not clever tricks that save five lines but cost an hour to understand.",
+      "Consistency beats chasing the latest framework feature. I stick to patterns that work, and that the next person can trust.",
+    ],
+    stageParagraphs: [
+      [
+        "I write code that's meant to be read, debugged, and eventually replaced — not clever tricks that save five lines but cost an hour to understand.",
+        "Consistency beats chasing the latest framework feature. I stick to patterns that work, and that the next person can trust.",
+      ],
+      [
+        'PSA, Oct 2023 — now: building the CBMS Portal, Vue 3 + TypeScript + ECharts at government scale.',
+        "Before that, an internship at iPhitech, and a CS degree at Tarlac State that taught me the theory I'd spend years turning into fluency.",
+      ],
+      [
+        "Strict TypeScript: if the compiler can catch it, I'd rather fix it in the editor than at runtime.",
+        'Deleting code: the best pull requests remove lines. Dead code is debt nobody asked for.',
+      ],
+      [
+        'Performance budgets and composables over monoliths — small, testable pieces instead of one file that does everything.',
+        "That's how I work. Scroll on, or stop here and say hello.",
+      ],
+    ],
+    interactionHint: 'no tricks here — the same four rules, every time',
+    morphStart: 0.55,
+    morphEnd: 0.95,
+    cameraZ: 8,
+    textSide: 'right',
+  },
+  {
     id: 'epilogue',
     index: '005',
     title: 'End of the road',
