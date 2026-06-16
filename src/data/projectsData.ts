@@ -125,7 +125,7 @@ export const useRiskStore = defineStore('risk', () => {
     description:
       'A food-first social recipe platform with recipe forking, automatic macro calculations, meal planning, and a real-time social feed. Live on Cloudflare Pages.',
     backgroundImage: new URL('@/assets/projects/nutrisipe-hero.png', import.meta.url).href,
-    role: 'Front-end Developer',
+    role: 'Solo Developer',
     stack: 'React 17, Sanity CMS, Socket.io, Google OAuth, Tailwind',
     timeline: '2023',
     liveUrl: 'https://officialnutrisipe.pages.dev/',
@@ -302,7 +302,7 @@ export function useDemoMode() {
     description:
       "A full-stack scheduling and enrollment platform for a music school. Three role-scoped surfaces — Admin, Teacher, Student — with a negotiation-based booking engine, HMAC-signed uploads, and Docker-containerized deployment.",
     backgroundImage: new URL('@/assets/projects/smc-hero.png', import.meta.url).href,
-    role: 'Full-stack Developer',
+    role: 'Solo Developer',
     stack: 'Vue 3, TypeScript, Pinia, Tailwind, FastAPI, PostgreSQL, Docker',
     timeline: '2025',
     repoUrl: 'https://github.com/Araragee/SMC',
@@ -370,8 +370,8 @@ export function useDemoMode() {
     description:
       'Interactive particle avatar of Koyomi Araragi, constructed from pixel density sampling of araragi.png.',
     backgroundImage: new URL('@/assets/projects/tango-hero.png', import.meta.url).href,
-    role: 'Creator / Developer',
-    stack: 'Vue 3, Three.js, Custom Shader, GLSL',
+    role: 'Front-end / Developer',
+    stack: 'Vue 3, WebGL, Tailwind CSS, Three.js, TypeScript',
     timeline: '2026',
     liveUrl: '',
     introStatement:

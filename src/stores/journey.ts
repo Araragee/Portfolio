@@ -200,11 +200,17 @@ export const useJourneyStore = defineStore('journey', () => {
       accVh += h
     }
 
-    const LeadVh = 20 // start transition 20vh before the boundary
+    const getLeadVhForTransitionTo = (idx: number) => {
+      if (idx === journeyChapters.length - 1) {
+        return ENTRANCE_VH + 28 + 20 // 76 vh
+      }
+      return ENTRANCE_VH + 28 // 56 vh
+    }
 
     // Check if we are in a cross-chapter transition
     for (let idx = 1; idx < journeyChapters.length; idx++) {
-      const boundaryStart = startsVh[idx] - LeadVh
+      const transitionLead = getLeadVhForTransitionTo(idx)
+      const boundaryStart = startsVh[idx] - transitionLead
       const boundaryEnd = boundaryStart + ENTRANCE_VH
       if (scrollVh >= boundaryStart && scrollVh < boundaryEnd) {
         const prev = journeyChapters[idx - 1]
@@ -227,7 +233,8 @@ export const useJourneyStore = defineStore('journey', () => {
     let activeIdx = 0
     for (let idx = journeyChapters.length - 1; idx >= 0; idx--) {
       // The body of chapter idx starts after the previous transition ends
-      const prevEnd = idx > 0 ? startsVh[idx] - LeadVh + ENTRANCE_VH : 0
+      const prevLead = idx > 0 ? getLeadVhForTransitionTo(idx) : 0
+      const prevEnd = idx > 0 ? startsVh[idx] - prevLead + ENTRANCE_VH : 0
       if (scrollVh >= prevEnd) {
         activeIdx = idx
         break
@@ -272,8 +279,10 @@ export const useJourneyStore = defineStore('journey', () => {
     }
 
     // Normal multi-stage chapter body logic
-    const prevEnd = activeIdx > 0 ? startsVh[activeIdx] - LeadVh + ENTRANCE_VH : 0
-    const nextStart = activeIdx + 1 < journeyChapters.length ? startsVh[activeIdx + 1] - LeadVh : totalVh - 100
+    const prevLead = activeIdx > 0 ? getLeadVhForTransitionTo(activeIdx) : 0
+    const prevEnd = activeIdx > 0 ? startsVh[activeIdx] - prevLead + ENTRANCE_VH : 0
+    const nextLead = activeIdx + 1 < journeyChapters.length ? getLeadVhForTransitionTo(activeIdx + 1) : 0
+    const nextStart = activeIdx + 1 < journeyChapters.length ? startsVh[activeIdx + 1] - nextLead : totalVh - 100
     const bodySpan = nextStart - prevEnd
     const bodyProg = bodySpan > 0 ? Math.min(1, Math.max(0, (scrollVh - prevEnd) / bodySpan)) : 1
 

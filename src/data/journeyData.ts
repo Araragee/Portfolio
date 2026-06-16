@@ -185,7 +185,7 @@ export const journeyChapters: JourneyChapter[] = [
     morphState: 'textMass',
     paragraphs: [
       'Everything you scrolled past collapses into one word.',
-      'Have a project, a role, or an argument about frame rates? I read every message.',
+      'Have a project, a role, or an argument about who\'\s best girl? I read every message.',
     ],
     interactionHint: 'click the name — it explodes, then reforms',
     morphStart: 0.3,

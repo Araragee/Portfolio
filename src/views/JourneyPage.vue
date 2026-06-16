@@ -4,9 +4,7 @@ import { useRoute } from 'vue-router'
 import ChapterSection from '@/components/Journey/ChapterSection.vue'
 import JourneyLoader from '@/components/Journey/JourneyLoader.vue'
 import SEOHead from '@/components/SEOHead.vue'
-import { useJourneySnap } from '@/composables/useJourneySnap'
 import { useLenis } from '@/composables/useLenis'
-import { useReducedMotion } from '@/composables/useReducedMotion'
 import { useWebGLSupport } from '@/composables/useWebGLSupport'
 import { journeyChapters } from '@/data/journeyData'
 import { useJourneyStore } from '@/stores/journey'
@@ -19,7 +17,6 @@ const JourneyCanvas = defineAsyncComponent(
 const store = useJourneyStore()
 const { webglSupported } = useWebGLSupport()
 const { onScroll, lenis } = useLenis()
-const { prefersReducedMotion } = useReducedMotion()
 const route = useRoute()
 
 const containerRef = ref<HTMLElement | null>(null)
@@ -48,14 +45,7 @@ function onWindowResize(): void {
 
 onScroll(updateProgress)
 
-// Snap to the nearest held-formation "station" once scrolling settles; the
-// glide scrubs the morph it passes. Disabled under reduced motion (free scroll).
-useJourneySnap({
-  lenis,
-  getAnchors: () => store.snapAnchors.map((p) => containerTop + p * scrollableHeight),
-  getMorphT: () => store.morphT,
-  enabled: () => store.journeyReady && !prefersReducedMotion.value,
-})
+// Snap-to-station removed for now (was useJourneySnap) — free scroll only.
 
 const activeIndexStr = computed(
   () => journeyChapters[store.activeChapterIndex]?.index || '000',
@@ -113,7 +103,7 @@ onBeforeUnmount(() => {
 
 <template>
   <main ref="containerRef" class="relative bg-surface" id="main-content" tabindex="-1">
-    <SEOHead title="Journey — Dave Gonzales" />
+    <SEOHead title="Davxloper" />
     <JourneyLoader />
     <JourneyCanvas v-if="webglSupported" />
     <!-- No WebGL: static dithered background -->

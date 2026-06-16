@@ -22,25 +22,53 @@ const smoothstep = (t: number) => {
   const x = Math.min(1, Math.max(0, t))
   return x * x * (3 - 2 * x)
 }
-const FADE_OUT_VH = 50
+const heights = journeyChapters.map((c) => c.heightVh)
+const startsVh: number[] = []
+let accVh = 0
+for (const h of heights) {
+  startsVh.push(accVh)
+  accVh += h
+}
+const totalVh = accVh
+const scrollableVh = totalVh - 100
+
+const scrollVh = computed(() => store.scrollProgress * scrollableVh)
+
 const opacity = computed(() => {
-  const p = store.getChapterProgress(chapterIdx)
+  const s = scrollVh.value
   const isLast = chapterIdx === journeyChapters.length - 1
-  if (p <= 0) return 0
-  const h = props.chapter.heightVh
+  const startVh = startsVh[chapterIdx]
 
-  // Fade in over the entrance, matching the particle morph
-  const fadeIn = Math.min(0.9, ENTRANCE_VH / h)
-  if (p < fadeIn) return smoothstep(p / fadeIn) * 0.9
+  const getLeadVhForTransitionTo = (idx: number) => {
+    if (idx === journeyChapters.length - 1) {
+      return ENTRANCE_VH + 28 + 20 // 76 vh
+    }
+    return ENTRANCE_VH + 28 // 56 vh
+  }
 
-  if (isLast) return 0.9 // last chapter holds its copy to the end
+  // 1. Fade in during transition from previous chapter
+  if (chapterIdx > 0) {
+    const fadeInLead = getLeadVhForTransitionTo(chapterIdx)
+    const fadeInStart = startVh - fadeInLead
+    const fadeInEnd = fadeInStart + ENTRANCE_VH
+    if (s < fadeInStart) return 0
+    if (s < fadeInEnd) {
+      return smoothstep((s - fadeInStart) / ENTRANCE_VH) * 0.9
+    }
+  }
 
-  // Fade out as the card unpins (last 100vh of the runway)
-  const fadeOutStart = Math.max(fadeIn, (h - 100) / h)
-  const fadeOutBand = Math.min(1 - fadeOutStart, FADE_OUT_VH / h)
-  if (fadeOutBand <= 0 || p <= fadeOutStart) return 0.9
-  if (p >= fadeOutStart + fadeOutBand) return 0
-  return 0.9 * (1 - smoothstep((p - fadeOutStart) / fadeOutBand))
+  // 2. Fade out during transition to next chapter
+  if (!isLast) {
+    const fadeOutLead = getLeadVhForTransitionTo(chapterIdx + 1)
+    const fadeOutStart = startsVh[chapterIdx + 1] - fadeOutLead
+    const fadeOutEnd = fadeOutStart + ENTRANCE_VH
+    if (s >= fadeOutEnd) return 0
+    if (s >= fadeOutStart) {
+      return 0.9 * (1 - smoothstep((s - fadeOutStart) / ENTRANCE_VH))
+    }
+  }
+
+  return 0.9
 })
 
 const { elementRef, isVisible } = useIntersectionObserver({
