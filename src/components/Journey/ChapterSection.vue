@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import anime from 'animejs'
 import type { JourneyChapter } from '@/types/journey'
 import { useIntersectionObserver } from '@/composables/useIntersectionObserver'
 import { useReducedMotion } from '@/composables/useReducedMotion'
-import { projects } from '@/data/projectsData'
 import { useJourneyStore } from '@/stores/journey'
-import { journeyChapters } from '@/data/journeyData'
+import { ENTRANCE_VH, journeyChapters } from '@/data/journeyData'
+import ProjectDeck from '@/components/Journey/ProjectDeck.vue'
 
 const props = defineProps<{
   chapter: JourneyChapter
@@ -15,48 +15,32 @@ const props = defineProps<{
 const store = useJourneyStore()
 const chapterIdx = journeyChapters.findIndex((c) => c.id === props.chapter.id)
 
-const textDivRef = ref<HTMLElement | null>(null)
-const textHeight = ref(0)
-
-function measureTextHeight() {
-  if (textDivRef.value) {
-    textHeight.value = textDivRef.value.offsetHeight
-  }
+// Copy fades IN across the entrance (with the morph forming the new shape), then
+// holds, then fades OUT as the card unpins — decoupled from the morph, which by
+// then lives in the NEXT section's entrance.
+const smoothstep = (t: number) => {
+  const x = Math.min(1, Math.max(0, t))
+  return x * x * (3 - 2 * x)
 }
-
+const FADE_OUT_VH = 50
 const opacity = computed(() => {
   const p = store.getChapterProgress(chapterIdx)
   const isLast = chapterIdx === journeyChapters.length - 1
   if (p <= 0) return 0
-  if (p >= 1) return isLast ? 0.9 : 0
+  const h = props.chapter.heightVh
 
-  // Fade in to 0.9 over first 15% of the runway
-  if (p < 0.15) return (p / 0.15) * 0.9
+  // Fade in over the entrance, matching the particle morph
+  const fadeIn = Math.min(0.9, ENTRANCE_VH / h)
+  if (p < fadeIn) return smoothstep(p / fadeIn) * 0.9
 
-  // Calculate progress at which the chapter starts unpinning and scrolling up
-  const heightVh = props.chapter.heightVh
-  const unpinProgress = 1 - 100 / heightVh
+  if (isLast) return 0.9 // last chapter holds its copy to the end
 
-  if (p > unpinProgress) {
-    if (isLast) return 0.9
-
-    // Relative progress in the unpinned 100vh scroll region (t goes from 0 to 1)
-    const t = (p - unpinProgress) / (1 - unpinProgress)
-
-    // Calculate when the bottom of the text div reaches the middle of the viewport
-    // bottom = window.innerHeight * (0.5 - t) + textHeight / 2
-    // bottom <= window.innerHeight * 0.5  =>  t >= textHeight / (2 * window.innerHeight)
-    // Delay the fade-out start by 12vh (0.12 in t space) after crossing the midpoint
-    const tFadeStart = Math.min(0.85, (textHeight.value / (2 * window.innerHeight)) + 0.12)
-
-    if (t > tFadeStart) {
-      // Fade to 0 over a smoother 18vh (0.18 in t space)
-      const fadeProgress = (t - tFadeStart) / 0.18
-      return Math.max(0, 0.9 * (1 - fadeProgress))
-    }
-  }
-
-  return 0.9
+  // Fade out as the card unpins (last 100vh of the runway)
+  const fadeOutStart = Math.max(fadeIn, (h - 100) / h)
+  const fadeOutBand = Math.min(1 - fadeOutStart, FADE_OUT_VH / h)
+  if (fadeOutBand <= 0 || p <= fadeOutStart) return 0.9
+  if (p >= fadeOutStart + fadeOutBand) return 0
+  return 0.9 * (1 - smoothstep((p - fadeOutStart) / fadeOutBand))
 })
 
 const { elementRef, isVisible } = useIntersectionObserver({
@@ -120,19 +104,12 @@ const stickyAlignStyle = computed(() =>
 )
 
 onMounted(() => {
-  measureTextHeight()
-  window.addEventListener('resize', measureTextHeight, { passive: true })
-
   if (elementRef.value && !prefersReducedMotion.value) {
     const targets = elementRef.value.querySelectorAll('.reveal-text')
     targets.forEach((el) => {
       ;(el as HTMLElement).style.opacity = '0'
     })
   }
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', measureTextHeight)
 })
 
 watch(isVisible, (visible) => {
@@ -162,7 +139,7 @@ watch(isVisible, (visible) => {
       :class="stickyAlignStyle"
       :style="{ opacity: opacity }"
     >
-      <div class="mx-auto w-full max-w-5xl px-6" ref="textDivRef">
+      <div class="mx-auto w-full max-w-5xl px-6">
         <!-- Hero layout (prologue) -->
         <div
           v-if="chapter.layout === 'hero'"
@@ -260,25 +237,8 @@ watch(isVisible, (visible) => {
             ↳ {{ chapter.interactionHint }}
           </p>
 
-          <div v-if="chapter.showProjects" class="mt-6 space-y-3 md:mt-12 md:space-y-6">
-            <RouterLink
-              v-for="project in projects"
-              :key="project.slug"
-              :to="`/case-study/${project.slug}`"
-              class="reveal-text group block border-l border-outline-variant/30 pl-4 transition-colors hover:border-primary active:opacity-60"
-            >
-              <h3
-                class="font-headline text-lg md:text-xl font-medium tracking-tight text-primary"
-              >
-                {{ project.title }}
-              </h3>
-              <p class="mt-1 font-mono text-xs uppercase tracking-widest text-secondary">
-                {{ project.role }}
-              </p>
-              <p class="mt-1 md:mt-2 font-body text-xs md:text-sm text-outline-variant">
-                {{ project.stack }}
-              </p>
-            </RouterLink>
+          <div v-if="chapter.showProjects" class="reveal-text mt-6 md:mt-12">
+            <ProjectDeck />
           </div>
         </div>
       </div>

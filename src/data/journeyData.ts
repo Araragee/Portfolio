@@ -4,12 +4,30 @@ import type { JourneyChapter } from '@/types/journey'
  * Chapter content for "The Long Way Around".
  * Source of truth for the story: src/data/personalData.ts.
  *
- * Pacing (docs/TWEAKS/D-pacing.md): chapters hold their own formation through
- * the first 55% of the runway, then morph to the next across 55–95%. For chapters
- * with extra stages (e.g. psa-map), this holding/morphing logic applies per segment.
+ * Pacing: each section LOCKS (holds its formation + text) for most of the
+ * runway, then runs a full transition to the next across a fixed TRANSITION_VH
+ * window of scroll. Single-stage chapters place that window right after the
+ * sticky text unpins; multi-stage chapters (e.g. psa-map) at each segment's end.
+ * Per-chapter morphStart/morphEnd are no longer consulted — the window is
+ * derived from TRANSITION_VH so every transition spans the same scroll distance.
  * Sides alternate so the field always slides opposite the text
  * (docs/TWEAKS/A-field-offset.md).
  */
+
+/**
+ * Scroll distance (vh) an INNER-stage morph spans (multi-stage chapters like
+ * psa-map). Outside it the stage holds. Fixed so every inner morph feels equal.
+ */
+export const TRANSITION_VH = 40
+
+/**
+ * Scroll distance (vh) of each section's ENTRANCE: the window at the start of a
+ * chapter's runway where its card fades in AND the field morphs the previous
+ * formation into this one. The morph is timed here — not at the previous
+ * section's exit — so shape and text arrive together. Card fade-in matches it.
+ */
+export const ENTRANCE_VH = 50
+
 export const journeyChapters: JourneyChapter[] = [
   {
     id: 'prologue',
@@ -143,7 +161,7 @@ export const journeyChapters: JourneyChapter[] = [
     index: '004',
     title: 'Side quests',
     era: 'Freelance + personal projects',
-    heightVh: 200,
+    heightVh: 500,
     morphState: 'portrait',
     paragraphs: [
       'Off the clock the building continues — freelance Vue work, experiments, this site.',

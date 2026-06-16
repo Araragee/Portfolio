@@ -1,19 +1,29 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { fieldOffsetFor, journeyChapters } from '@/data/journeyData'
+import { ENTRANCE_VH, fieldOffsetFor, journeyChapters, TRANSITION_VH } from '@/data/journeyData'
 import type { JourneyChapter, MorphStateId } from '@/types/journey'
+
+/** Smoothstep — gentle ease in/out of holds, even though it's scroll-scrubbed. */
+function smoothstep(t: number): number {
+  const x = Math.min(1, Math.max(0, t))
+  return x * x * (3 - 2 * x)
+}
+
+/** Entrance window of a chapter as a fraction of its runway. */
+function entranceFrac(heightVh: number): number {
+  return Math.min(0.9, ENTRANCE_VH / heightVh)
+}
 
 /**
  * Scroll-derived journey state, shared between the DOM chapters and the
  * WebGL canvas. The single writer is JourneyPage (via Lenis scroll events);
  * everything else reads.
  *
- * Morph timing: each chapter HOLDS its formation for the first 60% of its
- * runway, then transitions to the next chapter's formation over the last 40%.
- * Scrubbed by scroll — no clocked duration, so the 300ms rule doesn't apply.
+ * Morph timing: each section HOLDS its formation (the "lock") for most of its
+ * runway, then runs a full transition to the next across a fixed TRANSITION_VH
+ * window of scroll. Scrubbed by scroll — no clocked duration, so the 300ms rule
+ * doesn't apply. See morphBandFor() for where the window sits.
  */
-
-/** Fraction of a chapter's runway spent holding before the morph begins. Now in journeyData. */
 
 export const useJourneyStore = defineStore('journey', () => {
   /** 0–1 across the entire journey container. */
@@ -52,73 +62,109 @@ export const useJourneyStore = defineStore('journey', () => {
   }
 
   /**
-   * Active in-chapter segment. Chapters without extraStages have a single
-   * segment, so sp == chapterProgress and behavior is unchanged. The last
-   * segment's morph target is the next chapter's formation.
+   * Snap "stations" in 0–1 progress: where a formation is held and its card is
+   * centered (after the entrance morph, before the card unpins). One per chapter,
+   * plus each inner stage of a multi-stage chapter whose hold still falls inside
+   * the pinned region. useJourneySnap glides here on scroll-settle; the morph
+   * scrubs along the way.
    */
-  const segment = computed(() => {
-    const chapter = journeyChapters[activeChapterIndex.value]
+  const snapAnchors = computed<number[]>(() => {
+    const out: number[] = []
+    journeyChapters.forEach((chapter, i) => {
+      const S = stagesFor(chapter).length
+      const start = starts[i]
+      const end = i + 1 < starts.length ? starts[i + 1] : 1
+      const span = end - start
+      const E = entranceFrac(chapter.heightVh)
+      const pinnedFrac = Math.max(0, (chapter.heightVh - 100) / chapter.heightVh)
+      for (let j = 0; j < S; j++) {
+        // cp where stage j is held: just after it arrives. Stage 0 sits between
+        // the entrance end and where the card unpins; inner stages at the start
+        // of their sub-segment hold.
+        const subStart = S === 1 ? E : E + (j / S) * (1 - E)
+        if (subStart >= pinnedFrac) continue // only shows while unpinning — no centered rest
+        const restCp =
+          S === 1 ? (E + pinnedFrac) / 2 : Math.min(pinnedFrac - 0.001, subStart + 0.25 * ((1 - E) / S))
+        out.push(start + restCp * span)
+      }
+    })
+    return out
+  })
+
+  /**
+   * The single source of morph state. Each chapter's runway has two phases:
+   *
+   *  ENTRANCE (cp ≤ E): morph the PREVIOUS chapter's held formation into this
+   *  chapter's first formation, synced to the card fading in. The field offset
+   *  slides here too. This is why a transition reads as "the new shape forms as
+   *  the new text appears" — the morph belongs to the next section's entrance,
+   *  not the previous section's exit.
+   *
+   *  BODY (cp > E): hold the formation. Multi-stage chapters (psa-map) morph
+   *  between their inner stages here, each holding then morphing over a fixed
+   *  TRANSITION_VH band. No field-offset slide within a chapter.
+   */
+  const morphInfo = computed(() => {
+    const i = activeChapterIndex.value
+    const chapter = journeyChapters[i]
     const list = stagesFor(chapter)
     const S = list.length
     const cp = chapterProgress.value
-    const k = Math.min(S - 1, Math.floor(cp * S))
-    const sp = Math.min(1, Math.max(0, cp * S - k))
-    return { list, S, k, sp }
+    const E = entranceFrac(chapter.heightVh)
+    const prev = i > 0 ? journeyChapters[i - 1] : chapter
+    const prevList = stagesFor(prev)
+    const prevLast = prevList[prevList.length - 1]
+
+    if (cp <= E) {
+      return {
+        from: prevLast,
+        to: list[0],
+        t: E > 0 ? smoothstep(cp / E) : 1,
+        stageIndex: 0,
+        offsetFrom: fieldOffsetFor(prev),
+        offsetTo: fieldOffsetFor(chapter),
+      }
+    }
+
+    const off = fieldOffsetFor(chapter)
+    const bodyProg = (cp - E) / (1 - E)
+    const j = Math.min(S - 1, Math.floor(bodyProg * S))
+    if (j >= S - 1) {
+      // Final (or only) stage holds to the end — its morph to the next chapter
+      // belongs to that chapter's entrance.
+      return { from: list[S - 1], to: list[S - 1], t: 0, stageIndex: S - 1, offsetFrom: off, offsetTo: off }
+    }
+    const sp = Math.min(1, Math.max(0, bodyProg * S - j))
+    const subVh = (chapter.heightVh * (1 - E)) / S
+    const band = Math.min(1, TRANSITION_VH / subVh)
+    const start = Math.max(0, 1 - band)
+    return {
+      from: list[j],
+      to: list[j + 1],
+      t: sp <= start ? 0 : smoothstep((sp - start) / band),
+      stageIndex: j,
+      offsetFrom: off,
+      offsetTo: off,
+    }
   })
 
-  const activeStageIndex = computed(() => segment.value.k)
-
-  const morphFrom = computed<MorphStateId>(() => segment.value.list[segment.value.k])
-
-  const morphTo = computed<MorphStateId>(() => {
-    const { list, S, k } = segment.value
-    if (k + 1 < S) return list[k + 1]
-    const next = Math.min(activeChapterIndex.value + 1, journeyChapters.length - 1)
-    return journeyChapters[next].morphState
-  })
-
-  /**
-   * 0 while holding, ramps 0→1 across the morph window. Drives uProgress.
-   * morphStart/morphEnd are fractions of the active SEGMENT (== the whole
-   * runway for single-stage chapters).
-   */
-  const morphT = computed(() => {
-    const { sp } = segment.value
-    const currentChapter = journeyChapters[activeChapterIndex.value]
-    const morphStart = currentChapter?.morphStart ?? 0.1
-    const morphEnd = currentChapter?.morphEnd ?? 0.5
-
-    if (sp <= morphStart) return 0
-    if (sp >= morphEnd) return 1
-    return (sp - morphStart) / (morphEnd - morphStart)
-  })
+  const activeStageIndex = computed(() => morphInfo.value.stageIndex)
+  const morphFrom = computed<MorphStateId>(() => morphInfo.value.from)
+  const morphTo = computed<MorphStateId>(() => morphInfo.value.to)
+  const morphT = computed(() => morphInfo.value.t)
+  const fieldOffsetFrom = computed<[number, number]>(() => morphInfo.value.offsetFrom)
+  const fieldOffsetTo = computed<[number, number]>(() => morphInfo.value.offsetTo)
 
   const cameraZ = computed(() => {
-    // Continuous dolly: lerp from the PREVIOUS chapter's Z (where the camera
-    // actually is at the boundary) to this chapter's Z over the first half of
-    // the runway. Lerping from a fixed base would snap at every boundary.
+    // Dolly from the PREVIOUS chapter's Z to this chapter's over the entrance,
+    // arriving with the morph and card. Lerping from where the camera actually
+    // is at the boundary keeps it continuous (no snap).
     const i = activeChapterIndex.value
+    const chapter = journeyChapters[i]
     const fromZ = i > 0 ? journeyChapters[i - 1].cameraZ : journeyChapters[0].cameraZ
-    const targetZ = journeyChapters[i].cameraZ
-    const t = Math.min(1, chapterProgress.value * 2)
-    return fromZ + (targetZ - fromZ) * t
-  })
-
-  /** Field offset of the active chapter (uOffsetFrom). */
-  const fieldOffsetFrom = computed<[number, number]>(() =>
-    fieldOffsetFor(journeyChapters[activeChapterIndex.value]),
-  )
-
-  /**
-   * Field offset the morph slides toward (uOffsetTo). In-chapter stages keep
-   * the chapter's own offset (no slide); the final segment slides to the
-   * next chapter's offset as before.
-   */
-  const fieldOffsetTo = computed<[number, number]>(() => {
-    const { S, k } = segment.value
-    if (k + 1 < S) return fieldOffsetFor(journeyChapters[activeChapterIndex.value])
-    const next = Math.min(activeChapterIndex.value + 1, journeyChapters.length - 1)
-    return fieldOffsetFor(journeyChapters[next])
+    const E = entranceFrac(chapter.heightVh)
+    const t = E > 0 ? Math.min(1, chapterProgress.value / E) : 1
+    return fromZ + (chapter.cameraZ - fromZ) * t
   })
 
   // --- Phase 7: adaptive degrade ladder ---
@@ -164,16 +210,6 @@ export const useJourneyStore = defineStore('journey', () => {
     return Math.min(1, Math.max(0, (scrollProgress.value - start) / span))
   }
 
-  const getChapterOpacity = (index: number): number => {
-    const p = getChapterProgress(index)
-    const isLast = index === journeyChapters.length - 1
-    if (p <= 0) return 0
-    if (p >= 1) return isLast ? 1 : 0
-    if (p < 0.15) return p / 0.15
-    if (p > 0.85) return isLast ? 1 : (1 - p) / 0.15
-    return 1
-  }
-
   function setScrollProgress(value: number): void {
     scrollProgress.value = Math.min(1, Math.max(0, value))
   }
@@ -198,7 +234,7 @@ export const useJourneyStore = defineStore('journey', () => {
     degradeTier,
     ditherEnabled,
     advanceDegradeLevel,
-    getChapterOpacity,
     getChapterProgress,
+    snapAnchors,
   }
 })
