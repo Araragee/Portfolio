@@ -19,7 +19,7 @@ export type MorphStateId =
   | 'textMass'
 
 /** Allowed scroll-runway heights. Constrained so Tailwind classes stay static. */
-export type ChapterHeightVh = 150 | 200 | 300 | 500
+export type ChapterHeightVh = number
 
 /** Which side the DOM text column sits on (desktop). Field slides opposite. */
 export type TextSide = 'left' | 'right' | 'center'

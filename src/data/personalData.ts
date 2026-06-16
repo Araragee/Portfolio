@@ -6,7 +6,7 @@ export const personalContent: PersonalContent = {
     'The professional page is about the work. This page is about the person doing it.',
   ],
   story: [
-    "I came into software the long way around. I was a CS student first (learning the lectures, the theory, and joining late-night study groups trying to make sense of recursion at 2 AM). School gave me the vocabulary, but it did not give me the fluency.",
+    "I came into software the long way around. I was a IT student first (learning the lectures, the theory, and joining late-night study groups trying to make sense of recursion at 2 AM). School gave me the vocabulary, but it did not give me the fluency.",
     'Fluency came from building. I worked on small projects, broken projects, and projects that never shipped. I moved from static pages to jQuery to Vue, hunted down stack traces on forums, and slowly put together a mental model of how the web actually works underneath the tooling.',
     'A 3-month web-design internship at iPhitech in Clark from March to May 2023 was the first time I got paid to care about pixels. By October 2023, I landed at the Philippine Statistics Authority, where I\'ve worked on the CBMS Portal since 2023, building the thing and becoming the developer I wanted to be along the way.',
   ],
@@ -17,7 +17,7 @@ export const personalContent: PersonalContent = {
     },
     {
       title: 'Curiosity',
-      body: 'Every unfamiliar tool is a door. I read docs for fun, wander through changelogs, and keep a running list of things to break open next.',
+      body: 'Every unfamiliar tool is a door. I read docs for fun, wander through changelogs, and keep a running list of things to break open next. \b\ They say curiosity kills the cat, but for me it makes the cat have 10x more lives.',
     },
     {
       title: 'Restraint',
@@ -42,12 +42,12 @@ export const personalContent: PersonalContent = {
     {
       name: 'Music',
       blurb:
-        'Always something playing while I work. I listen to anything from OSTs to lo-fi to whatever the algorithm surfaces this week.',
+        'Always something playing while I work. I listen to a plethora of genres, but my top of all time would be OPM, Pop-rock, J-pop, and some 80s-20s alternative rock',
     },
     {
       name: 'Fitness & Outdoors',
       blurb:
-        'Balancing screen time with movement. I enjoy gym sessions, walks, and trips out of the city.',
+        'Balancing screen time with movement. I enjoy gym sessions, walks, and domination to the basketball and badminton court',
     },
   ],
 }

@@ -52,54 +52,9 @@ void main() {
   float t = easeInOutCubic(rawT);
   
   vec3 pos;
-  if (uChapterIndex == 0) {
-    // Transition to Bonsai: Dropping like a sand timer
-    float h1 = hash(position.xy + vec2(0.123, 0.456));
-    float h2 = hash(position.yx + vec2(0.789, 0.111));
-    float h3 = hash(position.xy + vec2(0.222, 0.333));
-    
-    // Sand timer neck/nozzle source (above the tree)
-    vec3 posNozzle = vec3((h1 - 0.5) * 0.2, 2.8 + (h2 - 0.5) * 0.15, (h3 - 0.5) * 0.2);
-    vec3 posTarget = aPositionTo;
-    
-    // Normalise tree Y (-2.3 to 1.2)
-    float targetY = posTarget.y;
-    float heightNorm = clamp((targetY + 2.3) / 3.5, 0.0, 1.0);
-    
-    // Higher points land first, lower points land last
-    float startVal = (1.0 - heightNorm) * 0.5;
-    float endVal = startVal + 0.5;
-    
-    // Add jitter to create organic particle streams
-    float jitter = (h1 - 0.5) * 0.08;
-    startVal = clamp(startVal + jitter, 0.0, 0.5);
-    endVal = clamp(endVal + jitter, 0.5, 1.0);
-    
-    float pT = clamp((uProgress - startVal) / (endVal - startVal), 0.0, 1.0);
-    float easePT = easeInOutCubic(pT);
-    
-    if (easePT < 0.35) {
-      // Phase 1: Converge from initial position to nozzle
-      float t1 = clamp(easePT / 0.35, 0.0, 1.0);
-      pos = mix(position, posNozzle, easeInOutCubic(t1));
-    } else {
-      // Phase 2: Drop from nozzle to target on the tree
-      float t2 = clamp((easePT - 0.35) / 0.65, 0.0, 1.0);
-      float tVert = clamp(t2 / 0.7, 0.0, 1.0);
-      float tHoriz = clamp((t2 - 0.55) / 0.45, 0.0, 1.0);
-      
-      float easeVert = tVert * tVert;
-      
-      pos.y = mix(posNozzle.y, posTarget.y, easeVert);
-      pos.x = mix(posNozzle.x, posTarget.x, easeInOutCubic(tHoriz));
-      pos.z = mix(posNozzle.z, posTarget.z, easeInOutCubic(tHoriz));
-    }
-    vColor = mix(aColorFrom, aColorTo, easePT);
-  } else {
-    // Standard linear mix for other chapters
-    pos = mix(position, aPositionTo, t);
-    vColor = mix(aColorFrom, aColorTo, t);
-  }
+  // Standard linear mix for all chapters
+  pos = mix(position, aPositionTo, t);
+  vColor = mix(aColorFrom, aColorTo, t);
   
   // Apply scaling and offsets
   pos.xy *= uFormationScale;

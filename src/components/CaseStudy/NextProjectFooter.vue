@@ -17,7 +17,7 @@ function navigate() {
   <footer class="border-t border-outline">
     <a
       :href="`/case-study/${nextProject.slug}`"
-      class="group block w-full flex flex-col items-center justify-center bg-surface text-on-surface transition-colors duration-700 cursor-pointer relative overflow-hidden no-underline py-20 md:py-0"
+      class="group w-full flex flex-col items-center justify-center bg-surface text-on-surface transition-colors duration-700 cursor-pointer relative overflow-hidden no-underline py-20 md:py-0"
       style="min-height: 40vh;"
       :id="`next-project-link-${nextProject.slug}`"
       :aria-label="`Next project: ${nextProject.title}`"

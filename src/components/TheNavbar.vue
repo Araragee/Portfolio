@@ -196,7 +196,7 @@ onUnmounted(() => {
       <div
         class="font-headline uppercase text-label font-semibold text-on-surface hidden lg:block opacity-50"
       >
-        VUE3 / TS / NODE
+        VUE3 / TS / CSS
       </div>
 
       <!-- Mobile menu button -->
@@ -258,7 +258,7 @@ onUnmounted(() => {
 
       <!-- Tech stack label in mobile menu -->
       <span class="font-mono text-label uppercase text-secondary opacity-40 mt-8">
-        VUE3 / TS / NODE
+        VUE3 / TS / CSS
       </span>
     </div>
   </Transition>

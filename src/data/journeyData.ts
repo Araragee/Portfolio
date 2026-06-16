@@ -26,7 +26,7 @@ export const TRANSITION_VH = 40
  * formation into this one. The morph is timed here — not at the previous
  * section's exit — so shape and text arrive together. Card fade-in matches it.
  */
-export const ENTRANCE_VH = 50
+export const ENTRANCE_VH = 20
 
 export const journeyChapters: JourneyChapter[] = [
   {
@@ -87,7 +87,7 @@ export const journeyChapters: JourneyChapter[] = [
     index: '003',
     title: 'The portal',
     era: 'Philippine Statistics Authority, Oct 2023 — now',
-    heightVh: 300,
+    heightVh: 200,
     morphState: 'cbmsLogo',
     paragraphs: [
       'Vue 3, TypeScript, ECharts. Real-scale government systems.',

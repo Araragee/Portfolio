@@ -26,9 +26,9 @@ const timeline = [
   },
   {
     period: "2019 — JUL 2023",
-    title: "Bachelor of Science in Computer Science",
+    title: "Bachelor of Science in Information Technology Major in Web and Mobile Development",
     company: "Tarlac State University",
-    description: "Computer Science degree at Tarlac State University. Graduated July 2023. Completed OJT at iPhitech (Clark, Pampanga) from March to May 2023 as part of the program."
+    description: "Information Technology degree majoring in Web and Mobile Development at Tarlac State University. Graduated July 2023. Where I learned about theories, algorithms, and built my first project."
   }
 ]
 
@@ -43,11 +43,11 @@ const pillars = [
   },
   {
     heading: 'Performance budgets',
-    body: 'I keep an eye on bundle sizes and render times. A fast interface makes users trust the system. Slow apps usually mean someone got lazy with dependencies.',
+    body: 'I keep an eye on bundle sizes and render times. A fast, responsive, and efficient interface makes users trust the system. Slow and uninteractive apps usually mean someone got lazy with dependencies.',
   },
   {
     heading: 'Composables',
-    body: 'Vue 3 changed how I write front-ends. I prefer to keep state and logic in small, testable composables instead of huge component files.',
+    body: 'Vue 3 changed how I write front-ends. I prefer to keep state and logic in small, testable composables instead of huge, monolothic component files.',
   }
 ]
 </script>
