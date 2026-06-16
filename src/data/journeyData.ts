@@ -18,7 +18,7 @@ import type { JourneyChapter } from '@/types/journey'
  * Scroll distance (vh) an INNER-stage morph spans (multi-stage chapters like
  * psa-map). Outside it the stage holds. Fixed so every inner morph feels equal.
  */
-export const TRANSITION_VH = 40
+export const TRANSITION_VH = 56
 
 /**
  * Scroll distance (vh) of each section's ENTRANCE: the window at the start of a
@@ -26,7 +26,7 @@ export const TRANSITION_VH = 40
  * formation into this one. The morph is timed here — not at the previous
  * section's exit — so shape and text arrive together. Card fade-in matches it.
  */
-export const ENTRANCE_VH = 20
+export const ENTRANCE_VH = 28
 
 export const journeyChapters: JourneyChapter[] = [
   {
@@ -34,7 +34,7 @@ export const journeyChapters: JourneyChapter[] = [
     index: '000',
     title: 'The long way around',
     era: 'Prologue',
-    heightVh: 200,
+    heightVh: 150,
     morphState: 'daveGonzales',
     paragraphs: [
       'I came into software the long way around.',

@@ -272,7 +272,7 @@ function mergeRects(rects: ScreenRect[], gapPx: number): ScreenRect[] {
 
 /** On-screen .reveal-text rects for one chapter container. */
 function collectTextRects(chapterId: string | undefined): ScreenRect[] {
-  if (!chapterId) return []
+  if (!chapterId || chapterId === 'student') return []
   const container = document.getElementById(chapterId)
   if (!container) return []
   const rects: ScreenRect[] = []

@@ -94,7 +94,7 @@ export const useJourneyStore = defineStore('journey', () => {
 
         // 2. Project holds: for each project k from 0 to N - 1
         const totalActiveVh = deckChapter.heightVh - 100 - 20
-        const holdVh = 32
+        const holdVh = 22
         const finalScrollVh = 30
         const transitionsTotalVh = Math.max(0, totalActiveVh - finalScrollVh - N * holdVh)
         const transitionVh = transitionsTotalVh / N
@@ -161,7 +161,7 @@ export const useJourneyStore = defineStore('journey', () => {
 
     if (activeVh >= totalActiveVh) return N
 
-    const holdVh = 32
+    const holdVh = 22
     const finalScrollVh = 30
     const transitionsTotalVh = Math.max(0, totalActiveVh - finalScrollVh - N * holdVh)
     const transitionVh = transitionsTotalVh / N
@@ -187,26 +187,57 @@ export const useJourneyStore = defineStore('journey', () => {
   })
 
   const morphInfo = computed(() => {
-    const i = activeChapterIndex.value
-    const chapter = journeyChapters[i]
-    const list = stagesFor(chapter)
-    const S = list.length
-    const cp = chapterProgress.value
-    const E = entranceFrac(chapter.heightVh)
-    const prev = i > 0 ? journeyChapters[i - 1] : chapter
-    const prevList = stagesFor(prev)
-    const prevLast = prevList[prevList.length - 1]
+    const totalVh = journeyChapters.reduce((acc, c) => acc + c.heightVh, 0)
+    const scrollableVh = totalVh - 100
+    const scrollVh = scrollProgress.value * scrollableVh
 
-    if (cp <= E) {
-      return {
-        from: prevLast,
-        to: list[0],
-        t: E > 0 ? smoothstep(cp / E) : 1,
-        stageIndex: 0,
-        offsetFrom: fieldOffsetFor(prev),
-        offsetTo: fieldOffsetFor(chapter),
+    // Cumulative starts in Vh
+    const heights = journeyChapters.map((c) => c.heightVh)
+    const startsVh: number[] = []
+    let accVh = 0
+    for (const h of heights) {
+      startsVh.push(accVh)
+      accVh += h
+    }
+
+    const LeadVh = 20 // start transition 20vh before the boundary
+
+    // Check if we are in a cross-chapter transition
+    for (let idx = 1; idx < journeyChapters.length; idx++) {
+      const boundaryStart = startsVh[idx] - LeadVh
+      const boundaryEnd = boundaryStart + ENTRANCE_VH
+      if (scrollVh >= boundaryStart && scrollVh < boundaryEnd) {
+        const prev = journeyChapters[idx - 1]
+        const curr = journeyChapters[idx]
+        const prevList = stagesFor(prev)
+        const currList = stagesFor(curr)
+        const t = smoothstep((scrollVh - boundaryStart) / ENTRANCE_VH)
+        return {
+          from: prevList[prevList.length - 1],
+          to: currList[0],
+          t,
+          stageIndex: prevList.length - 1,
+          offsetFrom: fieldOffsetFor(prev),
+          offsetTo: fieldOffsetFor(curr),
+        }
       }
     }
+
+    // Otherwise, we are in the body of some chapter
+    let activeIdx = 0
+    for (let idx = journeyChapters.length - 1; idx >= 0; idx--) {
+      // The body of chapter idx starts after the previous transition ends
+      const prevEnd = idx > 0 ? startsVh[idx] - LeadVh + ENTRANCE_VH : 0
+      if (scrollVh >= prevEnd) {
+        activeIdx = idx
+        break
+      }
+    }
+
+    const chapter = journeyChapters[activeIdx]
+    const list = stagesFor(chapter)
+    const S = list.length
+    const off = fieldOffsetFor(chapter)
 
     if (chapter.id === 'projects') {
       const deckProg = projectDeckProgress.value
@@ -230,7 +261,6 @@ export const useJourneyStore = defineStore('journey', () => {
       const toState = states[toI] || 'portrait'
       const t = pIdx % 1
       
-      const off = fieldOffsetFor(chapter)
       return {
         from: fromState,
         to: toState,
@@ -241,16 +271,18 @@ export const useJourneyStore = defineStore('journey', () => {
       }
     }
 
-    const off = fieldOffsetFor(chapter)
-    const bodyProg = (cp - E) / (1 - E)
+    // Normal multi-stage chapter body logic
+    const prevEnd = activeIdx > 0 ? startsVh[activeIdx] - LeadVh + ENTRANCE_VH : 0
+    const nextStart = activeIdx + 1 < journeyChapters.length ? startsVh[activeIdx + 1] - LeadVh : totalVh - 100
+    const bodySpan = nextStart - prevEnd
+    const bodyProg = bodySpan > 0 ? Math.min(1, Math.max(0, (scrollVh - prevEnd) / bodySpan)) : 1
+
     const j = Math.min(S - 1, Math.floor(bodyProg * S))
     if (j >= S - 1) {
-      // Final (or only) stage holds to the end — its morph to the next chapter
-      // belongs to that chapter's entrance.
       return { from: list[S - 1], to: list[S - 1], t: 0, stageIndex: S - 1, offsetFrom: off, offsetTo: off }
     }
     const sp = Math.min(1, Math.max(0, bodyProg * S - j))
-    const subVh = (chapter.heightVh * (1 - E)) / S
+    const subVh = bodySpan / S
     const band = Math.min(1, TRANSITION_VH / subVh)
     const start = Math.max(0, 1 - band)
     return {
