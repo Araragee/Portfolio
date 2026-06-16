@@ -23,6 +23,7 @@ import {
 } from '@/utils/morphTargets'
 import type { MorphStateId } from '@/types/journey'
 import { journeyChapters } from '@/data/journeyData'
+import { journeyDeckProjects } from '@/data/projectsData'
 import { particleFragmentShader, particleVertexShader } from '@/shaders/particles'
 
 const props = withDefaults(
@@ -139,58 +140,96 @@ function loadImages(): void {
     targets.colors.cbmsLogo = colors
     updateActiveBuffers('cbmsLogo')
   })
-  const faceCount = Math.floor(activeCount * 0.65)
-  const iconCount = Math.floor(activeCount * 0.07)
-  const remainingCount = activeCount - faceCount - 4 * iconCount
+  // Density follows the hero: the centered formation (face in `portrait`, a
+  // project in `proj_N`) always owns the dense 65% block at the SAME particle
+  // indices. The center morph is therefore always dense→dense (face⇄project),
+  // so each project reads as crisply as the face. Whoever is NOT the hero shrinks
+  // into the floating constellation of small tokens above it.
+  const heroCount = Math.floor(activeCount * 0.65)
+  const slotCount = Math.floor(activeCount * 0.07)
+  const lastSlotCount = activeCount - heroCount - 4 * slotCount
 
-  Promise.all([
-    loadImageAndSample(resolveAssetPath('/assets/dave-face.png'), faceCount, 3.2, {
+  // The five floating small-token placements above the hero.
+  const iconSlots = [
+    { offset: [-1.6, 1.3] as [number, number], rotation: -0.15, z: 0.2 },
+    { offset: [-0.7, 1.9] as [number, number], rotation: -0.05, z: 0.1 },
+    { offset: [0.3, 2.1] as [number, number], rotation: 0.05, z: 0.3 },
+    { offset: [1.2, 1.7] as [number, number], rotation: 0.1, z: 0.1 },
+    { offset: [1.8, 1.0] as [number, number], rotation: 0.2, z: 0.2 },
+  ]
+  // proj_N hero ↔ deck card N (same order, single source of truth).
+  const projectFiles = journeyDeckProjects.map((p) => p.icon)
+  const FACE_FILE = '/assets/dave-face.png'
+  const centerInst = { offset: [0, 0] as [number, number], scale: 1, rotation: 0, z: 0 }
+
+  type Slot = (typeof iconSlots)[number]
+
+  const sampleFaceHero = (c: number) =>
+    loadImageAndSample(resolveAssetPath(FACE_FILE), c, 3.2, {
       colorScale: true,
       keyBackground: { tolerance: 30 },
       weightByDarkness: true,
       zRelief: 0.3,
-    }),
-    loadImageAndSample(resolveAssetPath('/assets/tango-icon.png'), iconCount, 0.45, {
+      instances: [centerInst],
+    })
+
+  const sampleFaceSlot = (c: number, slot: Slot) =>
+    loadImageAndSample(resolveAssetPath(FACE_FILE), c, 0.5, {
       colorScale: true,
-      instances: [{ offset: [-1.6, 1.3], scale: 1, rotation: -0.15, z: 0.2 }],
-      chatBubble: true,
-    }),
-    loadImageAndSample(resolveAssetPath('/assets/smc-logo.png'), iconCount, 0.45, {
+      keyBackground: { tolerance: 30 },
+      weightByDarkness: true,
+      instances: [{ offset: slot.offset, scale: 1, rotation: slot.rotation, z: slot.z }],
+    })
+
+  const sampleProjHero = (file: string, c: number) =>
+    loadImageAndSample(resolveAssetPath(file), c, 3.2, {
       colorScale: true,
-      instances: [{ offset: [-0.7, 1.9], scale: 1, rotation: -0.05, z: 0.1 }],
-      chatBubble: true,
-    }),
-    loadImageAndSample(resolveAssetPath('/assets/cbmsportal-favicon.svg'), iconCount, 0.45, {
+      instances: [centerInst],
+    })
+
+  const sampleProjSlot = (file: string, c: number, slot: Slot) =>
+    loadImageAndSample(resolveAssetPath(file), c, 0.45, {
       colorScale: true,
-      instances: [{ offset: [0.3, 2.1], scale: 1, rotation: 0.05, z: 0.3 }],
       chatBubble: true,
-    }),
-    loadImageAndSample(resolveAssetPath('/assets/nutrisipe-logo.svg'), iconCount, 0.45, {
-      colorScale: true,
-      instances: [{ offset: [1.2, 1.7], scale: 1, rotation: 0.1, z: 0.1 }],
-      chatBubble: true,
-    }),
-    loadImageAndSample(resolveAssetPath('/assets/lms-ai-icon.svg'), remainingCount, 0.45, {
-      colorScale: true,
-      instances: [{ offset: [1.8, 1.0], scale: 1, rotation: 0.2, z: 0.2 }],
-      chatBubble: true,
-    }),
-  ]).then(([face, tango, smc, cbms, nutrisipe, lms]) => {
-    if (activeCount !== currentCount) return
-    const positions = new Float32Array(activeCount * 3)
-    const colors = new Float32Array(activeCount * 3)
-    
-    let floatOffset = 0
-    for (const res of [face, tango, smc, cbms, nutrisipe, lms]) {
-      positions.set(res.positions, floatOffset)
-      colors.set(res.colors, floatOffset)
-      floatOffset += res.positions.length
-    }
-    
-    targets.positions.portrait = positions
-    targets.colors.portrait = colors
-    updateActiveBuffers('portrait')
-  })
+      instances: [{ offset: slot.offset, scale: 1, rotation: slot.rotation, z: slot.z }],
+    })
+
+  // activeIndex === -1 → face is the hero (portrait); else projectFiles[activeIndex].
+  const buildState = (stateName: MorphStateId, activeIndex: number) => {
+    const heroIsFace = activeIndex === -1
+    const heroPromise = heroIsFace
+      ? sampleFaceHero(heroCount)
+      : sampleProjHero(projectFiles[activeIndex], heroCount)
+
+    const slotPromises = iconSlots.map((slot, j) => {
+      const c = j === 4 ? lastSlotCount : slotCount
+      // The hero vacated slot `activeIndex` → the face takes that slot.
+      if (!heroIsFace && j === activeIndex) return sampleFaceSlot(c, slot)
+      return sampleProjSlot(projectFiles[j], c, slot)
+    })
+
+    Promise.all([heroPromise, ...slotPromises]).then(results => {
+      if (activeCount !== currentCount) return
+      const positions = new Float32Array(activeCount * 3)
+      const colors = new Float32Array(activeCount * 3)
+      let floatOffset = 0
+      for (const res of results) {
+        positions.set(res.positions, floatOffset)
+        colors.set(res.colors, floatOffset)
+        floatOffset += res.positions.length
+      }
+      targets.positions[stateName] = positions
+      targets.colors[stateName] = colors
+      updateActiveBuffers(stateName)
+    })
+  }
+
+  buildState('portrait', -1)
+  buildState('proj_0', 0)
+  buildState('proj_1', 1)
+  buildState('proj_2', 2)
+  buildState('proj_3', 3)
+  buildState('proj_4', 4)
 }
 
 // Bounding box text avoidance zones

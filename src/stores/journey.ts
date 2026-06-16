@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { ENTRANCE_VH, fieldOffsetFor, journeyChapters, TRANSITION_VH } from '@/data/journeyData'
+import { journeyDeckProjects } from '@/data/projectsData'
 import type { JourneyChapter, MorphStateId } from '@/types/journey'
 
 /** Smoothstep — gentle ease in/out of holds, even though it's scroll-scrubbed. */
@@ -104,6 +105,55 @@ export const useJourneyStore = defineStore('journey', () => {
    *  between their inner stages here, each holding then morphing over a fixed
    *  TRANSITION_VH band. No field-offset slide within a chapter.
    */
+  const projectDeckProgress = computed(() => {
+    const deckIdx = journeyChapters.findIndex((c) => c.showProjects)
+    if (deckIdx === -1) return -1
+    const deckChapter = journeyChapters[deckIdx]
+    const N = journeyDeckProjects.length // particle-hero stations in the deck
+
+    const sumPrior = journeyChapters.slice(0, deckIdx).reduce((acc, c) => acc + c.heightVh, 0)
+    const totalVh = journeyChapters.reduce((acc, c) => acc + c.heightVh, 0)
+    const scrollableVh = totalVh - 100
+
+    const pinScrollProgress = sumPrior / scrollableVh
+    const chapterStartGlobal = sumPrior / totalVh
+    const chapterSpanGlobal = deckChapter.heightVh / totalVh
+    const pinChapterProgress = (pinScrollProgress - chapterStartGlobal) / chapterSpanGlobal
+
+    const chapterProg = getChapterProgress(deckIdx)
+    const vhSincePin = (chapterProg - pinChapterProgress) * deckChapter.heightVh
+
+    if (vhSincePin <= 20) return -1
+
+    const activeVh = vhSincePin - 20
+    const totalActiveVh = deckChapter.heightVh - 100 - 20
+
+    if (activeVh >= totalActiveVh) return N
+
+    const holdVh = 20
+    const transitionsTotalVh = Math.max(0, totalActiveVh - N * holdVh)
+    const transitionVh = transitionsTotalVh / (N + 1)
+    const cycleVh = transitionVh + holdVh
+
+    const cycleIndex = Math.floor(activeVh / cycleVh)
+
+    if (cycleIndex >= N) {
+      const vhInCycle = activeVh - N * cycleVh
+      const t = Math.min(1, vhInCycle / transitionVh)
+      const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+      return (N - 1) + ease
+    }
+
+    const vhInCycle = activeVh % cycleVh
+    if (vhInCycle <= transitionVh) {
+      const t = vhInCycle / transitionVh
+      const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+      return (cycleIndex - 1) + ease
+    } else {
+      return cycleIndex
+    }
+  })
+
   const morphInfo = computed(() => {
     const i = activeChapterIndex.value
     const chapter = journeyChapters[i]
@@ -123,6 +173,29 @@ export const useJourneyStore = defineStore('journey', () => {
         stageIndex: 0,
         offsetFrom: fieldOffsetFor(prev),
         offsetTo: fieldOffsetFor(chapter),
+      }
+    }
+
+    if (chapter.id === 'projects') {
+      const deckProg = projectDeckProgress.value
+      const pIdx = Math.max(0, Math.min(6, deckProg + 1)) // 0 to 6
+      const fromI = Math.floor(pIdx)
+      let toI = Math.ceil(pIdx)
+      if (toI === fromI) toI = Math.min(6, fromI + 1)
+      
+      const states: MorphStateId[] = ['portrait', 'proj_0', 'proj_1', 'proj_2', 'proj_3', 'proj_4', 'portrait']
+      const fromState = states[fromI] || 'portrait'
+      const toState = states[toI] || 'portrait'
+      const t = pIdx % 1
+      
+      const off = fieldOffsetFor(chapter)
+      return {
+        from: fromState,
+        to: toState,
+        t,
+        stageIndex: fromI,
+        offsetFrom: off,
+        offsetTo: off,
       }
     }
 
@@ -236,5 +309,6 @@ export const useJourneyStore = defineStore('journey', () => {
     advanceDegradeLevel,
     getChapterProgress,
     snapAnchors,
+    projectDeckProgress,
   }
 })

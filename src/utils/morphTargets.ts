@@ -836,6 +836,11 @@ export function buildMorphTargets(count: number): MorphTargets {
     phMap: phMapPos,
     cbmsLogo: createGridFallback(count), // Temp grid before image load
     portrait: createArtifactFallback(count), // Temp artifact before image load
+    proj_0: createArtifactFallback(count), // Built per-project in ParticleField
+    proj_1: createArtifactFallback(count),
+    proj_2: createArtifactFallback(count),
+    proj_3: createArtifactFallback(count),
+    proj_4: createArtifactFallback(count),
     textMass: createTextMass(count, 'DAVXLOPER'),
   }
 
@@ -851,6 +856,11 @@ export function buildMorphTargets(count: number): MorphTargets {
     phMap: phMapCol,
     cbmsLogo: defaultCol,
     portrait: defaultCol,
+    proj_0: defaultCol,
+    proj_1: defaultCol,
+    proj_2: defaultCol,
+    proj_3: defaultCol,
+    proj_4: defaultCol,
     textMass: defaultCol,
   }
 

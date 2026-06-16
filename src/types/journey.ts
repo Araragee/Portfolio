@@ -16,6 +16,11 @@ export type MorphStateId =
   | 'phMap'
   | 'cbmsLogo'
   | 'portrait'
+  | 'proj_0'
+  | 'proj_1'
+  | 'proj_2'
+  | 'proj_3'
+  | 'proj_4'
   | 'textMass'
 
 /** Allowed scroll-runway heights. Constrained so Tailwind classes stay static. */

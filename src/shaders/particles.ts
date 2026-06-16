@@ -47,7 +47,7 @@ float hash(vec2 p) {
 
 void main() {
   float h = hash(position.xy);
-  float stagger = h * 0.05;
+  float stagger = 0.0;
   float rawT = clamp((uProgress - stagger) / 0.95, 0.0, 1.0);
   float t = easeInOutCubic(rawT);
   

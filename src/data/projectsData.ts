@@ -364,6 +364,26 @@ export function useDemoMode() {
   },
 ]
 
+/**
+ * Projects that appear as particle-hero "stations" in the journey deck, in
+ * scroll order. Single source of truth shared by ProjectDeck (cards),
+ * ParticleField (hero formation per project) and the journey store (count) —
+ * so the pinned card, its floating token, and the big picture always agree.
+ *
+ * Accomplisher is intentionally absent: it has no logo asset, so it can't be a
+ * particle hero. It still lives in `projects` for its case-study page.
+ * Each `icon` must exist under public/assets.
+ */
+export const journeyDeckProjects = (
+  [
+    { slug: 'cbms-portal', icon: '/assets/cbmsportal-favicon.svg' },
+    { slug: 'lms-ai-platform', icon: '/assets/lms-ai-icon.svg' },
+    { slug: 'nutrisipe', icon: '/assets/nutrisipe-logo.svg' },
+    { slug: 'tango', icon: '/assets/tango-icon.png' },
+    { slug: 'smc', icon: '/assets/smc-logo.png' },
+  ] as const
+).map((d) => ({ ...projects.find((p) => p.slug === d.slug)!, icon: d.icon }))
+
 export function getProjectBySlug(slug: string): Project | undefined {
   return projects.find(p => p.slug === slug)
 }

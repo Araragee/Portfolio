@@ -1,25 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ENTRANCE_VH, journeyChapters } from '@/data/journeyData'
-import { projects } from '@/data/projectsData'
+import { journeyDeckProjects } from '@/data/projectsData'
 import { useReducedMotion } from '@/composables/useReducedMotion'
 import { useJourneyStore } from '@/stores/journey'
 
 const store = useJourneyStore()
 const { prefersReducedMotion } = useReducedMotion()
 
-const N = projects.length
-const deckIdx = journeyChapters.findIndex((c) => c.showProjects)
-const deckChapter = journeyChapters[deckIdx]
-// Deck runs across the pinned window — after the entrance morph, before unpin.
-const deckStart = Math.min(0.9, ENTRANCE_VH / deckChapter.heightVh)
-const deckEnd = Math.max(deckStart + 0.01, (deckChapter.heightVh - 100) / deckChapter.heightVh)
-
-/** Fractional card position 0..N-1, scrubbed by scroll through the deck window. */
-const cardPos = computed(() => {
-  const dt = (store.getChapterProgress(deckIdx) - deckStart) / (deckEnd - deckStart)
-  return Math.min(1, Math.max(0, dt)) * (N - 1)
-})
+const cardPos = computed(() => store.projectDeckProgress)
 
 /** One card pushes up and fades as the next pulls in from below — one motion. */
 function cardStyle(k: number): Record<string, string> {
@@ -38,7 +26,7 @@ function cardStyle(k: number): Record<string, string> {
 <template>
   <div class="relative" :class="prefersReducedMotion ? 'space-y-6' : 'h-44 md:h-52'">
     <RouterLink
-      v-for="(project, k) in projects"
+      v-for="(project, k) in journeyDeckProjects"
       :key="project.slug"
       :to="`/case-study/${project.slug}`"
       class="group block border-l border-outline-variant/30 pl-4 transition-colors hover:border-primary active:opacity-60"
