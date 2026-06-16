@@ -230,6 +230,7 @@ function loadImages(): void {
   buildState('proj_2', 2)
   buildState('proj_3', 3)
   buildState('proj_4', 4)
+  buildState('proj_5', 5)
 }
 
 // Bounding box text avoidance zones

@@ -362,6 +362,29 @@ export function useDemoMode() {
       },
     ],
   },
+  {
+    slug: 'araragi',
+    index: '06',
+    title: 'Araragi',
+    categoryLabel: 'Identity / Particle Model',
+    description:
+      'Interactive particle avatar of Koyomi Araragi, constructed from pixel density sampling of araragi.png.',
+    backgroundImage: new URL('@/assets/projects/tango-hero.png', import.meta.url).href,
+    role: 'Creator / Developer',
+    stack: 'Vue 3, Three.js, Custom Shader, GLSL',
+    timeline: '2026',
+    liveUrl: '',
+    introStatement:
+      'The final node in the project deck. An image-sampled particle field that forms the shape of Koyomi Araragi, rendering at 60 FPS through custom GPU-bound vertex and fragment shaders.',
+    heroImage: new URL('@/assets/projects/araragi.png', import.meta.url).href,
+    sections: [
+      {
+        heading: 'Shader-based image sampling',
+        body: 'To generate the particle representation of Araragi, we sample the pixel coordinates and color channels of the source PNG. The resulting positions are loaded into WebGL buffer attributes, allowing smooth morph transitions and interactive cursor repulsion directly in the GPU vertex shader.'
+      }
+    ],
+    gallery: []
+  },
 ]
 
 /**
@@ -381,6 +404,7 @@ export const journeyDeckProjects = (
     { slug: 'nutrisipe', icon: '/assets/nutrisipe-logo.svg' },
     { slug: 'tango', icon: '/assets/tango-icon.png' },
     { slug: 'smc', icon: '/assets/smc-logo.png' },
+    { slug: 'araragi', icon: '/assets/araragi.png' },
   ] as const
 ).map((d) => ({ ...projects.find((p) => p.slug === d.slug)!, icon: d.icon }))
 

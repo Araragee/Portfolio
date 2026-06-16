@@ -72,12 +72,43 @@ export const useJourneyStore = defineStore('journey', () => {
   const snapAnchors = computed<number[]>(() => {
     const out: number[] = []
     journeyChapters.forEach((chapter, i) => {
-      const S = stagesFor(chapter).length
       const start = starts[i]
       const end = i + 1 < starts.length ? starts[i + 1] : 1
       const span = end - start
       const E = entranceFrac(chapter.heightVh)
       const pinnedFrac = Math.max(0, (chapter.heightVh - 100) / chapter.heightVh)
+
+      if (chapter.id === 'projects') {
+        const deckChapter = chapter
+        const N = journeyDeckProjects.length
+        const sumPrior = journeyChapters.slice(0, i).reduce((acc, c) => acc + c.heightVh, 0)
+        const totalVh = journeyChapters.reduce((acc, c) => acc + c.heightVh, 0)
+        const scrollableVh = totalVh - 100
+
+        const getGlobalProgressForVhSincePin = (vh: number) => {
+          return (sumPrior + vh) / scrollableVh
+        }
+
+        // 1. Portrait hold (initial): vhSincePin midpoint = 10
+        out.push(getGlobalProgressForVhSincePin(10))
+
+        // 2. Project holds: for each project k from 0 to N - 1
+        const totalActiveVh = deckChapter.heightVh - 100 - 20
+        const holdVh = 32
+        const finalScrollVh = 30
+        const transitionsTotalVh = Math.max(0, totalActiveVh - finalScrollVh - N * holdVh)
+        const transitionVh = transitionsTotalVh / N
+        const cycleVh = transitionVh + holdVh
+
+        for (let k = 0; k < N; k++) {
+          const activeVh = k * cycleVh + transitionVh + holdVh / 2
+          const vhSincePin = activeVh + 20
+          out.push(getGlobalProgressForVhSincePin(vhSincePin))
+        }
+        return
+      }
+
+      const S = stagesFor(chapter).length
       for (let j = 0; j < S; j++) {
         // cp where stage j is held: just after it arrives. Stage 0 sits between
         // the entrance end and where the card unpins; inner stages at the start
@@ -130,16 +161,17 @@ export const useJourneyStore = defineStore('journey', () => {
 
     if (activeVh >= totalActiveVh) return N
 
-    const holdVh = 20
-    const transitionsTotalVh = Math.max(0, totalActiveVh - N * holdVh)
-    const transitionVh = transitionsTotalVh / (N + 1)
+    const holdVh = 32
+    const finalScrollVh = 30
+    const transitionsTotalVh = Math.max(0, totalActiveVh - finalScrollVh - N * holdVh)
+    const transitionVh = transitionsTotalVh / N
     const cycleVh = transitionVh + holdVh
 
     const cycleIndex = Math.floor(activeVh / cycleVh)
 
     if (cycleIndex >= N) {
       const vhInCycle = activeVh - N * cycleVh
-      const t = Math.min(1, vhInCycle / transitionVh)
+      const t = Math.min(1, vhInCycle / finalScrollVh)
       const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
       return (N - 1) + ease
     }
@@ -178,12 +210,22 @@ export const useJourneyStore = defineStore('journey', () => {
 
     if (chapter.id === 'projects') {
       const deckProg = projectDeckProgress.value
-      const pIdx = Math.max(0, Math.min(6, deckProg + 1)) // 0 to 6
+      const N = journeyDeckProjects.length
+      const pIdx = Math.max(0, Math.min(N + 1, deckProg + 1)) // 0 to N+1
       const fromI = Math.floor(pIdx)
       let toI = Math.ceil(pIdx)
-      if (toI === fromI) toI = Math.min(6, fromI + 1)
+      if (toI === fromI) toI = Math.min(N + 1, fromI + 1)
       
-      const states: MorphStateId[] = ['portrait', 'proj_0', 'proj_1', 'proj_2', 'proj_3', 'proj_4', 'portrait']
+      const states: MorphStateId[] = [
+        'portrait',
+        'proj_0',
+        'proj_1',
+        'proj_2',
+        'proj_3',
+        'proj_4',
+        'proj_5',
+        'proj_5'
+      ]
       const fromState = states[fromI] || 'portrait'
       const toState = states[toI] || 'portrait'
       const t = pIdx % 1

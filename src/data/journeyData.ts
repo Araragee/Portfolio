@@ -163,6 +163,7 @@ export const journeyChapters: JourneyChapter[] = [
     era: 'Freelance + personal projects',
     heightVh: 500,
     morphState: 'portrait',
+    extraStages: ['proj_5'],
     paragraphs: [
       'Off the clock the building continues — freelance Vue work, experiments, this site.',
       'Each project is a station on the road. Step into one to see the case study.',

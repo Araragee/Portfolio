@@ -21,6 +21,7 @@ export type MorphStateId =
   | 'proj_2'
   | 'proj_3'
   | 'proj_4'
+  | 'proj_5'
   | 'textMass'
 
 /** Allowed scroll-runway heights. Constrained so Tailwind classes stay static. */
