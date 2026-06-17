@@ -46,6 +46,14 @@ const opacity = computed(() => {
     return ENTRANCE_VH + 28 // 56 vh
   }
 
+  // 0. Prologue delay
+  if (chapterIdx === 0) {
+    if (s < 30) return 0
+    if (s < 30 + ENTRANCE_VH) {
+      return smoothstep((s - 30) / ENTRANCE_VH) * 0.9
+    }
+  }
+
   // 1. Fade in during transition from previous chapter
   if (chapterIdx > 0) {
     const fadeInLead = getLeadVhForTransitionTo(chapterIdx)

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import ChapterSection from '@/components/Journey/ChapterSection.vue'
 import JourneyLoader from '@/components/Journey/JourneyLoader.vue'
@@ -46,13 +46,6 @@ function onWindowResize(): void {
 onScroll(updateProgress)
 
 // Snap-to-station removed for now (was useJourneySnap) — free scroll only.
-
-const activeIndexStr = computed(
-  () => journeyChapters[store.activeChapterIndex]?.index || '000',
-)
-const maxIndex = Math.max(...journeyChapters.map((c) => parseInt(c.index, 10)))
-const totalStr = `00${maxIndex}`
-const scrollPercent = computed(() => Math.round(store.scrollProgress * 100))
 
 function startJourney(): void {
   lenis.value?.start()
@@ -112,28 +105,6 @@ onBeforeUnmount(() => {
       class="bg-dither-noise pointer-events-none fixed inset-0 z-0 opacity-[0.045]"
       aria-hidden="true"
     />
-
-    <!-- Progress rail: live %, chapter ticks (docs/TWEAKS/D-pacing.md) -->
-    <!-- Mobile: ticks only, hugging the edge — labels overlap chapter text -->
-    <div
-      class="pointer-events-none fixed right-1.5 md:right-6 top-1/2 z-50 flex -translate-y-1/2 flex-col items-center gap-3 opacity-50 md:opacity-100"
-      aria-hidden="true"
-    >
-      <span class="hidden md:block font-mono text-xs tabular-nums tracking-widest text-primary">
-        {{ scrollPercent }}%
-      </span>
-      <div class="flex flex-col items-center gap-2">
-        <span
-          v-for="(chapter, i) in journeyChapters"
-          :key="chapter.id"
-          class="h-1.5 w-1.5 border border-primary transition-colors duration-200"
-          :class="i === store.activeChapterIndex ? 'bg-primary' : 'bg-transparent'"
-        />
-      </div>
-      <span class="hidden md:block font-mono text-xs tracking-widest text-secondary">
-        {{ activeIndexStr }}—{{ totalStr }}
-      </span>
-    </div>
 
     <div class="relative z-10">
       <ChapterSection
