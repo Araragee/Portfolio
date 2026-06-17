@@ -27,6 +27,7 @@ function entranceFrac(heightVh: number): number {
  */
 
 export const useJourneyStore = defineStore('journey', () => {
+  // ─── Scroll State (single writer: JourneyPage)
   /** 0–1 across the entire journey container. */
   const scrollProgress = ref(0)
 
@@ -136,6 +137,7 @@ export const useJourneyStore = defineStore('journey', () => {
    *  between their inner stages here, each holding then morphing over a fixed
    *  TRANSITION_VH band. No field-offset slide within a chapter.
    */
+  // ─── Morph Derivation (two phases: entrance vs body)
   const projectDeckProgress = computed(() => {
     const deckIdx = journeyChapters.findIndex((c) => c.showProjects)
     if (deckIdx === -1) return -1
@@ -323,7 +325,7 @@ export const useJourneyStore = defineStore('journey', () => {
     return fromZ + (chapter.cameraZ - fromZ) * t
   })
 
-  // --- Phase 7: adaptive degrade ladder ---
+  // ─── Phase 7: Degradation Ladder
   // Tier 0 = full quality; each step sacrifices one layer to recover fps.
   // ParticleField drives progression; JourneyCanvas reads dpr.
   const degradeTier = ref(0)
@@ -333,7 +335,7 @@ export const useJourneyStore = defineStore('journey', () => {
     if (degradeTier.value < 3) degradeTier.value++
   }
 
-  // --- Loader readiness (docs/TWEAKS/B-loading-splash.md) ---
+  // ─── Loader Readiness
   const assetsLoaded = ref(false)        // vendor-three chunk arrived
   const firstFrameRendered = ref(false)  // ParticleField drew a frame
   const fontsLoaded = ref(false)         // document.fonts.ready

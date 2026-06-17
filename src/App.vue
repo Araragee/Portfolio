@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
-import TheNavbar from '@/components/TheNavbar.vue'
-import TheFooter from '@/components/TheFooter.vue'
+import TheNavbar from '@/components/Core/TheNavbar.vue'
+import TheFooter from '@/components/Core/TheFooter.vue'
 
 const route = useRoute()
 const routeKey = computed(() => route.path)

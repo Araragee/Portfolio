@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useJourneyStore } from '@/stores/journey'
 import { journeyChapters } from '@/data/journeyData'
-import DuckParticle from '@/components/DuckParticle.vue'
+import DuckParticle from '@/components/Manifest/DuckParticle.vue'
 
 const route = useRoute()
 const store = useJourneyStore()

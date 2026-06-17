@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted, nextTick } from "vue";
+import { computed, ref, watch, onMounted, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useEventListener } from "@/composables/useEventListener";
 
 const route = useRoute();
 const router = useRouter();
@@ -97,14 +98,10 @@ function onMenuKeydown(e: KeyboardEvent) {
   }
 }
 
-onMounted(() => {
-  window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
-});
+useEventListener(window, "scroll", onScroll, { passive: true });
 
-onUnmounted(() => {
-  window.removeEventListener("scroll", onScroll);
-  document.body.classList.remove("menu-open");
+onMounted(() => {
+  onScroll();
 });
 </script>
 

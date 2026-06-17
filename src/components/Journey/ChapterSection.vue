@@ -134,9 +134,10 @@ const textColumnStyle = computed(
 // Project-list chapters overflow a phone viewport when vertically centered
 // (title clips off the top) — top-align on mobile, center from md up
 const stickyAlignStyle = computed(() =>
-  props.chapter.showProjects
-    ? 'items-start pt-20 pb-8 md:items-center md:pt-0 md:pb-0'
-    : 'items-center',
+  ({
+    projects: 'items-start pt-20 pb-8 md:items-center md:pt-0 md:pb-0',
+    default: 'items-center',
+  })[props.chapter.showProjects ? 'projects' : 'default'],
 )
 
 onMounted(() => {
@@ -173,7 +174,7 @@ watch(isVisible, (visible) => {
     <div
       class="sticky top-0 flex h-screen transition-opacity duration-75"
       :class="stickyAlignStyle"
-      :style="{ opacity: opacity }"
+      :style="{ opacity }"
     >
       <div class="mx-auto w-full max-w-5xl px-6">
         <!-- Hero layout (prologue) -->

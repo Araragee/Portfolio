@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 
 interface Props {
   src: string
@@ -15,6 +15,14 @@ const props = withDefaults(defineProps<Props>(), {
   placeholder: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 400 300\'%3E%3Crect fill=\'%23e5e7eb\' width=\'400\' height=\'300\'/%3E%3C/svg%3E',
   objectFit: 'cover'
 })
+
+const objectFitClass = computed(() => ({
+  'cover': 'object-cover',
+  'contain': 'object-contain',
+  'fill': 'object-fill',
+  'none': 'object-none',
+  'scale-down': 'object-scale-down',
+}[props.objectFit]))
 
 const imageRef = ref<HTMLImageElement | null>(null)
 const isLoaded = ref(false)
@@ -67,7 +75,7 @@ onMounted(() => {
   observer.observe(imageRef.value)
 })
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   if (observer) {
     observer.disconnect()
   }
@@ -83,12 +91,10 @@ onUnmounted(() => {
     :height="height"
     :class="[
       className,
+      objectFitClass,
       'transition-opacity duration-500',
       isLoaded ? 'opacity-100' : 'opacity-50'
     ]"
-    :style="{
-      objectFit: objectFit
-    }"
     loading="lazy"
     decoding="async"
   />

@@ -14,6 +14,7 @@ import { useLoop } from '@tresjs/core'
 import { buildMorphTargets, particleCountForViewport } from '@/utils/morphTargets'
 import { particleFragmentShader, particleVertexShader } from '@/shaders/particles'
 import { useReducedMotion } from '@/composables/useReducedMotion'
+import { useEventListener } from '@/composables/useEventListener'
 
 const { prefersReducedMotion } = useReducedMotion()
 
@@ -78,7 +79,7 @@ function onPointerMove(e: PointerEvent): void {
   mouseTarget.set(ndcX * HALF_HEIGHT * aspect, ndcY * HALF_HEIGHT, 0)
 }
 
-window.addEventListener('pointermove', onPointerMove, { passive: true })
+useEventListener(window, 'pointermove', onPointerMove as EventListener, { passive: true })
 
 const { onBeforeRender } = useLoop()
 
@@ -89,7 +90,6 @@ onBeforeRender(({ elapsed }) => {
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('pointermove', onPointerMove)
   geometry.dispose()
   material.dispose()
 })

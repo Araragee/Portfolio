@@ -13,6 +13,7 @@ import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { useLoop } from '@tresjs/core'
 import { useJourneyStore } from '@/stores/journey'
 import { useReducedMotion } from '@/composables/useReducedMotion'
+import { useEventListener } from '@/composables/useEventListener'
 import {
   buildMorphTargets,
   particleCountForViewport,
@@ -398,7 +399,8 @@ function onResize(): void {
     updateExclusionZones()
   }
 }
-window.addEventListener('resize', onResize)
+
+useEventListener(window, 'resize', onResize)
 
 const mouseTarget = new Vector3(999, 999, 0)
 let targetInteractState = 0
@@ -432,9 +434,9 @@ function onPointerUp(): void {
   }
 }
 
-window.addEventListener('pointermove', onPointerMove, { passive: true })
-window.addEventListener('pointerdown', onPointerDown, { passive: true })
-window.addEventListener('pointerup', onPointerUp, { passive: true })
+useEventListener(window, 'pointermove', onPointerMove as EventListener, { passive: true })
+useEventListener(window, 'pointerdown', onPointerDown as EventListener, { passive: true })
+useEventListener(window, 'pointerup', onPointerUp as EventListener, { passive: true })
 
 let slowFrameCount = 0
 const { onBeforeRender, stop, start } = useLoop()
@@ -448,7 +450,7 @@ function onVisibilityChange(): void {
   }
 }
 
-document.addEventListener('visibilitychange', onVisibilityChange)
+useEventListener(document, 'visibilitychange', onVisibilityChange)
 
 onBeforeRender(({ elapsed, delta }) => {
   if (!hasRenderedFirstFrame) {
@@ -549,11 +551,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('pointermove', onPointerMove)
-  window.removeEventListener('pointerdown', onPointerDown)
-  window.removeEventListener('pointerup', onPointerUp)
-  window.removeEventListener('resize', onResize)
-  document.removeEventListener('visibilitychange', onVisibilityChange)
   points.value.geometry.dispose()
   material.dispose()
 })
