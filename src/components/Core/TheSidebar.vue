@@ -16,6 +16,10 @@ const activeIndexStr = computed(
 const maxIndex = Math.max(...journeyChapters.map((c) => parseInt(c.index, 10)))
 const totalStr = `00${maxIndex}`
 const scrollPercent = computed(() => Math.round(store.scrollProgress * 100))
+
+function jumpToChapter(index: number) {
+  store.scrollToChapterIndex(index)
+}
 </script>
 
 <template>
@@ -26,17 +30,19 @@ const scrollPercent = computed(() => Math.round(store.scrollProgress * 100))
     <!-- We wrap the main sidebar content to layout them correctly -->
     <div class="flex flex-col items-center justify-center gap-8">
 
-      <!-- 1. Progress Rail -->
-      <div class="flex flex-col items-center gap-3 opacity-50 md:opacity-100 transition-opacity pointer-events-none">
+      <!-- 1. Progress Rail (Interactive) -->
+      <div class="flex flex-col items-center gap-3 opacity-50 md:opacity-100 transition-opacity">
         <span class="hidden md:block font-mono text-xs tabular-nums tracking-widest text-primary">
           {{ scrollPercent }}%
         </span>
         <div class="flex flex-col items-center gap-2">
-          <span
+          <button
             v-for="(chapter, i) in journeyChapters"
             :key="chapter.id"
-            class="h-1.5 w-1.5 border border-primary transition-colors duration-200"
-            :class="i === store.activeChapterIndex ? 'bg-primary' : 'bg-transparent'"
+            @click="jumpToChapter(i)"
+            class="h-1.5 w-1.5 border border-primary transition-all duration-200 hover:scale-150 cursor-pointer"
+            :class="i === store.activeChapterIndex ? 'bg-primary' : 'bg-transparent hover:bg-primary/30'"
+            :aria-label="`Jump to ${chapter.title}`"
           />
         </div>
         <span class="hidden md:block font-mono text-xs tracking-widest text-secondary">

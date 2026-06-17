@@ -372,6 +372,12 @@ export const useJourneyStore = defineStore('journey', () => {
     scrollProgress.value = Math.min(1, Math.max(0, value))
   }
 
+  function scrollToChapterIndex(index: number): void {
+    const clamped = Math.max(0, Math.min(index, journeyChapters.length - 1))
+    const progress = starts[clamped] ?? 0
+    setScrollProgress(progress)
+  }
+
   return {
     scrollProgress,
     activeChapterIndex,
@@ -389,6 +395,7 @@ export const useJourneyStore = defineStore('journey', () => {
     markFirstFrame,
     markFontsLoaded,
     setScrollProgress,
+    scrollToChapterIndex,
     degradeTier,
     ditherEnabled,
     advanceDegradeLevel,

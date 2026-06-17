@@ -43,6 +43,10 @@ const opacity = computed(() => {
     if (idx === journeyChapters.length - 1) {
       return ENTRANCE_VH + 28 + 20 // 76 vh
     }
+    // Prologue gets extra hold time (15vh buffer before fade-out)
+    if (chapterIdx === 0) {
+      return ENTRANCE_VH + 28 + 15 // 71 vh
+    }
     return ENTRANCE_VH + 28 // 56 vh
   }
 
