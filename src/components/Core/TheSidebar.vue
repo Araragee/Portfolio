@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useJourneyStore } from '@/stores/journey'
 import { journeyChapters } from '@/data/journeyData'
-import DuckParticle from '@/components/Manifest/DuckParticle.vue'
+import { journeyDeckProjects } from '@/data/projectsData'
+import { lenis } from '@/composables/useLenis'
 
 const route = useRoute()
 const store = useJourneyStore()
 
 const isJourney = computed(() => route.name === 'Journey')
+const isCaseStudy = computed(() => route.name === 'CaseStudy')
 
+// ─── Journey rail
 const activeIndexStr = computed(
   () => journeyChapters[store.activeChapterIndex]?.index || '000',
 )
@@ -18,20 +21,50 @@ const totalStr = `00${maxIndex}`
 const scrollPercent = computed(() => Math.round(store.scrollProgress * 100))
 
 function jumpToChapter(index: number) {
-  store.scrollToChapterIndex(index)
+  const chapter = journeyChapters[index]
+  if (!chapter) return
+  const el = document.getElementById(chapter.id)
+  if (el) lenis.value?.scrollTo(el, { offset: 0 })
 }
+
+// ─── Page scroll (non-journey routes)
+const pageScrollPct = ref(0)
+
+function updatePageScroll() {
+  const el = document.documentElement
+  const max = el.scrollHeight - el.clientHeight
+  pageScrollPct.value = max > 0 ? Math.round((window.scrollY / max) * 100) : 0
+}
+
+onMounted(() => window.addEventListener('scroll', updatePageScroll, { passive: true }))
+onBeforeUnmount(() => window.removeEventListener('scroll', updatePageScroll))
+
+// ─── Case study project icon
+const caseStudyProject = computed(() => {
+  if (!isCaseStudy.value) return null
+  const slug = route.params.slug as string
+  return journeyDeckProjects.find((p) => p.slug === slug) ?? null
+})
+
+// ─── Nav
+const navLinks = [
+  { to: '/', label: 'Journey' },
+  { to: '/personal', label: 'Personal' },
+  { to: '/manifesto', label: 'How I Work' },
+]
 </script>
 
 <template>
   <div
-    v-if="isJourney"
-    class="fixed right-1.5 md:right-6 top-1/2 z-50 flex -translate-y-1/2 flex-col items-center opacity-100"
+    class="fixed right-1.5 md:right-6 top-1/2 z-50 flex -translate-y-1/2 flex-col items-center opacity-100 pointer-events-none"
   >
-    <!-- We wrap the main sidebar content to layout them correctly -->
-    <div class="flex flex-col items-center justify-center gap-8">
+    <div class="flex flex-col items-center justify-center gap-6 pointer-events-auto">
 
-      <!-- 1. Progress Rail (Interactive) -->
-      <div class="flex flex-col items-center gap-3 opacity-50 md:opacity-100 transition-opacity">
+      <!-- ── Journey: chapter-dot rail ── -->
+      <div
+        v-if="isJourney"
+        class="flex flex-col items-center gap-3 opacity-50 md:opacity-100 transition-opacity"
+      >
         <span class="hidden md:block font-mono text-xs tabular-nums tracking-widest text-primary">
           {{ scrollPercent }}%
         </span>
@@ -50,40 +83,45 @@ function jumpToChapter(index: number) {
         </span>
       </div>
 
-      <!-- 2. Rubber Ducky Link (How I Work) -->
-      <router-link
-        to="/manifesto"
-        class="mt-2 md:mt-8 pointer-events-auto hover:opacity-80 transition-opacity active:scale-95 group relative flex flex-col items-center justify-center"
-        aria-label="How I work"
+      <!-- ── Other pages: scroll progress bar + optional project icon ── -->
+      <div
+        v-else
+        class="flex flex-col items-center gap-2 opacity-50 md:opacity-100 transition-opacity"
       >
-        <div class="w-24 h-24">
-          <DuckParticle />
-        </div>
-        <!-- Optional hover label for clarity -->
-        <span class="absolute -left-20 top-1/2 -translate-y-1/2 font-mono text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity text-primary whitespace-nowrap bg-surface px-2 py-1 border border-outline-variant rounded">
-          How I work
-        </span>
-      </router-link>
+        <!-- Project icon (case study only, if in deck) -->
+        <img
+          v-if="caseStudyProject"
+          :src="caseStudyProject.icon"
+          :alt="caseStudyProject.title"
+          class="w-5 h-5 object-contain grayscale opacity-80 mb-1"
+        />
 
-      <!-- 3. Other Navigation Links -->
-      <nav class="hidden md:flex flex-col items-center gap-6 mt-4 pointer-events-auto">
+        <span class="hidden md:block font-mono text-xs tabular-nums tracking-widest text-primary">
+          {{ pageScrollPct }}%
+        </span>
+
+        <!-- Thin vertical bar -->
+        <div class="relative w-px h-24 bg-primary/20">
+          <div
+            class="absolute top-0 left-0 w-full bg-primary transition-[height] duration-100"
+            :style="{ height: `${pageScrollPct}%` }"
+          />
+        </div>
+      </div>
+
+      <!-- ── Site Nav ── -->
+      <nav class="flex flex-col items-center gap-4 pointer-events-auto">
         <router-link
-          to="/"
-          class="font-headline text-label uppercase tracking-widest text-secondary hover:text-primary transition-colors [writing-mode:vertical-rl] rotate-180"
+          v-for="link in navLinks"
+          :key="link.to"
+          :to="link.to"
+          class="font-headline text-label uppercase tracking-widest transition-colors [writing-mode:vertical-rl] rotate-180"
+          :class="route.path === link.to ? 'text-primary' : 'text-secondary hover:text-primary'"
         >
-          Case Studies
-        </router-link>
-        <router-link
-          to="/personal"
-          class="font-headline text-label uppercase tracking-widest text-secondary hover:text-primary transition-colors [writing-mode:vertical-rl] rotate-180"
-        >
-          Personal
+          {{ link.label }}
         </router-link>
       </nav>
 
     </div>
   </div>
 </template>
-
-<style scoped>
-</style>

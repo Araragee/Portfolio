@@ -20,7 +20,7 @@ export const journeyChapters: JourneyChapter[] = [
     index: '000',
     title: 'The long way around',
     era: 'Prologue',
-    heightVh: 150,
+    heightVh: 200,
     morphState: 'daveGonzales',
     paragraphs: [
       'I came into software the long way around.',

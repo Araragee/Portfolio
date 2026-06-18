@@ -2,6 +2,7 @@
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
 import TheFooter from '@/components/Core/TheFooter.vue'
+import TheSidebar from '@/components/Core/TheSidebar.vue'
 import CommandPalette from '@/components/Shared/CommandPalette.vue'
 import { useKeyboardNav } from '@/composables/useKeyboardNav'
 
@@ -19,6 +20,7 @@ useKeyboardNav()
       <component :is="Component" :key="routeKey" />
     </Transition>
   </router-view>
+  <TheSidebar />
   <!-- Footer hidden on journey — the epilogue chapter serves as the ending -->
   <TheFooter v-if="!isJourney" />
   <!-- Command palette for chapter navigation -->
