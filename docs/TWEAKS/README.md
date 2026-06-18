@@ -12,6 +12,7 @@
 | B | [B-loading-splash.md](B-loading-splash.md) | Splash screen, scroll locked until ready | ✅ done |
 | C | [C-performance.md](C-performance.md) | Hidden-tab render pause, antialias off, camera fix, leaks | ✅ done |
 | D | [D-pacing.md](D-pacing.md) | 200vh+ chapters, late morph windows, rail upgrade | ✅ done |
+| E | [E-mobile-split.md](E-mobile-split.md) | Mobile: field/text split into alternating top/bottom halves | ✅ done |
 
 Verify any step: `npm run type-check && npm run build`, then browser pass on
 `/journey` (console clean, scroll full runway, check the step's accept list).

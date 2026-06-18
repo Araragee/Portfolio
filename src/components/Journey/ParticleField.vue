@@ -390,6 +390,7 @@ function updateParticleCount(newCount: number): void {
 }
 
 function onResize(): void {
+  store.setIsMobile(window.innerWidth < 768)
   uniforms.uOffsetScale.value.set(window.innerWidth < 768 ? 0 : 1, 1)
   uniforms.uFormationScale.value = formationScaleForViewport()
   const newCount = particleCountForViewport(window.innerWidth)
@@ -519,8 +520,9 @@ onBeforeRender(({ elapsed, delta }) => {
 })
 
 onMounted(() => {
+  store.setIsMobile(window.innerWidth < 768)
   loadImages()
-  
+
   // Wait slightly for DOM to settle and reveal-text to render before measuring text boxes
   setTimeout(updateExclusionZones, 200)
 

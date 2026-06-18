@@ -1,6 +1,13 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { ENTRANCE_VH, fieldOffsetFor, journeyChapters, TRANSITION_VH } from '@/data/journeyData'
+import {
+  ENTRANCE_VH,
+  fieldOffsetFor,
+  journeyChapters,
+  MOBILE_FIELD_OFFSET_Y,
+  mobileParticlesOnTop,
+  TRANSITION_VH,
+} from '@/data/journeyData'
 import { journeyDeckProjects } from '@/data/projectsData'
 import type { JourneyChapter, MorphStateId } from '@/types/journey'
 
@@ -30,6 +37,28 @@ export const useJourneyStore = defineStore('journey', () => {
   // ─── Scroll State (single writer: JourneyPage)
   /** 0–1 across the entire journey container. */
   const scrollProgress = ref(0)
+
+  // ─── Viewport (set by ParticleField on mount/resize)
+  // On phones the side-slide that places the field opposite the text column is
+  // disabled (no room), so instead the field is pushed into the top/bottom half
+  // and the text takes the other — see offsetForChapter + ChapterSection.
+  const isMobile = ref(false)
+  function setIsMobile(value: boolean): void {
+    isMobile.value = value
+  }
+
+  /**
+   * Field offset for a chapter, viewport-aware. Phones swap the desktop
+   * horizontal slide for an alternating vertical split (prologue keeps its
+   * bespoke hero offset).
+   */
+  function offsetForChapter(chapter: JourneyChapter, index: number): [number, number] {
+    if (isMobile.value && index > 0) {
+      const y = mobileParticlesOnTop(index) ? MOBILE_FIELD_OFFSET_Y : -MOBILE_FIELD_OFFSET_Y
+      return [0, y]
+    }
+    return fieldOffsetFor(chapter)
+  }
 
   // Chapter runway weights (a 300vh chapter owns more of the progress range)
   const weights = journeyChapters.map((c) => c.heightVh)
@@ -225,8 +254,8 @@ export const useJourneyStore = defineStore('journey', () => {
           to: currList[0],
           t,
           stageIndex: prevList.length - 1,
-          offsetFrom: fieldOffsetFor(prev),
-          offsetTo: fieldOffsetFor(curr),
+          offsetFrom: offsetForChapter(prev, idx - 1),
+          offsetTo: offsetForChapter(curr, idx),
         }
       }
     }
@@ -246,7 +275,7 @@ export const useJourneyStore = defineStore('journey', () => {
     const chapter = journeyChapters[activeIdx]
     const list = stagesFor(chapter)
     const S = list.length
-    const off = fieldOffsetFor(chapter)
+    const off = offsetForChapter(chapter, activeIdx)
 
     if (chapter.id === 'projects') {
       const deckProg = projectDeckProgress.value
@@ -389,6 +418,7 @@ export const useJourneyStore = defineStore('journey', () => {
     markFirstFrame,
     markFontsLoaded,
     setScrollProgress,
+    setIsMobile,
     degradeTier,
     ditherEnabled,
     advanceDegradeLevel,

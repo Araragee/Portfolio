@@ -5,7 +5,7 @@ import type { JourneyChapter } from '@/types/journey'
 import { useIntersectionObserver } from '@/composables/useIntersectionObserver'
 import { useReducedMotion } from '@/composables/useReducedMotion'
 import { useJourneyStore } from '@/stores/journey'
-import { ENTRANCE_VH, journeyChapters } from '@/data/journeyData'
+import { ENTRANCE_VH, journeyChapters, mobileParticlesOnTop } from '@/data/journeyData'
 import ProjectDeck from '@/components/Journey/ProjectDeck.vue'
 
 const props = defineProps<{
@@ -131,14 +131,18 @@ const textColumnStyle = computed(
     })[props.chapter.textSide],
 )
 
-// Project-list chapters overflow a phone viewport when vertically centered
-// (title clips off the top) — top-align on mobile, center from md up
-const stickyAlignStyle = computed(() =>
-  ({
-    projects: 'items-start pt-20 pb-8 md:items-center md:pt-0 md:pb-0',
-    default: 'items-center',
-  })[props.chapter.showProjects ? 'projects' : 'default'],
-)
+// Phones split the field and text into opposite halves so they stop colliding:
+// particles take the top or bottom half (alternating per chapter, mirrored by
+// the field's vertical offset in the store), and the text aligns to the other.
+// The hero (prologue) keeps its bespoke centered layout. md+ restores the
+// two-column vertical-center layout where field and text slide side-by-side.
+const stickyAlignStyle = computed(() => {
+  if (props.chapter.layout === 'hero') return 'items-center'
+  const mobileAlign = mobileParticlesOnTop(chapterIdx)
+    ? 'items-end pb-16' // particles on top → text drops to the bottom half
+    : 'items-start pt-24' // particles on bottom → text rises to the top half
+  return `${mobileAlign} md:items-center md:pt-0 md:pb-0`
+})
 
 onMounted(() => {
   if (elementRef.value && !prefersReducedMotion.value) {
