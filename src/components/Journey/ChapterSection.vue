@@ -94,6 +94,8 @@ const runwayStyle = computed(
       150: 'h-[150vh]',
       200: 'h-[200vh]',
       300: 'h-[300vh]',
+      450: 'h-[450vh]',
+      470: 'h-[470vh]',
       500: 'h-[500vh]',
       700: 'h-[700vh]',
     })[props.chapter.heightVh],
@@ -285,7 +287,7 @@ watch(isVisible, (visible) => {
 </script>
 
 <template>
-  <section :id="chapter.id" :class="runwayStyle" ref="elementRef" :aria-label="chapter.title">
+  <section :id="chapter.id" :class="runwayStyle" :style="{ height: chapter.heightVh + 'vh' }" ref="elementRef" :aria-label="chapter.title">
     <div
       class="sticky top-0 flex h-screen transition-opacity duration-75"
       :class="stickyAlignStyle"

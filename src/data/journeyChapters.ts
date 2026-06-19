@@ -131,7 +131,7 @@ export const journeyChapters: JourneyChapter[] = [
     index: '004',
     title: 'Side quests',
     era: 'Freelance + personal projects',
-    heightVh: 500,
+    heightVh: 450,
     showProjects: true,
     morphState: 'portrait',
     extraStages: ['proj_5'],
