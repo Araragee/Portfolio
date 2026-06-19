@@ -441,9 +441,6 @@ watch(isVisible, (visible) => {
             </Transition>
           </div>
 
-          <p class="reveal-text mt-4 md:mt-10 font-mono text-xs text-outline-variant">
-            ↳ {{ chapter.interactionHint }}
-          </p>
 
           <div v-if="chapter.showProjects" class="reveal-text mt-6 md:mt-12">
             <ProjectDeck />

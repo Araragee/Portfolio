@@ -24,7 +24,7 @@ export const journeyChapters: JourneyChapter[] = [
     morphState: 'daveGonzales',
     paragraphs: [
       'I came into software the long way around.',
-      'Dave Gonzales. Frontend developer. I build interfaces to turn unintersting things interesting.',
+      'Dave Gonzales. Frontend developer. I build interfaces to turn uninteresting  things interesting.',
     ],
     interactionHint: 'move cursor — the name scatters',
     morphStart: 0.55,
