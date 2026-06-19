@@ -49,6 +49,12 @@ const { prefersReducedMotion } = useReducedMotion()
 // Must match the GLSL array size in particles.ts — a mismatch fails silently.
 const MAX_EXCLUSION_ZONES = 8
 
+// Fraction of particles that form the centered hero (the face in `portrait`, a
+// project in `proj_N`). MUST match the `heroCount` block written first in
+// loadImages — `aIsHero` flags exactly these so the crisp-PNG fade/scatter hits
+// the face only, not the floating project icons above it.
+const FACE_HERO_FRACTION = 0.65
+
 let currentCount = particleCountForViewport(window.innerWidth)
 let targets = buildMorphTargets(currentCount)
 
@@ -75,7 +81,7 @@ geometry.setAttribute(
 )
 
 const initialIsHero = new Float32Array(currentCount)
-const initialHeroCount = Math.floor(currentCount * 0.8)
+const initialHeroCount = Math.floor(currentCount * FACE_HERO_FRACTION)
 for (let i = 0; i < currentCount; i++) {
   initialIsHero[i] = i < initialHeroCount ? 1.0 : 0.0
 }
@@ -174,7 +180,7 @@ function loadImages(): void {
   // indices. The center morph is therefore always dense→dense (face⇄project),
   // so each project reads as crisply as the face. Whoever is NOT the hero shrinks
   // into the floating constellation of small tokens above it.
-  const heroCount = Math.floor(activeCount * 0.65)
+  const heroCount = Math.floor(activeCount * FACE_HERO_FRACTION)
   const slotCount = Math.floor(activeCount * 0.07)
   const lastSlotCount = activeCount - heroCount - 4 * slotCount
 
@@ -410,7 +416,7 @@ function updateParticleCount(newCount: number): void {
   )
 
   const aIsHero = new Float32Array(newCount)
-  const heroCount = Math.floor(newCount * 0.8)
+  const heroCount = Math.floor(newCount * FACE_HERO_FRACTION)
   for (let i = 0; i < newCount; i++) {
     aIsHero[i] = i < heroCount ? 1.0 : 0.0
   }

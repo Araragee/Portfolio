@@ -145,7 +145,6 @@ export const journeyChapters: JourneyChapter[] = [
     morphEnd: 0.98,
     cameraZ: 8,
     textSide: 'right',
-    showProjects: true,
     fieldOffset: [-2.8, 0],
   },
   {

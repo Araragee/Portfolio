@@ -35,6 +35,7 @@ uniform float uFormationScale;
 uniform int uDriftMode;
 uniform int uHoverMode;
 uniform float uPulse;
+uniform float uFaceCrispProgress;
 
 varying float vAlpha;
 varying vec3 vColor;
@@ -64,6 +65,17 @@ void main() {
   // Apply scaling and offsets
   pos.xy *= uFormationScale;
   pos.xy += mix(uOffsetFrom, uOffsetTo, t) * uOffsetScale;
+
+  // Hero (face) particles break apart into a diffuse cloud as the crisp portrait
+  // PNG resolves over them, gathering back as it releases — "shatter / reform"
+  // instead of a flat dissolve. Only the face block (aIsHero) scatters, so the
+  // floating project icons hold. uDriftAmp gate => reduced motion snaps, no scatter.
+  if (aIsHero > 0.5 && uFaceCrispProgress > 0.0) {
+    float ang = h * 6.28318;
+    float rad = (0.35 + 0.65 * hash(position.yx)) * 1.6; // diffuse disc, ~world units
+    pos.xy += vec2(cos(ang), sin(ang)) * rad * uFaceCrispProgress * uDriftAmp;
+    pos.z  += (h - 0.5) * 1.2 * uFaceCrispProgress * uDriftAmp;
+  }
 
   // Idle drift
   if (uDriftMode == 0) {
