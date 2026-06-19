@@ -322,6 +322,14 @@ function collectTextRects(chapterId: string | undefined): ScreenRect[] {
 }
 
 function updateExclusionZones(): void {
+  // Phones split the field into the half opposite the text already, so the rect
+  // repulsion only domes the formation and flings stray particles to the edges.
+  // Skip it — let each formation sit whole in its half.
+  if (window.innerWidth < 768) {
+    exclusionZones.value = []
+    return
+  }
+
   const activeIdx = store.activeChapterIndex
   const activeChapter = journeyChapters[activeIdx]
 
@@ -481,6 +489,9 @@ useEventListener(window, 'pointerdown', onPointerDown as EventListener, { passiv
 useEventListener(window, 'pointerup', onPointerUp as EventListener, { passive: true })
 
 let slowFrameCount = 0
+// Last scrollProgress at which text-avoidance zones were recomputed — the sticky
+// text rects move as you scroll, so the zones must follow (not just on resize).
+let lastExclScroll = -1
 const { onBeforeRender, stop, start } = useLoop()
 let hasRenderedFirstFrame = false
 
@@ -525,6 +536,13 @@ onBeforeRender(({ elapsed, delta }) => {
   const [toX, toY] = store.fieldOffsetTo
   uniforms.uOffsetFrom.value.set(fromX, fromY)
   uniforms.uOffsetTo.value.set(toX, toY)
+
+  // Re-read the chapter's text rects while scrolling so particles keep clearing
+  // the copy as it slides past (~1vh of scroll between recomputes; idle = skip).
+  if (Math.abs(store.scrollProgress - lastExclScroll) > 0.0005) {
+    lastExclScroll = store.scrollProgress
+    updateExclusionZones()
+  }
 
   // Update text avoidance zones
   const zones = exclusionZones.value
@@ -575,7 +593,12 @@ onMounted(() => {
   setTimeout(updateExclusionZones, 200)
 
   document.fonts.ready.then(() => {
-    targets.positions.daveGonzales = createTextMass(currentCount, ['Dave Gonzales'], { fontPx: 115, align: 'left' })
+    // Desktop keeps the left bias (sits under the left text column); phones have
+    // no side column, so centre the name and drop the right-edge clip.
+    targets.positions.daveGonzales = createTextMass(currentCount, ['Dave Gonzales'], {
+      fontPx: 115,
+      align: window.innerWidth < 768 ? 'center' : 'left',
+    })
     targets.positions.textMass = createTextMass(currentCount, 'DAVXLOPER', { fontPx: 115 })
     const currentGeometry = points.value.geometry
     const positionAttr = currentGeometry.getAttribute('position') as BufferAttribute

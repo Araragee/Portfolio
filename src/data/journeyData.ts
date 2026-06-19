@@ -12,7 +12,16 @@ const FIELD_OFFSET_X = 2.1
  * phones. The matching text column is aligned to the opposite half in
  * ChapterSection, so the two never stack (the original mobile collision).
  */
-export const MOBILE_FIELD_OFFSET_Y = 1.45
+export const MOBILE_FIELD_OFFSET_Y = 1.7
+
+/**
+ * Hero (prologue) keeps its own mobile push: the name particles must land in the
+ * blank band the hero layout reserves (the `h-60` spacer, ~mid-upper screen) so
+ * they sit clear of the body copy below AND the nav dots at vertical-center.
+ * ~1.2 world units ≈ 18vh upward → name core near 32vh, centered in the gap
+ * between "Frontend Engineer" and the body copy.
+ */
+export const MOBILE_HERO_OFFSET_Y = 1.2
 
 /**
  * On phones the field and text split into opposite halves, alternating per

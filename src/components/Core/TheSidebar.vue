@@ -25,6 +25,30 @@ const scrollPercent = computed(() => Math.round(store.scrollProgress * 100))
     <!-- We wrap the main sidebar content to layout them correctly -->
     <div class="flex flex-col items-center justify-center gap-8">
 
+      <!-- 0. Mobile route icons — the navbar is hidden on the journey, so phones
+           reach the other sections from here, above the progress rail. -->
+      <nav class="md:hidden flex flex-col items-center gap-2 pointer-events-auto" aria-label="Sections">
+        <router-link
+          to="/"
+          aria-label="Case studies"
+          class="grid h-8 w-8 place-items-center border border-primary bg-surface text-primary transition-colors active:bg-primary active:text-surface"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true">
+            <rect x="4" y="4" width="6" height="6" /><rect x="14" y="4" width="6" height="6" />
+            <rect x="4" y="14" width="6" height="6" /><rect x="14" y="14" width="6" height="6" />
+          </svg>
+        </router-link>
+        <router-link
+          to="/personal"
+          aria-label="Personal"
+          class="grid h-8 w-8 place-items-center border border-primary bg-surface text-primary transition-colors active:bg-primary active:text-surface"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+            <circle cx="12" cy="8" r="3.5" /><path d="M5.5 20a6.5 6.5 0 0 1 13 0" />
+          </svg>
+        </router-link>
+      </nav>
+
       <!-- 1. Progress Rail -->
       <div class="flex flex-col items-center gap-3 opacity-50 md:opacity-100 transition-opacity pointer-events-none">
         <span class="hidden md:block font-mono text-xs tabular-nums tracking-widest text-primary">

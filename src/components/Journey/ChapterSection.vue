@@ -5,8 +5,23 @@ import type { JourneyChapter } from '@/types/journey'
 import { useIntersectionObserver } from '@/composables/useIntersectionObserver'
 import { useReducedMotion } from '@/composables/useReducedMotion'
 import { useJourneyStore } from '@/stores/journey'
-import { ENTRANCE_VH, journeyChapters, mobileParticlesOnTop } from '@/data/journeyData'
+import {
+  ENTRANCE_VH,
+  journeyChapters,
+  MOBILE_FIELD_OFFSET_Y,
+  mobileParticlesOnTop,
+} from '@/data/journeyData'
+import { formationScaleForViewport } from '@/utils/morphTargets'
 import ProjectDeck from '@/components/Journey/ProjectDeck.vue'
+
+// Camera frustum (fov 45°, z 8) → 1 world unit in vh. Lets the crisp face PNG
+// track the WebGL field's scale/offset instead of hand-tuned magic numbers.
+const WORLD_VH = 50 / (Math.tan((45 / 2) * (Math.PI / 180)) * 8)
+// Face hero sits slightly below the portrait formation's centre (empirical).
+const FACE_CY = -0.293
+// Crisp PNG height at the old mobile baseline scale; scales 1:1 with the field.
+const FACE_BASE_HEIGHT_VH = 48.3
+const FACE_BASE_SCALE = 0.85
 
 const props = defineProps<{
   chapter: JourneyChapter
@@ -213,14 +228,19 @@ const faceCrispStyle = computed(() => {
     height: '48.3vh',
     transform: 'translate(-50%, -50%)',
   }
-  
+
   if (store.isMobile) {
-    // WebGL mobile Y offset is 1.2 for the projects chapter (index 4 -> top half).
-    // 1.2 units corresponds to 18.1vh offset upwards.
+    // Derive size + position from the live field scale and vertical push so the
+    // PNG stays glued to the particle face when either changes. Height scales
+    // 1:1 with the field; the face centre = (faceCy·scale + offsetY) world units
+    // above screen centre.
+    const scale = formationScaleForViewport()
+    const topVh = (FACE_CY * scale + MOBILE_FIELD_OFFSET_Y) * WORLD_VH
     return {
       ...baseStyle,
+      height: `${((FACE_BASE_HEIGHT_VH * scale) / FACE_BASE_SCALE).toFixed(1)}vh`,
       left: '50%',
-      top: 'calc(50% - 18.1vh)',
+      top: `calc(50% - ${topVh.toFixed(1)}vh)`,
     }
   } else {
     // WebGL desktop X offset is -2.8 for the projects chapter.
@@ -252,8 +272,8 @@ const textColumnStyle = computed(
 const stickyAlignStyle = computed(() => {
   if (props.chapter.layout === 'hero') return 'items-center'
   const mobileAlign = mobileParticlesOnTop(chapterIdx)
-    ? 'items-end pb-16' // particles on top → text drops to the bottom half
-    : 'items-start pt-24' // particles on bottom → text rises to the top half
+    ? 'items-end pb-8' // particles on top → text hugs the bottom edge, clear of the field
+    : 'items-start pt-14' // particles on bottom → text hugs the top edge, clear of the field
   return `${mobileAlign} md:items-center md:pt-0 md:pb-0`
 })
 
@@ -302,7 +322,7 @@ watch(isVisible, (visible) => {
         class="pointer-events-none absolute w-auto object-contain"
         :style="faceCrispStyle"
       />
-      <div class="mx-auto w-full max-w-[80%] px-6">
+      <div class="mx-auto w-full max-w-none px-3 md:max-w-[80%] md:px-6">
         <!-- Hero layout (prologue) -->
         <div
           v-if="chapter.layout === 'hero'"
@@ -361,14 +381,14 @@ watch(isVisible, (visible) => {
               {{ chapter.index }} / {{ chapter.era }}
             </p>
             <h2
-              class="reveal-text mt-4 font-headline text-5xl font-medium uppercase leading-[0.95] tracking-tight text-primary md:text-7xl whitespace-pre-wrap"
+              class="reveal-text mt-3 md:mt-4 font-headline text-4xl font-medium uppercase leading-[0.95] tracking-tight text-primary md:text-7xl whitespace-pre-wrap"
             >
               {{ activeTitle }}
             </h2>
           </template>
 
-          <div v-if="activeStat" class="reveal-text mt-10">
-            <p class="font-headline text-3xl md:text-5xl font-bold tracking-tight text-primary">
+          <div v-if="activeStat" class="reveal-text mt-6 md:mt-10">
+            <p class="font-headline text-2xl md:text-5xl font-bold tracking-tight text-primary">
               {{ activeStat.value }}
             </p>
             <p
@@ -378,7 +398,7 @@ watch(isVisible, (visible) => {
             </p>
           </div>
 
-          <div class="relative mt-8">
+          <div class="relative mt-5 md:mt-8">
             <!-- Multi-stage chapters: deck-stacked cards -->
             <div
               v-if="chapter.extraStages?.length"
@@ -396,7 +416,7 @@ watch(isVisible, (visible) => {
                 <p
                   v-for="(paragraph, i) in stageParas"
                   :key="i"
-                  class="reveal-text font-body text-base leading-relaxed text-on-surface"
+                  class="reveal-text font-body text-sm leading-snug md:text-base md:leading-relaxed text-on-surface"
                 >
                   {{ paragraph }}
                 </p>
@@ -413,7 +433,7 @@ watch(isVisible, (visible) => {
                 <p
                   v-for="(paragraph, i) in activeParagraphs"
                   :key="i"
-                  class="reveal-text font-body text-base leading-relaxed text-on-surface"
+                  class="reveal-text font-body text-sm leading-snug md:text-base md:leading-relaxed text-on-surface"
                 >
                   {{ paragraph }}
                 </p>
@@ -421,7 +441,7 @@ watch(isVisible, (visible) => {
             </Transition>
           </div>
 
-          <p class="reveal-text mt-6 md:mt-10 font-mono text-xs text-outline-variant">
+          <p class="reveal-text mt-4 md:mt-10 font-mono text-xs text-outline-variant">
             ↳ {{ chapter.interactionHint }}
           </p>
 

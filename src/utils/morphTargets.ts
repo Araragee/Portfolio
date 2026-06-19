@@ -17,7 +17,10 @@ export interface MorphTargets {
  * Lives here so frustum-fitting samplers can compensate for it.
  */
 export function formationScaleForViewport(): number {
-  if (window.innerWidth < 768) return 0.85
+  // Phones: shrink image formations to ~70% of the old 0.85 baseline so they
+  // sit compactly in their half, clear of the text column. Text formations
+  // (createTextMass) divide this out, so the name/DAVXLOPER keep their fit.
+  if (window.innerWidth < 768) return 0.6
   const aspect = window.innerWidth / window.innerHeight
   return Math.min(1, Math.max(0.62, aspect / 1.5))
 }
@@ -826,7 +829,9 @@ export function buildMorphTargets(count: number): MorphTargets {
 
   const positions: MorphTargetMap = {
     scatter: createScatter(count),
-    daveGonzales: createTextMass(count, ['Dave Gonzales'], { align: 'left' }),
+    daveGonzales: createTextMass(count, ['Dave Gonzales'], {
+      align: window.innerWidth < 768 ? 'center' : 'left',
+    }),
     bonsai: bonsaiPos,
     peso: createGridFallback(count), // Temp grid before image load
     archipelago: sdgPos,

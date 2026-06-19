@@ -5,6 +5,7 @@ import {
   fieldOffsetFor,
   journeyChapters,
   MOBILE_FIELD_OFFSET_Y,
+  MOBILE_HERO_OFFSET_Y,
   mobileParticlesOnTop,
   TRANSITION_VH,
 } from '@/data/journeyData'
@@ -53,7 +54,10 @@ export const useJourneyStore = defineStore('journey', () => {
    * bespoke hero offset).
    */
   function offsetForChapter(chapter: JourneyChapter, index: number): [number, number] {
-    if (isMobile.value && index > 0) {
+    if (isMobile.value) {
+      // Hero pushes the name up into its reserved band; every other chapter
+      // splits top/bottom by parity.
+      if (index === 0) return [0, MOBILE_HERO_OFFSET_Y]
       const y = mobileParticlesOnTop(index) ? MOBILE_FIELD_OFFSET_Y : -MOBILE_FIELD_OFFSET_Y
       return [0, y]
     }
