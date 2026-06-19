@@ -113,10 +113,10 @@ export const journeyChapters: JourneyChapter[] = [
     stageStat: [
       { value: 'Philippine Statistics Authority', label: 'Solid. Responsive. World-Class.' }, // cbmsLogo
       null,                                                    // archipelago
-      null,                                                    // sdgBars
-      null,                                                    // sdgGroupedBars
+      { value: '17', label: 'SDG tables' },                    // sdgBars
+      { value: 'Custom', label: 'Dashboard Makers' },          // sdgGroupedBars
       null,                                                    // sdgStackedBars
-      { value: '110M+', label: "Citizens' Data Handled" },    // phMap
+      { value: 'Interactive', label: 'dashboards for data visualization' }, // phMap
     ],
     stageTitles: [null, 'CBMS Portal', null, 'Lead\nFront-end\nDeveloper', null, null],
     entranceVh: 100,

@@ -7,14 +7,14 @@ export const projects: Project[] = [
     title: 'CBMS Portal',
     categoryLabel: 'Government / Data Visualization',
     description:
-      'Data-visualization portal for the Community-Based Monitoring System at the Philippine Statistics Authority — dashboards, geospatial views, and analyst tooling over national survey data.',
+      'Data-visualization portal for the Community-Based Monitoring System at the Philippine Statistics Authority — featuring 17 SDG tables, custom dashboard makers, and interactive dashboards for data visualization.',
     backgroundImage: new URL('@/assets/projects/cbms-hero.png', import.meta.url).href,
     role: 'Lead Front-end Developer — PSA Central Office',
     stack: 'Vue 3, TypeScript, Pinia, Vuetify, ECharts, D3, Babylon.js, Laravel',
     timeline: '2023 — Present',
     liveUrl: 'https://cbmsportal.psa.gov.ph',
     introStatement:
-      'A public-sector analytics portal surfacing CBMS indicators for policymakers and researchers. Built inside the PSA Central Office, the frontend is a typed Vue 3 application that renders millions of rows of municipal survey data through interactive dashboards, geographic layers, and exportable reports.',
+      'A public-sector analytics portal surfacing CBMS indicators for policymakers and researchers. Built inside the PSA Central Office, the frontend is a typed Vue 3 application that surfaces 17 SDG tables and custom dashboard makers through interactive dashboards, geographic layers, and exportable reports.',
     heroImage: new URL('@/assets/projects/cbms-hero.png', import.meta.url).href,
     sections: [
       {
@@ -23,7 +23,7 @@ export const projects: Project[] = [
       },
       {
         heading: 'How the frontend is put together',
-        body: 'A Vue 3 and Pinia core feeds a visualization layer built on ECharts, D3, and Observable Plot. Each chart type is wrapped in a composable so instrumentation, legends, and export behavior stay consistent. Vuetify handles dense data-table surfaces and form-heavy admin views, while Babylon.js powers the 3D geographic scene. A Laravel service brokers auth and data access between the client and the PSA data layer.',
+        body: 'A Vue 3 and Pinia core feeds a visualization layer built on ECharts, D3, and Observable Plot. Each chart type is wrapped in a composable so instrumentation, legends, and export behavior stay consistent. We built custom dashboard makers and interactive dashboards for data visualization to render 17 SDG tables dynamically. Vuetify handles dense data-table surfaces and form-heavy admin views, while Babylon.js powers the 3D geographic scene. A Laravel service brokers auth and data access between the client and the PSA data layer.',
         code: {
           filename: 'composables/useIndicator.ts',
           content: `import { storeToRefs } from 'pinia'
@@ -43,7 +43,7 @@ export function useIndicator(code: string) {
       },
       {
         heading: 'Where it landed',
-        body: 'The portal is now the analyst-facing surface for CBMS rounds at PSA. Render-time for large indicator sets dropped from unusable to sub-second through virtualized tables, throttled store updates, and precomputed aggregates. The typed store layer has kept the codebase stable across schema changes.',
+        body: 'The portal is now the analyst-facing surface for CBMS rounds at PSA, supporting custom dashboard makers and interactive dashboards for data visualization across 17 SDG tables. Render-time for large indicator sets dropped from unusable to sub-second through virtualized tables, throttled store updates, and precomputed aggregates. The typed store layer has kept the codebase stable across schema changes.',
       },
     ],
     gallery: [

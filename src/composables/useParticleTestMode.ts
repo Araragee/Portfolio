@@ -21,7 +21,7 @@ const PRESETS: ParticlePreset[] = [
   { name: 'Glow',          driftMode: 1, hoverMode: 2, pulse: 1, softCircle: 1, additive: true  },
 ]
 
-const currentIndex = ref(0)
+const currentIndex = ref(4) // Vortex preset by default
 const current = computed(() => PRESETS[currentIndex.value])
 
 export function useParticleTestMode() {

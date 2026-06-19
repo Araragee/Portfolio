@@ -2,52 +2,55 @@ import type { PersonalContent } from '@/types/personal'
 
 export const personalContent: PersonalContent = {
   intro: [
-    'Off the clock, I go by Araragi. This is the side of me that does not ship tickets. It is the side that reads late, plays late, and argues about frame rates.',
-    'The professional page is about the work. This page is about the person doing it.',
+    'Off the clock, I go by Araragi. The name is a reference — if you know, you know. If you do not, that is fine. It is also a kind of test.',
+    'This page has nothing to do with sprints, standups, or stack decisions. It is the other slice — the one that explains why I end up caring more than I probably should about the details.',
   ],
   story: [
-    "I came into software the long way around. I was a IT student first (learning the lectures, the theory, and joining late-night study groups trying to make sense of recursion at 2 AM). School gave me the vocabulary, but it did not give me the fluency.",
-    'Fluency came from building. I worked on small projects, broken projects, and projects that never shipped. I moved from static pages to jQuery to Vue, hunted down stack traces on forums, and slowly put together a mental model of how the web actually works underneath the tooling.',
-    'A 3-month web-design internship at iPhitech in Clark from March to May 2023 was the first time I got paid to care about pixels. By October 2023, I landed at the Philippine Statistics Authority, where I\'ve worked on the CBMS Portal since 2023, building the thing and becoming the developer I wanted to be along the way.',
+    "I did not plan to end up in software. I planned to understand computers. Those are different things, and the gap between them took a few years of getting lost to close.",
+    "School gave me structure. Recursion at 2 AM gave me humility. The real education happened when I started breaking things on purpose — cloning UIs, rebuilding them badly, rebuilding them less badly, asking why.",
+    "My first internship at iPhitech in Clark (March–May 2023) was three months of wireframes, layout corrections, and finally getting paid to care about pixels. It felt like being let into a room I had been trying to pick the lock of for two years.",
+    "By October 2023 I was at the Philippine Statistics Authority. The CBMS Portal was the first system I built at a scale where real decisions — about real communities — depended on whether the data visualized correctly. That kind of weight changes how you read a design review.",
+    "I am still there. Still learning. Still occasionally breaking things on purpose, but now I know what I am looking for when I do.",
   ],
   values: [
     {
-      title: 'Craftsmanship',
-      body: 'I would rather ship one well-made component than ten half-working ones. Quality compounds; shortcuts do not.',
+      title: 'Precision',
+      body: 'I am not a perfectionist. I am specific. There is a difference — perfectionism is about fear, precision is about respect for the person on the other side of the interface.',
     },
     {
-      title: 'Curiosity',
-      body: 'Every unfamiliar tool is a door. I read docs for fun, wander through changelogs, and keep a running list of things to break open next. \b\ They say curiosity kills the cat, but for me it makes the cat have 10x more lives.',
+      title: 'Honest Code',
+      body: 'Code is communication. A clever solution that no one else can read is just a private joke. I write for the developer who inherits the file at 11 PM on a Friday.',
     },
     {
-      title: 'Restraint',
-      body: 'The best interface is the one that gets out of the way. I delete features that do not earn their place.',
+      title: 'Taste',
+      body: 'The hardest thing to teach is taste — knowing when something is good, when it is almost good, and when to stop adding. I spend a lot of time on that last one.',
     },
     {
-      title: 'Collaboration',
-      body: 'Software is a team sport. I value clear writing, honest reviews, and assume the next developer is smarter than me.',
+      title: 'Show Up',
+      body: 'Consistency beats intensity. I have never had a breakthrough that was not preceded by a long, boring stretch of just showing up and doing the work anyway.',
     },
   ],
   hobbies: [
     {
       name: 'Gaming',
       blurb:
-        'Long-form RPGs, competitive shooters, and anything with a tight feedback loop. It sharpens pattern recognition.',
+        "JRPGs, tactical games, anything with a story worth following or a system worth dismantling. I pick a game apart the same way I read code — looking for the intent underneath the surface. Also: I have strong opinions about which FromSoftware game is the best and I am not afraid to defend them.",
     },
     {
       name: 'Anime & Manga',
       blurb:
-        'The handle "Araragi" is not an accident. I read widely across shonen, seinen, and slice-of-life genres. I think animation is a very under-rated storytelling medium.',
+        "The handle is Araragi. The series is Monogatari. If that means nothing to you, it is a show about a boy who gets bitten by a vampire and spends the rest of his life helping people with problems that are technically supernatural but are actually about loneliness. I think about it a lot. I read widely — shonen, seinen, slice-of-life — but Monogatari is where the bar is set.",
     },
     {
       name: 'Music',
       blurb:
-        'Always something playing while I work. I listen to a plethora of genres, but my top of all time would be OPM, Pop-rock, J-pop, and some 80s-20s alternative rock',
+        'Something is always playing. The playlist changes with the task — focus work gets ambient or instrumental, debugging gets whatever is loud enough to drown out the frustration. Top shelf, all-time: OPM, pop-rock, J-pop, and the specific strain of 80s–2000s alternative rock that sounds best at midnight. The test for a song is whether it earns a second listen.',
     },
     {
-      name: 'Fitness & Outdoors',
+      name: 'Sport & Movement',
       blurb:
-        'Balancing screen time with movement. I enjoy gym sessions, walks, and domination to the basketball and badminton court',
+        'Basketball and badminton, where I am aggressively competitive with people who are mostly just having fun. Gym sessions to balance the hours of being completely still in front of a monitor. Movement is how I reset — there is a kind of clarity that only arrives after you have run out of the energy to overthink.',
     },
   ],
 }
+
