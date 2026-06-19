@@ -31,6 +31,9 @@ uniform vec2 uOffsetFrom;
 uniform vec2 uOffsetTo;
 uniform vec2 uOffsetScale;
 uniform float uFormationScale;
+uniform int uDriftMode;
+uniform int uHoverMode;
+uniform float uPulse;
 
 varying float vAlpha;
 varying vec3 vColor;
@@ -61,24 +64,51 @@ void main() {
   pos.xy += mix(uOffsetFrom, uOffsetTo, t) * uOffsetScale;
 
   // Idle drift
-  pos.x += sin(uTime * 0.30 + position.y * 2.0) * 0.02 * uDriftAmp;
-  pos.y += cos(uTime * 0.25 + position.x * 2.0) * 0.02 * uDriftAmp;
+  if (uDriftMode == 0) {
+    pos.x += sin(uTime * 0.30 + position.y * 2.0) * 0.02 * uDriftAmp;
+    pos.y += cos(uTime * 0.25 + position.x * 2.0) * 0.02 * uDriftAmp;
+  } else if (uDriftMode == 1) {
+    float nx = sin(pos.y * 2.1 + uTime * 0.4) + 0.5 * sin(pos.y * 4.3 + uTime * 0.8);
+    float ny = cos(pos.x * 2.1 + uTime * 0.4) + 0.5 * cos(pos.x * 4.3 + uTime * 0.8);
+    pos.x += ny * 0.025 * uDriftAmp;
+    pos.y -= nx * 0.025 * uDriftAmp;
+  } else if (uDriftMode == 2) {
+    pos.y += sin(uTime * 1.2 + pos.x * 2.5) * 0.035 * uDriftAmp;
+    pos.x += cos(uTime * 0.9 + pos.y * 1.8) * 0.012 * uDriftAmp;
+  } else if (uDriftMode == 3) {
+    float angle = uTime * 0.35 + h * 6.28318;
+    pos.x += cos(angle) * 0.018 * uDriftAmp;
+    pos.y += sin(angle) * 0.018 * uDriftAmp;
+  }
 
   // Interactions (switch by chapter)
   float force = 0.0;
   
   if (uChapterIndex == 0) {
-    // Dave Gonzales text: Hover scatter
     vec2 away = pos.xy - uMouse.xy;
     float dist = length(away);
-    force = smoothstep(2.0, 0.0, dist);
-    
-    float h = hash(position.xy);
-    float angle = h * 6.28318 + uTime * 2.0;
-    vec2 scatterNoise = vec2(cos(angle), sin(angle)) * 0.5;
-    
-    pos.xy += (normalize(away + vec2(0.0001)) * 1.2 + scatterNoise) * force * uDriftAmp;
-  } 
+    if (uHoverMode == 0) {
+      // scatter (original)
+      force = smoothstep(2.0, 0.0, dist);
+      float angle = h * 6.28318 + uTime * 2.0;
+      vec2 scatterNoise = vec2(cos(angle), sin(angle)) * 0.5;
+      pos.xy += (normalize(away + vec2(0.0001)) * 1.2 + scatterNoise) * force * uDriftAmp;
+    } else if (uHoverMode == 1) {
+      // vortex
+      force = smoothstep(2.0, 0.0, dist);
+      vec2 tangent = vec2(-away.y, away.x) / max(dist, 0.001);
+      pos.xy += tangent * force * 0.5 * uDriftAmp;
+    } else if (uHoverMode == 2) {
+      // radial ripple
+      force = smoothstep(3.0, 0.0, dist) * 0.5;
+      float wave = sin(dist * 4.0 - uTime * 6.0) * smoothstep(3.0, 0.0, dist) * 0.4;
+      pos.xy += normalize(away + vec2(0.0001)) * wave * uDriftAmp;
+    } else if (uHoverMode == 3) {
+      // attract
+      force = smoothstep(2.0, 0.0, dist);
+      pos.xy -= normalize(away + vec2(0.0001)) * force * 0.8 * uDriftAmp;
+    }
+  }
   else if (uChapterIndex == 1) {
     // Bonsai: Hover extend
     vec2 away = pos.xy - uMouse.xy;
@@ -134,7 +164,8 @@ void main() {
 
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mvPosition;
-  gl_PointSize = uPointSize * (8.0 / -mvPosition.z);
+  float pulseFactor = 1.0 + uPulse * 0.3 * sin(uTime * 1.4 + h * 6.28318);
+  gl_PointSize = uPointSize * pulseFactor * (8.0 / -mvPosition.z);
 
   vAlpha = 1.0 - force * 0.3;
 }
@@ -143,6 +174,7 @@ void main() {
 export const particleFragmentShader = /* glsl */ `
 uniform float uOpacity;
 uniform float uDither;
+uniform float uSoftCircle;
 
 varying float vAlpha;
 varying vec3 vColor;
@@ -178,6 +210,11 @@ float bayerThreshold(vec2 fragCoord) {
 
 void main() {
   float alpha = uOpacity * vAlpha;
+  if (uSoftCircle > 0.5) {
+    vec2 coord = gl_PointCoord - 0.5;
+    float circle = 1.0 - smoothstep(0.35, 0.5, length(coord));
+    alpha *= circle;
+  }
   if (uDither > 0.5) {
     alpha = step(bayerThreshold(gl_FragCoord.xy), alpha);
   }

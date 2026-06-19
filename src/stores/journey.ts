@@ -18,8 +18,8 @@ function smoothstep(t: number): number {
 }
 
 /** Entrance window of a chapter as a fraction of its runway. */
-function entranceFrac(heightVh: number): number {
-  return Math.min(0.9, ENTRANCE_VH / heightVh)
+function entranceFrac(heightVh: number, entranceVh = ENTRANCE_VH): number {
+  return Math.min(0.9, entranceVh / heightVh)
 }
 
 /**
@@ -232,23 +232,25 @@ export const useJourneyStore = defineStore('journey', () => {
     }
 
     const getLeadVhForTransitionTo = (idx: number) => {
+      const eVh = journeyChapters[idx].entranceVh ?? ENTRANCE_VH
       if (idx === journeyChapters.length - 1) {
-        return ENTRANCE_VH + 28 + 20 // 76 vh
+        return eVh + 28 + 20
       }
-      return ENTRANCE_VH + 28 // 56 vh
+      return eVh + 28
     }
 
     // Check if we are in a cross-chapter transition
     for (let idx = 1; idx < journeyChapters.length; idx++) {
+      const chapterEntrVh = journeyChapters[idx].entranceVh ?? ENTRANCE_VH
       const transitionLead = getLeadVhForTransitionTo(idx)
       const boundaryStart = startsVh[idx] - transitionLead
-      const boundaryEnd = boundaryStart + ENTRANCE_VH
+      const boundaryEnd = boundaryStart + chapterEntrVh
       if (scrollVh >= boundaryStart && scrollVh < boundaryEnd) {
         const prev = journeyChapters[idx - 1]
         const curr = journeyChapters[idx]
         const prevList = stagesFor(prev)
         const currList = stagesFor(curr)
-        const t = smoothstep((scrollVh - boundaryStart) / ENTRANCE_VH)
+        const t = smoothstep((scrollVh - boundaryStart) / chapterEntrVh)
         return {
           from: prevList[prevList.length - 1],
           to: currList[0],
@@ -349,7 +351,7 @@ export const useJourneyStore = defineStore('journey', () => {
     const i = activeChapterIndex.value
     const chapter = journeyChapters[i]
     const fromZ = i > 0 ? journeyChapters[i - 1].cameraZ : journeyChapters[0].cameraZ
-    const E = entranceFrac(chapter.heightVh)
+    const E = entranceFrac(chapter.heightVh, chapter.entranceVh)
     const t = E > 0 ? Math.min(1, chapterProgress.value / E) : 1
     return fromZ + (chapter.cameraZ - fromZ) * t
   })

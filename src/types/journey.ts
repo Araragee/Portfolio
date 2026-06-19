@@ -76,6 +76,12 @@ export interface JourneyChapter {
   showProjects?: boolean
   /** Mono stat callout rendered in the text column. */
   stat?: { value: string; label: string }
+  /** Per-stage stat — overrides stat when present. null = hide for that stage. */
+  stageStat?: ({ value: string; label: string } | null)[]
+  /** Per-stage title — overrides chapter title when non-null. */
+  stageTitles?: (string | null)[]
+  /** Override ENTRANCE_VH for this chapter's incoming morph (vh). */
+  entranceVh?: number
 }
 
 /** Precomputed particle positions per morph state (count * 3 floats each). */

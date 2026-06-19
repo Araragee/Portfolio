@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import {
+  AdditiveBlending,
   BufferAttribute,
   BufferGeometry,
+  NormalBlending,
   Points,
   ShaderMaterial,
   Vector2,
@@ -24,6 +26,7 @@ import {
 } from '@/utils/morphTargets'
 import type { MorphStateId } from '@/types/journey'
 import { journeyChapters } from '@/data/journeyData'
+import { useParticleTestMode } from '@/composables/useParticleTestMode'
 import { journeyDeckProjects } from '@/data/projectsData'
 import { particleFragmentShader, particleVertexShader } from '@/shaders/particles'
 
@@ -40,6 +43,7 @@ const props = withDefaults(
 
 const store = useJourneyStore()
 const { morphFrom, morphTo, morphT, ditherEnabled } = storeToRefs(store)
+const { current: particlePreset } = useParticleTestMode()
 const { prefersReducedMotion } = useReducedMotion()
 
 // Must match the GLSL array size in particles.ts — a mismatch fails silently.
@@ -92,7 +96,11 @@ const uniforms = {
   uExclusionCount: { value: 0 },
   uExclusionZones: {
     value: Array.from({ length: MAX_EXCLUSION_ZONES }, () => new Vector4()),
-  }
+  },
+  uDriftMode:  { value: 0 },
+  uHoverMode:  { value: 0 },
+  uPulse:      { value: 0 },
+  uSoftCircle: { value: 0 },
 }
 
 watch(() => props.repelRadius, (val) => {
@@ -100,6 +108,15 @@ watch(() => props.repelRadius, (val) => {
 })
 watch(() => props.repelStrength, (val) => {
   uniforms.uRepelStrength.value = val
+})
+
+watch(particlePreset, (preset) => {
+  uniforms.uDriftMode.value  = preset.driftMode
+  uniforms.uHoverMode.value  = preset.hoverMode
+  uniforms.uPulse.value      = preset.pulse
+  uniforms.uSoftCircle.value = preset.softCircle
+  material.blending    = preset.additive ? AdditiveBlending : NormalBlending
+  material.needsUpdate = true
 })
 
 const material = new ShaderMaterial({
@@ -527,7 +544,7 @@ onMounted(() => {
   setTimeout(updateExclusionZones, 200)
 
   document.fonts.ready.then(() => {
-    targets.positions.daveGonzales = createTextMass(currentCount, ['Dave', 'Gonzales'], { fontPx: 115, align: 'left' })
+    targets.positions.daveGonzales = createTextMass(currentCount, ['Dave Gonzales'], { fontPx: 115, align: 'left' })
     targets.positions.textMass = createTextMass(currentCount, 'DAVXLOPER', { fontPx: 115 })
     const currentGeometry = points.value.geometry
     const positionAttr = currentGeometry.getAttribute('position') as BufferAttribute

@@ -3,6 +3,7 @@ import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vu
 import { useRoute } from 'vue-router'
 import ChapterSection from '@/components/Journey/ChapterSection.vue'
 import JourneyLoader from '@/components/Journey/JourneyLoader.vue'
+import TestParticlePanel from '@/components/Journey/TestParticlePanel.vue'
 import SEOHead from '@/components/Shared/SEOHead.vue'
 import { useLenis } from '@/composables/useLenis'
 import { useWebGLSupport } from '@/composables/useWebGLSupport'
@@ -113,5 +114,6 @@ onBeforeUnmount(() => {
         :chapter="chapter"
       />
     </div>
+    <TestParticlePanel />
   </main>
 </template>

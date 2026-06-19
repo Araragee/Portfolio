@@ -115,6 +115,7 @@ onMounted(() => {
   </a>
 
   <header
+    v-if="!isJourney"
     class="fixed top-0 left-0 w-full z-50 border-b flex justify-between items-center section-padding py-5 md:py-6 transition-all duration-300"
     :style="{
       background: isJourney

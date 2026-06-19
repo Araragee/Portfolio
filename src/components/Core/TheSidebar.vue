@@ -3,7 +3,6 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useJourneyStore } from '@/stores/journey'
 import { journeyChapters } from '@/data/journeyData'
-import DuckParticle from '@/components/Manifest/DuckParticle.vue'
 
 const route = useRoute()
 const store = useJourneyStore()
@@ -44,22 +43,7 @@ const scrollPercent = computed(() => Math.round(store.scrollProgress * 100))
         </span>
       </div>
 
-      <!-- 2. Rubber Ducky Link (How I Work) -->
-      <router-link
-        to="/manifesto"
-        class="mt-2 md:mt-8 pointer-events-auto hover:opacity-80 transition-opacity active:scale-95 group relative flex flex-col items-center justify-center"
-        aria-label="How I work"
-      >
-        <div class="w-24 h-24">
-          <DuckParticle />
-        </div>
-        <!-- Optional hover label for clarity -->
-        <span class="absolute -left-20 top-1/2 -translate-y-1/2 font-mono text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity text-primary whitespace-nowrap bg-surface px-2 py-1 border border-outline-variant rounded">
-          How I work
-        </span>
-      </router-link>
-
-      <!-- 3. Other Navigation Links -->
+      <!-- 2. Other Navigation Links -->
       <nav class="hidden md:flex flex-col items-center gap-6 mt-4 pointer-events-auto">
         <router-link
           to="/"

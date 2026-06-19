@@ -826,7 +826,7 @@ export function buildMorphTargets(count: number): MorphTargets {
 
   const positions: MorphTargetMap = {
     scatter: createScatter(count),
-    daveGonzales: createTextMass(count, ['Dave', 'Gonzales'], { align: 'left' }),
+    daveGonzales: createTextMass(count, ['Dave Gonzales'], { align: 'left' }),
     bonsai: bonsaiPos,
     peso: createGridFallback(count), // Temp grid before image load
     archipelago: sdgPos,
