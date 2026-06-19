@@ -42,7 +42,7 @@ const props = withDefaults(
 )
 
 const store = useJourneyStore()
-const { morphFrom, morphTo, morphT, ditherEnabled } = storeToRefs(store)
+const { morphFrom, morphTo, morphT, ditherEnabled, isMobile } = storeToRefs(store)
 const { current: particlePreset } = useParticleTestMode()
 const { prefersReducedMotion } = useReducedMotion()
 
@@ -459,6 +459,7 @@ let isExploding = false
 const explodeDuration = 1.2 // seconds
 
 function onPointerMove(event: PointerEvent): void {
+  if (isMobile.value) return
   const ndcX = (event.clientX / window.innerWidth) * 2 - 1
   const ndcY = -((event.clientY / window.innerHeight) * 2 - 1)
   const aspect = window.innerWidth / window.innerHeight
@@ -466,6 +467,7 @@ function onPointerMove(event: PointerEvent): void {
 }
 
 function onPointerDown(): void {
+  if (isMobile.value) return
   const activeIdx = store.activeChapterIndex
   if (activeIdx === 6) {
     isExploding = true
@@ -478,6 +480,7 @@ function onPointerDown(): void {
 }
 
 function onPointerUp(): void {
+  if (isMobile.value) return
   const activeIdx = store.activeChapterIndex
   if (activeIdx !== 6) {
     targetInteractState = 0
