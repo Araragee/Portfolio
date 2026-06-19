@@ -132,13 +132,14 @@ export const journeyChapters: JourneyChapter[] = [
     title: 'Side quests',
     era: 'Freelance + personal projects',
     heightVh: 500,
+    showProjects: true,
     morphState: 'portrait',
     extraStages: ['proj_5'],
     paragraphs: [
       'Off the clock the building continues — freelance Vue work, experiments, this site.',
       'Each project is a station on the road. Step into one to see the case study.',
     ],
-    interactionHint: 'hover to see a 3D portrait form',
+    interactionHint: 'scroll to advance — click to enter',
     // Late window keeps DAVXLOPER from forming over this chapter's text
     morphStart: 0.85,
     morphEnd: 0.98,

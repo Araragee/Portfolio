@@ -196,6 +196,41 @@ const deckStackMinHeight = computed(() =>
   props.chapter.stageParagraphs?.length ? 'min-h-[13rem] md:min-h-[10rem]' : '',
 )
 
+// Crisp face PNG shown over the projects portrait hold: the particle face
+// resolves into it, holds, then breaks back into particles (store.faceCrispProgress).
+// The background has been removed, so mix-blend-multiply is no longer needed.
+// Positioning matches the exact WebGL scaling and offset for perfect alignment.
+const faceCrispSrc = import.meta.env.BASE_URL + 'assets/daveno-bg.png'
+const faceCrispOpacity = computed(() =>
+  prefersReducedMotion.value ? (store.faceCrispProgress > 0.5 ? 1 : 0) : store.faceCrispProgress,
+)
+
+const faceCrispStyle = computed(() => {
+  const baseStyle = {
+    opacity: faceCrispOpacity.value,
+    height: '48.3vh',
+    transform: 'translate(-50%, -50%)',
+  }
+  
+  if (store.isMobile) {
+    // WebGL mobile Y offset is 1.2 for the projects chapter (index 4 -> top half).
+    // 1.2 units corresponds to 18.1vh offset upwards.
+    return {
+      ...baseStyle,
+      left: '50%',
+      top: 'calc(50% - 18.1vh)',
+    }
+  } else {
+    // WebGL desktop X offset is -2.8 for the projects chapter.
+    // -2.8 units corresponds to 42.25vh offset to the left.
+    return {
+      ...baseStyle,
+      left: 'calc(50% - 42.25vh)',
+      top: '50%',
+    }
+  }
+})
+
 // Text column sits on chapter.textSide; the particle field slides opposite
 // (docs/TWEAKS/A-field-offset.md) — no id-based special-casing
 const textColumnStyle = computed(
@@ -256,6 +291,15 @@ watch(isVisible, (visible) => {
       :class="stickyAlignStyle"
       :style="{ opacity }"
     >
+      <!-- Crisp face: particle portrait resolves into this PNG, holds, then breaks back -->
+      <img
+        v-if="chapter.id === 'projects'"
+        :src="faceCrispSrc"
+        alt=""
+        aria-hidden="true"
+        class="pointer-events-none absolute w-auto object-contain"
+        :style="faceCrispStyle"
+      />
       <div class="mx-auto w-full max-w-[80%] px-6">
         <!-- Hero layout (prologue) -->
         <div

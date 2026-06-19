@@ -74,6 +74,13 @@ geometry.setAttribute(
   new BufferAttribute(targets.colors[morphTo.value as MorphStateId].slice(), 3),
 )
 
+const initialIsHero = new Float32Array(currentCount)
+const initialHeroCount = Math.floor(currentCount * 0.8)
+for (let i = 0; i < currentCount; i++) {
+  initialIsHero[i] = i < initialHeroCount ? 1.0 : 0.0
+}
+geometry.setAttribute('aIsHero', new BufferAttribute(initialIsHero, 1))
+
 const uniforms = {
   uTime: { value: 0 },
   uProgress: { value: 0 },
@@ -101,6 +108,7 @@ const uniforms = {
   uHoverMode:  { value: 0 },
   uPulse:      { value: 0 },
   uSoftCircle: { value: 0 },
+  uFaceCrispProgress: { value: 0 },
 }
 
 watch(() => props.repelRadius, (val) => {
@@ -108,6 +116,9 @@ watch(() => props.repelRadius, (val) => {
 })
 watch(() => props.repelStrength, (val) => {
   uniforms.uRepelStrength.value = val
+})
+watch(() => store.faceCrispProgress, (val) => {
+  uniforms.uFaceCrispProgress.value = val
 })
 
 watch(particlePreset, (preset) => {
@@ -177,7 +188,7 @@ function loadImages(): void {
   ]
   // proj_N hero ↔ deck card N (same order, single source of truth).
   const projectFiles = journeyDeckProjects.map((p) => p.icon)
-  const FACE_FILE = '/assets/dave-face.png'
+  const FACE_FILE = '/assets/daveno-bg.png'
   const centerInst = { offset: [0, 0] as [number, number], scale: 1, rotation: 0, z: 0 }
 
   type Slot = (typeof iconSlots)[number]
@@ -398,6 +409,13 @@ function updateParticleCount(newCount: number): void {
     new BufferAttribute(targets.colors[morphTo.value as MorphStateId].slice(), 3),
   )
 
+  const aIsHero = new Float32Array(newCount)
+  const heroCount = Math.floor(newCount * 0.8)
+  for (let i = 0; i < newCount; i++) {
+    aIsHero[i] = i < heroCount ? 1.0 : 0.0
+  }
+  newGeometry.setAttribute('aIsHero', new BufferAttribute(aIsHero, 1))
+
   const oldGeometry = points.value.geometry
   points.value.geometry = newGeometry
   oldGeometry.dispose()
@@ -534,6 +552,13 @@ onBeforeRender(({ elapsed, delta }) => {
     }
   }
   uniforms.uDither.value = ditherEnabled.value ? 1.0 : 0.0
+
+  // Dim the field to 0 while the crisp face PNG resolves over the portrait hold
+  // (projects chapter), then bring it back as the face breaks into particles.
+  const targetOpacity = store.particleFieldOpacity
+  uniforms.uOpacity.value = prefersReducedMotion.value
+    ? targetOpacity
+    : uniforms.uOpacity.value + (targetOpacity - uniforms.uOpacity.value) * 0.15
 })
 
 onMounted(() => {

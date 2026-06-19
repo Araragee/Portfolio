@@ -167,28 +167,55 @@ export const useJourneyStore = defineStore('journey', () => {
    *  TRANSITION_VH band. No field-offset slide within a chapter.
    */
   // ─── Morph Derivation (two phases: entrance vs body)
+  
+  // Projects opens on the particle face (portrait). It holds long enough to
+  // resolve into the crisp dave-face.png (faceCrispProgress), rest, then break
+  // back into particles before the deck starts cycling proj_0…proj_5.
+  const PORTRAIT_HOLD_VH = 50
+
+  /** Vh scrolled since the projects chapter pinned (negative/NaN-safe). */
+  const projectVhSincePin = computed(() => {
+    const deckIdx = journeyChapters.findIndex((c) => c.showProjects)
+    if (deckIdx === -1) return -1
+    const deckChapter = journeyChapters[deckIdx]
+    const sumPrior = journeyChapters.slice(0, deckIdx).reduce((acc, c) => acc + c.heightVh, 0)
+    const totalVh = journeyChapters.reduce((acc, c) => acc + c.heightVh, 0)
+    const scrollableVh = totalVh - 100
+    const pinScrollProgress = sumPrior / scrollableVh
+    const chapterStartGlobal = sumPrior / totalVh
+    const chapterSpanGlobal = deckChapter.heightVh / totalVh
+    const pinChapterProgress = (pinScrollProgress - chapterStartGlobal) / chapterSpanGlobal
+    return (getChapterProgress(deckIdx) - pinChapterProgress) * deckChapter.heightVh
+  })
+
+  /**
+   * 0→1→0 envelope for the crisp face PNG during the portrait hold:
+   *   smooth fade-in (0–20vh) → hold (20–40) → smooth fade-out (40–50)
+   */
+  const faceCrispProgress = computed(() => {
+    const deckIdx = journeyChapters.findIndex((c) => c.showProjects)
+    if (activeChapterIndex.value !== deckIdx) return 0
+    const v = projectVhSincePin.value
+    if (v <= 0 || v > PORTRAIT_HOLD_VH) return 0
+    if (v < 20) return smoothstep(v / 20)
+    if (v <= 40) return 1
+    return 1 - smoothstep((v - 40) / 10)
+  })
+
+  /** Field opacity baseline, stays steady so the top project icons don't vanish! */
+  const particleFieldOpacity = computed(() => 0.7)
+
   const projectDeckProgress = computed(() => {
     const deckIdx = journeyChapters.findIndex((c) => c.showProjects)
     if (deckIdx === -1) return -1
     const deckChapter = journeyChapters[deckIdx]
     const N = journeyDeckProjects.length // particle-hero stations in the deck
+    const vhSincePin = projectVhSincePin.value
 
-    const sumPrior = journeyChapters.slice(0, deckIdx).reduce((acc, c) => acc + c.heightVh, 0)
-    const totalVh = journeyChapters.reduce((acc, c) => acc + c.heightVh, 0)
-    const scrollableVh = totalVh - 100
+    if (vhSincePin <= PORTRAIT_HOLD_VH) return -1
 
-    const pinScrollProgress = sumPrior / scrollableVh
-    const chapterStartGlobal = sumPrior / totalVh
-    const chapterSpanGlobal = deckChapter.heightVh / totalVh
-    const pinChapterProgress = (pinScrollProgress - chapterStartGlobal) / chapterSpanGlobal
-
-    const chapterProg = getChapterProgress(deckIdx)
-    const vhSincePin = (chapterProg - pinChapterProgress) * deckChapter.heightVh
-
-    if (vhSincePin <= 20) return -1
-
-    const activeVh = vhSincePin - 20
-    const totalActiveVh = deckChapter.heightVh - 100 - 20
+    const activeVh = vhSincePin - PORTRAIT_HOLD_VH
+    const totalActiveVh = deckChapter.heightVh - 100 - PORTRAIT_HOLD_VH
 
     if (activeVh >= totalActiveVh) return N
 
@@ -420,6 +447,7 @@ export const useJourneyStore = defineStore('journey', () => {
     markFirstFrame,
     markFontsLoaded,
     setScrollProgress,
+    isMobile,
     setIsMobile,
     degradeTier,
     ditherEnabled,
@@ -427,5 +455,7 @@ export const useJourneyStore = defineStore('journey', () => {
     getChapterProgress,
     snapAnchors,
     projectDeckProgress,
+    faceCrispProgress,
+    particleFieldOpacity,
   }
 })

@@ -7,6 +7,7 @@ attribute vec3 aPositionTo;
 attribute vec3 aBonsaiParent;
 attribute vec3 aColorFrom;
 attribute vec3 aColorTo;
+attribute float aIsHero;
 
 uniform float uTime;
 uniform float uProgress;
@@ -37,6 +38,7 @@ uniform float uPulse;
 
 varying float vAlpha;
 varying vec3 vColor;
+varying float vIsHero;
 
 float easeInOutCubic(float t) {
   return t < 0.5
@@ -168,6 +170,7 @@ void main() {
   gl_PointSize = uPointSize * pulseFactor * (8.0 / -mvPosition.z);
 
   vAlpha = 1.0 - force * 0.3;
+  vIsHero = aIsHero;
 }
 `
 
@@ -175,9 +178,11 @@ export const particleFragmentShader = /* glsl */ `
 uniform float uOpacity;
 uniform float uDither;
 uniform float uSoftCircle;
+uniform float uFaceCrispProgress;
 
 varying float vAlpha;
 varying vec3 vColor;
+varying float vIsHero;
 
 // Bayer 4×4 ordered dither
 float bayerThreshold(vec2 fragCoord) {
@@ -210,6 +215,10 @@ float bayerThreshold(vec2 fragCoord) {
 
 void main() {
   float alpha = uOpacity * vAlpha;
+  
+  // Fade out only the hero (face) particles when the crisp PNG is showing
+  alpha *= mix(1.0, 1.0 - uFaceCrispProgress, vIsHero);
+
   if (uSoftCircle > 0.5) {
     vec2 coord = gl_PointCoord - 0.5;
     float circle = 1.0 - smoothstep(0.35, 0.5, length(coord));
