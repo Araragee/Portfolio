@@ -61,21 +61,33 @@ void main() {
   // Standard linear mix for all chapters
   pos = mix(position, aPositionTo, t);
   vColor = mix(aColorFrom, aColorTo, t);
-  
-  // Apply scaling and offsets
-  pos.xy *= uFormationScale;
-  pos.xy += mix(uOffsetFrom, uOffsetTo, t) * uOffsetScale;
 
   // Hero (face) particles break apart into a diffuse cloud as the crisp portrait
   // PNG resolves over them, gathering back as it releases — "shatter / reform"
   // instead of a flat dissolve. Only the face block (aIsHero) scatters, so the
   // floating project icons hold. uDriftAmp gate => reduced motion snaps, no scatter.
   if (aIsHero > 0.5 && uFaceCrispProgress > 0.0) {
+    // Target center of the image (0, 0 in local space)
+    vec2 targetCenter = vec2(0.0, 0.0);
+    
+    // Variation so particles arrive at slightly different rates
+    float collapseSpeed = 0.8 + 0.4 * hash(position.yx);
+    float tCollapse = clamp(uFaceCrispProgress * collapseSpeed, 0.0, 1.0);
+    
+    // Ease the collapse (cubic in) so it starts slow and snaps into the center
+    tCollapse = tCollapse * tCollapse * tCollapse;
+    
+    // Tiny noise so it's an organic cluster rather than a perfect dot
     float ang = h * 6.28318;
-    float rad = (0.35 + 0.65 * hash(position.yx)) * 1.6; // diffuse disc, ~world units
-    pos.xy += vec2(cos(ang), sin(ang)) * rad * uFaceCrispProgress * uDriftAmp;
-    pos.z  += (h - 0.5) * 1.2 * uFaceCrispProgress * uDriftAmp;
+    vec2 noise = vec2(cos(ang), sin(ang)) * 0.05 * uFaceCrispProgress;
+    
+    pos.xy = mix(pos.xy, targetCenter, tCollapse) + noise;
+    pos.z  -= (0.2 + 0.5 * h) * 0.6 * uFaceCrispProgress * uDriftAmp;
   }
+  
+  // Apply scaling and offsets
+  pos.xy *= uFormationScale;
+  pos.xy += mix(uOffsetFrom, uOffsetTo, t) * uOffsetScale;
 
   // Idle drift
   if (uDriftMode == 0) {
