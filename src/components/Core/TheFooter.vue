@@ -9,7 +9,7 @@ const socialLinks = [
   },
   {
     platform: "LinkedIn",
-    url: "https://linkedin.com/in/davxloper",
+    url: "https://www.linkedin.com/in/dave-gonzales-741b74417/",
   },
   {
     platform: "Email",

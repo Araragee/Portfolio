@@ -93,7 +93,7 @@ useHead({
         image: resolveUrl(props.image),
         jobTitle: 'Vue.js & TypeScript Developer',
         description: props.description,
-        sameAs: ["https://github.com/Araragee", "https://linkedin.com/in/davxloper"]
+        sameAs: ["https://github.com/Araragee", "https://www.linkedin.com/in/dave-gonzales-741b74417/"]
       })
     }
   ]

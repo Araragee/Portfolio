@@ -16,7 +16,14 @@ const timeline = [
     period: "Oct 2023 — PRES.",
     title: "Front-end Developer",
     company: "Philippine Statistics Authority — Central Office",
-    description: "Lead front-end for the CBMS Portal — the analyst-facing surface for Community-Based Monitoring System data across the Philippines. Vue 3 + TypeScript + Tailwind, with Vuetify, ECharts, D3, and a Laravel service backing the data layer."
+    description: "Lead front-end for the CBMS Portal — the analyst-facing surface for Community-Based Monitoring System data across the Philippines.",
+    bullets: [
+      "Vue 3 + TypeScript + Tailwind, with Vuetify, ECharts, D3, and a Laravel service backing the data layer.",
+      "Conducted data analytics using R — trained at national, regional, provincial, and municipal levels.",
+      "Supervised data collection and data processing operations for field survey rounds.",
+      "Contributed to the development of in-house systems used in the 2024 POPCEN-CBMS.",
+      "Attended agency cybersecurity training programs.",
+    ]
   },
   {
     period: "Mar 2023 — MAY 2023",
@@ -114,7 +121,17 @@ const pillars = [
             <div class="col-span-1 md:col-span-9">
               <h3 class="font-body text-lg md:text-xl font-bold mb-1 md:mb-2">{{ entry.title }}</h3>
               <p class="text-secondary font-body text-body-sm mb-3 md:mb-4">{{ entry.company }}</p>
-              <p class="text-on-surface-variant text-body-sm leading-relaxed">{{ entry.description }}</p>
+              <p class="text-on-surface-variant text-body-sm leading-relaxed" :class="{ 'mb-3': entry.bullets?.length }">{{ entry.description }}</p>
+              <ul v-if="entry.bullets?.length" class="space-y-1.5 mt-2">
+                <li
+                  v-for="(bullet, bi) in entry.bullets"
+                  :key="bi"
+                  class="flex items-start gap-2.5 text-on-surface-variant text-body-sm leading-relaxed"
+                >
+                  <span class="font-mono text-secondary mt-0.5 shrink-0">—</span>
+                  <span>{{ bullet }}</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

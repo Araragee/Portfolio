@@ -6,11 +6,11 @@ export const personalContent: PersonalContent = {
     'This page has nothing to do with sprints, standups, or stack decisions. It is the other slice — the one that explains why I end up caring more than I probably should about the details.',
   ],
   story: [
-    "I did not plan to end up in software. I planned to understand computers. Those are different things, and the gap between them took a few years of getting lost to close.",
+    "I did not plan to end up in software. I planned to understand computers. Those are different things, and the gap between them took a few years of getting lost to close. What I really wanted was the mindset of a problem solver — not just the tools, but the way of seeing. The kind of thinking that sharpens how you approach a challenge, how you sit with uncertainty, and how you read the waves of life before they hit.",
     "School gave me structure. Recursion at 2 AM gave me humility. The real education happened when I started breaking things on purpose — cloning UIs, rebuilding them badly, rebuilding them less badly, asking why.",
     "My first internship at iPhitech in Clark (March–May 2023) was three months of wireframes, layout corrections, and finally getting paid to care about pixels. It felt like being let into a room I had been trying to pick the lock of for two years.",
     "By October 2023 I was at the Philippine Statistics Authority. The CBMS Portal was the first system I built at a scale where real decisions — about real communities — depended on whether the data visualized correctly. That kind of weight changes how you read a design review.",
-    "I am still there. Still learning. Still occasionally breaking things on purpose, but now I know what I am looking for when I do.",
+    "I am still there. Still learning. Still occasionally breaking things on purpose, but now I know what I am looking for when I do — with a cup of coffee, and the occasional orchestration of AI agents.",
   ],
   values: [
     {
@@ -39,7 +39,7 @@ export const personalContent: PersonalContent = {
     {
       name: 'Anime & Manga',
       blurb:
-        "The handle is Araragi. The series is Monogatari. If that means nothing to you, it is a show about a boy who gets bitten by a vampire and spends the rest of his life helping people with problems that are technically supernatural but are actually about loneliness. I think about it a lot. I read widely — shonen, seinen, slice-of-life — but Monogatari is where the bar is set.",
+        "The handle is Araragi — taken from Koyomi Araragi, the protagonist of Monogatari, my all-time favorite anime. If that means nothing to you: it is a show about a boy who gets bitten by a vampire and spends the rest of his life helping people with problems that are technically supernatural but are actually about loneliness and identity. I think about it a lot. I read widely — shonen, seinen, slice-of-life — but Monogatari is where the bar is set.",
     },
     {
       name: 'Music',
