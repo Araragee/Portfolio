@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import ChapterSection from '@/components/Journey/ChapterSection.vue'
 import JourneyLoader from '@/components/Journey/JourneyLoader.vue'
 // import TestParticlePanel from '@/components/Journey/TestParticlePanel.vue'
 import SEOHead from '@/components/Shared/SEOHead.vue'
 import { useLenis } from '@/composables/useLenis'
+import { useReducedMotion } from '@/composables/useReducedMotion'
 import { useWebGLSupport } from '@/composables/useWebGLSupport'
 import { journeyChapters } from '@/data/journeyData'
 import { useJourneyStore } from '@/stores/journey'
@@ -19,6 +20,8 @@ const store = useJourneyStore()
 const { webglSupported } = useWebGLSupport()
 const { onScroll, lenis } = useLenis()
 const route = useRoute()
+const router = useRouter()
+const { prefersReducedMotion } = useReducedMotion()
 
 const containerRef = ref<HTMLElement | null>(null)
 
@@ -48,12 +51,25 @@ onScroll(updateProgress)
 
 // Snap-to-station removed for now (was useJourneySnap) — free scroll only.
 
+/**
+ * Chapter links (sidebar dots, "/#projects") arrive as a route hash. Scroll
+ * there, then clear the hash so clicking the same link again still works.
+ */
+function scrollToHash(immediate: boolean): void {
+  if (!route.hash) return
+  // Fresh mount: Lenis' scroll limit is still stale (0) — re-measure first
+  lenis.value?.resize()
+  lenis.value?.scrollTo(route.hash, {
+    offset: 0,
+    immediate: immediate || prefersReducedMotion.value,
+  })
+  router.replace({ hash: '' })
+}
+
 function startJourney(): void {
   lenis.value?.start()
   measure()
-  if (route.hash) {
-    lenis.value?.scrollTo(route.hash, { offset: 0, immediate: true })
-  }
+  scrollToHash(true)
   updateProgress()
 }
 
@@ -87,6 +103,13 @@ watch(
   () => store.journeyReady,
   (ready) => {
     if (ready) startJourney()
+  },
+)
+
+watch(
+  () => route.hash,
+  () => {
+    if (store.journeyReady) scrollToHash(false)
   },
 )
 

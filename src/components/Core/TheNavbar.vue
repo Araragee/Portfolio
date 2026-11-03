@@ -16,6 +16,11 @@ let lastScrollY = 0;
 const menuRef = ref<HTMLElement | null>(null);
 const menuTriggerRef = ref<HTMLButtonElement | null>(null);
 
+const headerStyle = computed(() => [
+  isScrolled.value ? "bg-surface/95 border-surface-dim" : "bg-surface/90 border-transparent",
+  isHidden.value ? "-translate-y-full" : "translate-y-0",
+]);
+
 // On journey: drop "Case Studies" — you're already on it.
 // On other pages: full list, pointing back to '/'.
 const navLinks = computed(() =>
@@ -25,14 +30,15 @@ const navLinks = computed(() =>
         { label: "Personal", to: "/personal" },
       ]
     : [
-        { label: "Case Studies", to: "/" },
+        { label: "Case Studies", to: "/#projects" },
         { label: "How I work", to: "/manifesto" },
         { label: "Personal", to: "/personal" },
       ],
 );
 
+// Back to the projects chapter, not the journey's top
 function goBack() {
-  router.push("/");
+  router.push("/#projects");
 }
 
 function toggleMenu() {
@@ -116,16 +122,8 @@ onMounted(() => {
 
   <header
     v-if="!isJourney"
-    class="fixed top-0 left-0 w-full z-50 border-b flex justify-between items-center section-padding py-5 md:py-6 transition-all duration-300"
-    :style="{
-      background: isJourney
-        ? (isScrolled ? 'rgba(249,249,248,0.75)' : 'transparent')
-        : (isScrolled ? 'rgba(249,249,248,0.96)' : 'rgba(249,249,248,0.88)'),
-      backdropFilter: isJourney && !isScrolled ? 'none' : 'blur(12px)',
-      WebkitBackdropFilter: isJourney && !isScrolled ? 'none' : 'blur(12px)',
-      borderColor: isScrolled && !isJourney ? '#e5e5e5' : 'transparent',
-      transform: isHidden ? 'translateY(-100%)' : 'translateY(0)',
-    }"
+    class="fixed top-0 left-0 w-full z-50 border-b backdrop-blur-md flex justify-between items-center section-padding py-5 md:py-6 transition-all duration-300"
+    :class="headerStyle"
   >
     <!-- Case Study variant: back arrow + project label -->
     <template v-if="isCaseStudy">
@@ -228,12 +226,7 @@ onMounted(() => {
       v-if="isMenuOpen"
       ref="menuRef"
       id="mobile-menu"
-      class="fixed inset-0 z-40 flex flex-col items-center justify-center gap-10 md:hidden"
-      style="
-        background: rgba(249, 249, 248, 0.98);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-      "
+      class="fixed inset-0 z-40 flex flex-col items-center justify-center gap-10 bg-surface/[0.98] backdrop-blur-lg md:hidden"
       role="dialog"
       aria-modal="true"
       aria-label="Navigation menu"

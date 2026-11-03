@@ -43,7 +43,7 @@ useSeoMeta({
       <h1 class="font-headline text-display font-bold uppercase mb-8">
         Project not found
       </h1>
-      <router-link to="/" class="btn-monolith" id="back-home-btn">Back to Index</router-link>
+      <router-link to="/#projects" class="btn-monolith" id="back-home-btn">Back to Index</router-link>
     </div>
 
     <!-- Case study content -->

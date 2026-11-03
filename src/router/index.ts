@@ -36,7 +36,9 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  scrollBehavior(_to, _from, savedPosition) {
+  scrollBehavior(to, _from, savedPosition) {
+    // Journey hashes are scrolled by Lenis in JourneyPage, not the router
+    if (to.name === 'Journey' && to.hash) return false
     if (savedPosition) {
       return savedPosition
     }

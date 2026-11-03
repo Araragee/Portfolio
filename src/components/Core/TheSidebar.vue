@@ -29,13 +29,22 @@ const scrollPercent = computed(() => Math.round(store.scrollProgress * 100))
            reach the other sections from here, above the progress rail. -->
       <nav class="md:hidden flex flex-col items-center gap-2 pointer-events-auto" aria-label="Sections">
         <router-link
-          to="/"
+          to="/#projects"
           aria-label="Case studies"
           class="grid h-8 w-8 place-items-center border border-primary bg-surface text-primary transition-colors active:bg-primary active:text-surface"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true">
             <rect x="4" y="4" width="6" height="6" /><rect x="14" y="4" width="6" height="6" />
             <rect x="4" y="14" width="6" height="6" /><rect x="14" y="14" width="6" height="6" />
+          </svg>
+        </router-link>
+        <router-link
+          to="/manifesto"
+          aria-label="How I work"
+          class="grid h-8 w-8 place-items-center border border-primary bg-surface text-primary transition-colors active:bg-primary active:text-surface"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+            <path d="M5 7h14M5 12h14M5 17h9" />
           </svg>
         </router-link>
         <router-link
@@ -50,30 +59,50 @@ const scrollPercent = computed(() => Math.round(store.scrollProgress * 100))
       </nav>
 
       <!-- 1. Progress Rail -->
-      <div class="flex flex-col items-center gap-3 opacity-50 md:opacity-100 transition-opacity pointer-events-none">
-        <span class="hidden md:block font-mono text-xs tabular-nums tracking-widest text-primary">
+      <div class="flex flex-col items-center gap-3 opacity-50 md:opacity-100 transition-opacity">
+        <span class="hidden md:block font-mono text-xs tabular-nums tracking-widest text-primary pointer-events-none">
           {{ scrollPercent }}%
         </span>
-        <div class="flex flex-col items-center gap-2">
-          <span
+        <!-- Chapter dots jump to their chapter (JourneyPage scrolls the hash) -->
+        <nav class="flex flex-col items-center pointer-events-auto" aria-label="Chapters">
+          <router-link
             v-for="(chapter, i) in journeyChapters"
             :key="chapter.id"
-            class="h-1.5 w-1.5 border border-primary transition-colors duration-200"
-            :class="i === store.activeChapterIndex ? 'bg-primary' : 'bg-transparent'"
-          />
-        </div>
-        <span class="hidden md:block font-mono text-xs tracking-widest text-secondary">
+            :to="{ path: '/', hash: `#${chapter.id}` }"
+            :aria-label="`${chapter.index} — ${chapter.title}`"
+            :aria-current="i === store.activeChapterIndex ? 'step' : undefined"
+            class="group relative grid h-5 w-5 place-items-center"
+          >
+            <span
+              class="h-1.5 w-1.5 border border-primary transition-colors duration-200 group-hover:bg-primary/50"
+              :class="i === store.activeChapterIndex ? 'bg-primary' : 'bg-transparent'"
+            />
+            <span
+              class="pointer-events-none absolute right-full mr-2 hidden whitespace-nowrap bg-primary px-2 py-1 font-mono text-xs uppercase tracking-widest text-surface opacity-0 transition-opacity duration-150 md:block group-hover:opacity-100 group-focus-visible:opacity-100"
+              aria-hidden="true"
+            >
+              {{ chapter.title }}
+            </span>
+          </router-link>
+        </nav>
+        <span class="hidden md:block font-mono text-xs tracking-widest text-secondary pointer-events-none">
           {{ activeIndexStr }}—{{ totalStr }}
         </span>
       </div>
 
       <!-- 2. Other Navigation Links -->
-      <nav class="hidden md:flex flex-col items-center gap-6 mt-4 pointer-events-auto">
+      <nav class="hidden md:flex flex-col items-center gap-6 mt-4 pointer-events-auto" aria-label="Pages">
         <router-link
-          to="/"
+          to="/#projects"
           class="font-headline text-label uppercase tracking-widest text-secondary hover:text-primary transition-colors [writing-mode:vertical-rl] rotate-180"
         >
           Case Studies
+        </router-link>
+        <router-link
+          to="/manifesto"
+          class="font-headline text-label uppercase tracking-widest text-secondary hover:text-primary transition-colors [writing-mode:vertical-rl] rotate-180"
+        >
+          How I work
         </router-link>
         <router-link
           to="/personal"
@@ -87,5 +116,3 @@ const scrollPercent = computed(() => Math.round(store.scrollProgress * 100))
   </div>
 </template>
 
-<style scoped>
-</style>
