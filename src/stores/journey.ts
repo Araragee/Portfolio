@@ -174,7 +174,7 @@ export const useJourneyStore = defineStore('journey', () => {
   
   // Projects opens on the particle face (portrait). It holds long enough to
   // resolve into the crisp dave-face.png (faceCrispProgress), rest, then break
-  // back into particles before the deck starts cycling proj_0…proj_5.
+  // back into particles before the deck starts cycling proj_0…proj_6.
   const PORTRAIT_HOLD_VH = 50
 
   /** Vh scrolled since the projects chapter pinned (negative/NaN-safe). */
@@ -326,7 +326,8 @@ export const useJourneyStore = defineStore('journey', () => {
         'proj_3',
         'proj_4',
         'proj_5',
-        'proj_5'
+        'proj_6',
+        'proj_6'
       ]
       const fromState = states[fromI] || 'portrait'
       const toState = states[toI] || 'portrait'

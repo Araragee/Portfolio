@@ -2,8 +2,39 @@ import type { Project } from '@/types/caseStudy'
 
 export const projects: Project[] = [
   {
-    slug: 'cbms-portal',
+    slug: 'e-permits',
     index: '01',
+    // U+2011 non-breaking hyphen: keeps the title on one line in narrow columns
+    title: 'e‑Permits',
+    categoryLabel: 'Government / Permit Processing',
+    description:
+      'End-to-end permit system for the Department of Human Settlements and Urban Development — real estate developers file online, and every DHSUD desk from intake to the Regional Director processes the case in one place.',
+    backgroundImage: new URL('@/assets/projects/epermits-hero.png', import.meta.url).href,
+    role: 'Full-stack Developer — DHSUD',
+    stack: 'Vue 3, TypeScript, Tailwind v4, Pinia, ECharts, Laravel 13, Sanctum, PostgreSQL, Docker',
+    timeline: 'Jul 2026 — Present',
+    introStatement:
+      'e-Permits digitizes how DHSUD receives, reviews, and approves real estate development permits. Developers file applications, upload plans, pay, and answer deficiencies online; staff move each case through the official procedure — Intake, Evaluation, Issuance of Notices, Division Chief review, Regional Director approval, and Release — with every permit and license printed on its prescribed DHSUD form.',
+    heroImage: new URL('@/assets/projects/epermits-hero.png', import.meta.url).href,
+    sections: [
+      {
+        heading: 'Paper routing, rebuilt as a workflow',
+        body: 'Permit applications used to travel between desks as paper, with no single view of where a case sat or how long it had waited. The system had to follow the official DHSUD procedure exactly, enforce who may act at each stage, and keep the 15-day service level honest by aging a case only while it sits on a desk.',
+      },
+      {
+        heading: 'How it is put together',
+        body: 'A typed Vue 3 and Pinia frontend talks to a Laravel 13 API secured with Sanctum, backed by PostgreSQL. Cases route themselves to the regional office covering the property, then to the least busy desk. Case movements are all-or-nothing, so an interrupted step can never leave a case stuck between stages. Deficiency notices tie to the exact requirement, send reminders at day 30, day 60 and the deadline, and a Notice to Comply pauses the office clock. Files up to 500MB upload in chunks, and every re-upload keeps its earlier version.',
+      },
+      {
+        heading: 'Where it stands',
+        body: 'The system produces every Certificate of Registration, License to Sell, and Temporary and Conditional License on its official form, with executive dashboards for the Secretary, the Bureau, and each Regional Office built on live figures. Releases are automated with rollback, backups run on schedule on DHSUD servers, and every item from the quality assurance and user acceptance reviews has been closed.',
+      },
+    ],
+    gallery: [],
+  },
+  {
+    slug: 'cbms-portal',
+    index: '02',
     title: 'CBMS Portal',
     categoryLabel: 'Government / Data Visualization',
     description:
@@ -11,7 +42,7 @@ export const projects: Project[] = [
     backgroundImage: new URL('@/assets/projects/cbms-hero.png', import.meta.url).href,
     role: 'Lead Front-end Developer — PSA Central Office',
     stack: 'Vue 3, TypeScript, Pinia, Vuetify, ECharts, D3, Babylon.js, Laravel',
-    timeline: '2023 — Present',
+    timeline: '2023 — 2026',
     liveUrl: 'https://cbmsportal.psa.gov.ph',
     introStatement:
       'A public-sector analytics portal surfacing CBMS indicators for policymakers and researchers. Built inside the PSA Central Office, the frontend is a typed Vue 3 application that surfaces 17 SDG tables and custom dashboard makers through interactive dashboards, geographic layers, and exportable reports.',
@@ -59,7 +90,7 @@ export function useIndicator(code: string) {
   },
   {
     slug: 'lms-ai-platform',
-    index: '02',
+    index: '03',
     title: 'LMS-AI Platform',
     categoryLabel: 'EdTech / AI Integration',
     description:
@@ -119,7 +150,7 @@ export const useRiskStore = defineStore('risk', () => {
   },
   {
     slug: 'nutrisipe',
-    index: '03',
+    index: '04',
     title: 'Nutrisipe',
     categoryLabel: 'Social / Recipe Platform',
     description:
@@ -175,7 +206,7 @@ export const useRiskStore = defineStore('risk', () => {
   },
   {
     slug: 'tango',
-    index: '04',
+    index: '05',
     title: 'Tango',
     categoryLabel: 'Personal / Progressive Web App',
     description:
@@ -256,7 +287,7 @@ export function useDemoMode() {
   },
   {
     slug: 'accomplisher',
-    index: '05',
+    index: '06',
     title: 'Accomplisher',
     categoryLabel: 'Productivity / Desktop App',
     description:
@@ -296,7 +327,7 @@ export function useDemoMode() {
   },
   {
     slug: 'smc',
-    index: '06',
+    index: '07',
     title: "Sernan's Music Clinic",
     categoryLabel: 'Freelance / Business App',
     description:
@@ -364,7 +395,7 @@ export function useDemoMode() {
   },
   {
     slug: 'araragi',
-    index: '06',
+    index: '07',
     title: 'Araragi',
     categoryLabel: 'Identity / Particle Model',
     description:
@@ -399,6 +430,7 @@ export function useDemoMode() {
  */
 export const journeyDeckProjects = (
   [
+    { slug: 'e-permits', icon: '/assets/dhsud-logo.png' },
     { slug: 'cbms-portal', icon: '/assets/cbmsportal-favicon.svg' },
     { slug: 'lms-ai-platform', icon: '/assets/lms-ai-icon.svg' },
     { slug: 'nutrisipe', icon: '/assets/nutrisipe-logo.svg' },

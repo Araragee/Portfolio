@@ -181,17 +181,19 @@ function loadImages(): void {
   // so each project reads as crisply as the face. Whoever is NOT the hero shrinks
   // into the floating constellation of small tokens above it.
   const heroCount = Math.floor(activeCount * FACE_HERO_FRACTION)
-  const slotCount = Math.floor(activeCount * 0.07)
-  const lastSlotCount = activeCount - heroCount - 4 * slotCount
+  const slotCount = Math.floor(activeCount * 0.058)
 
-  // The five floating small-token placements above the hero.
+  // The six floating small-token placements above the hero (one per deck
+  // project minus the hero; the face takes the hero's vacated slot).
   const iconSlots = [
-    { offset: [-1.6, 1.3] as [number, number], rotation: -0.15, z: 0.2 },
-    { offset: [-0.7, 1.9] as [number, number], rotation: -0.05, z: 0.1 },
-    { offset: [0.3, 2.1] as [number, number], rotation: 0.05, z: 0.3 },
-    { offset: [1.2, 1.7] as [number, number], rotation: 0.1, z: 0.1 },
-    { offset: [1.8, 1.0] as [number, number], rotation: 0.2, z: 0.2 },
+    { offset: [-1.5, 1.15] as [number, number], rotation: -0.18, z: 0.2 },
+    { offset: [-0.85, 1.75] as [number, number], rotation: -0.08, z: 0.1 },
+    { offset: [-0.15, 2.05] as [number, number], rotation: -0.02, z: 0.3 },
+    { offset: [0.55, 2.05] as [number, number], rotation: 0.04, z: 0.1 },
+    { offset: [1.2, 1.7] as [number, number], rotation: 0.1, z: 0.2 },
+    { offset: [1.8, 1.1] as [number, number], rotation: 0.2, z: 0.2 },
   ]
+  const lastSlotCount = activeCount - heroCount - (iconSlots.length - 1) * slotCount
   // proj_N hero ↔ deck card N (same order, single source of truth).
   const projectFiles = journeyDeckProjects.map((p) => p.icon)
   const FACE_FILE = '/assets/daveno-bg.png'
@@ -237,7 +239,7 @@ function loadImages(): void {
       : sampleProjHero(projectFiles[activeIndex], heroCount)
 
     const slotPromises = iconSlots.map((slot, j) => {
-      const c = j === 4 ? lastSlotCount : slotCount
+      const c = j === iconSlots.length - 1 ? lastSlotCount : slotCount
       // The hero vacated slot `activeIndex` → the face takes that slot.
       if (!heroIsFace && j === activeIndex) return sampleFaceSlot(c, slot)
       return sampleProjSlot(projectFiles[j], c, slot)
@@ -266,6 +268,7 @@ function loadImages(): void {
   buildState('proj_3', 3)
   buildState('proj_4', 4)
   buildState('proj_5', 5)
+  buildState('proj_6', 6)
 }
 
 // Bounding box text avoidance zones

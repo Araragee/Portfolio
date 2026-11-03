@@ -1,19 +1,30 @@
 <script setup lang="ts">
 import { useSeoMeta } from '@unhead/vue'
-import { useScrollAnimation, useStaggerAnimation } from '@/composables/useScrollAnimation'
+import { useStaggerAnimation } from '@/composables/useScrollAnimation'
+import MacbookStory from '@/components/Manifesto/MacbookStory.vue'
 
 useSeoMeta({
   title: 'How I work — Dave Gonzales',
   description: 'Engineering philosophy, chronology, and technical pillars of Dave Gonzales.',
 })
 
-const { elementRef: heroRef } = useScrollAnimation({ threshold: 0.1 })
 const { containerRef: timelineRef } = useStaggerAnimation({ staggerDelay: 120 })
-const { containerRef: pillarsRef } = useStaggerAnimation({ staggerDelay: 100 })
 
 const timeline = [
   {
-    period: "Oct 2023 — PRES.",
+    period: "Jul 2026 — PRES.",
+    title: "Full-stack Developer",
+    company: "Department of Human Settlements and Urban Development — e-Permits",
+    description: "Building e-Permits, the system DHSUD uses to receive, review, and approve real estate development permits online.",
+    bullets: [
+      "Vue 3 + TypeScript + Tailwind v4 frontend on a Laravel 13 / PostgreSQL API.",
+      "Rebuilt case routing to follow the official DHSUD procedure, from Intake to Release, under a 15-day service level.",
+      "Every permit and license generated on its prescribed DHSUD form; executive dashboards on live figures.",
+      "Automated releases with rollback and scheduled backups on DHSUD servers.",
+    ]
+  },
+  {
+    period: "Oct 2023 — JUL 2026",
     title: "Front-end Developer",
     company: "Philippine Statistics Authority — Central Office",
     description: "Lead front-end for the CBMS Portal — the analyst-facing surface for Community-Based Monitoring System data across the Philippines.",
@@ -39,55 +50,14 @@ const timeline = [
   }
 ]
 
-const pillars = [
-  {
-    heading: 'Strict TypeScript',
-    body: 'I use strict mode and explicit types. If the compiler cannot catch it, the runtime will, and I would rather fix it in the editor.',
-  },
-  {
-    heading: 'Deleting code',
-    body: 'The best pull requests are the ones that remove lines. If a piece of logic or a component is no longer used, I delete it. Dead code is technical debt.',
-  },
-  {
-    heading: 'Performance budgets',
-    body: 'I keep an eye on bundle sizes and render times. A fast, responsive, and efficient interface makes users trust the system. Slow and uninteractive apps usually mean someone got lazy with dependencies.',
-  },
-  {
-    heading: 'Composables',
-    body: 'Vue 3 changed how I write front-ends. I prefer to keep state and logic in small, testable composables instead of huge, monolothic component files.',
-  }
-]
 </script>
 
 <template>
-  <main class="pt-28 md:pt-32 pb-24 px-5 sm:px-6" id="main-content" tabindex="-1">
-    <div class="max-w-[800px] mx-auto">
+  <main id="main-content" tabindex="-1">
+    <!-- Philosophy, told as an exploded laptop (replaces hero + pillars grid) -->
+    <MacbookStory />
 
-      <!-- Hero Manifesto -->
-      <section ref="heroRef" class="mb-20 md:mb-24 text-center" aria-labelledby="manifesto-heading">
-        <span class="font-mono text-caption uppercase text-secondary mb-6 md:mb-8 block">
-          About the work
-        </span>
-        <h1
-          id="manifesto-heading"
-          class="font-headline font-semibold text-heading-xl text-primary mb-10 md:mb-12"
-        >
-          How I work
-        </h1>
-        <div class="w-full h-px bg-outline mb-12 md:mb-16"></div>
-        <div class="space-y-6 md:space-y-8 text-left">
-          <p class="text-body-lg leading-relaxed font-body text-on-surface">
-            I write code that is meant to be read, debugged, and eventually replaced. I don't believe in clever tricks
-            that save five lines but take an hour to understand. When I build a feature, I assume someone
-            else will have to maintain it.
-          </p>
-          <p class="text-body leading-relaxed font-body text-secondary">
-            Over the last few years working on the CBMS Portal, I've learned that consistency is more valuable
-            than adopting the latest framework feature. I stick to established patterns, enforce strict TypeScript
-            rules, and focus on delivering something that works reliably.
-          </p>
-        </div>
-      </section>
+    <div class="max-w-[800px] mx-auto px-5 sm:px-6 pt-12 pb-24">
 
       <!-- Chronology -->
       <section class="mb-20 md:mb-24" aria-labelledby="chronology-heading">
@@ -136,28 +106,6 @@ const pillars = [
           </div>
         </div>
       </section>
-
-      <!-- Philosophical Pillars -->
-      <section
-        ref="pillarsRef"
-        class="grid grid-cols-1 md:grid-cols-2 gap-px bg-outline border border-outline mb-20 md:mb-24"
-        aria-labelledby="pillars-heading"
-      >
-        <h2 id="pillars-heading" class="sr-only">Engineering Pillars</h2>
-        <div
-          v-for="pillar in pillars"
-          :key="pillar.heading"
-          data-stagger
-          class="bg-surface p-8 md:p-10"
-        >
-          <span class="font-mono text-caption text-secondary uppercase block mb-4 md:mb-6">
-
-          </span>
-          <h3 class="font-headline text-heading font-semibold mb-3 md:mb-4">{{ pillar.heading }}</h3>
-          <p class="text-on-surface-variant text-body-sm leading-relaxed font-body">{{ pillar.body }}</p>
-        </div>
-      </section>
-
 
       <!-- CTA -->
       <section class="bg-primary text-surface p-10 md:p-16 text-center" aria-labelledby="manifesto-cta-heading">

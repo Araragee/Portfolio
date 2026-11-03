@@ -847,6 +847,7 @@ export function buildMorphTargets(count: number): MorphTargets {
     proj_3: createArtifactFallback(count),
     proj_4: createArtifactFallback(count),
     proj_5: createArtifactFallback(count),
+    proj_6: createArtifactFallback(count),
     textMass: createTextMass(count, 'DAVXLOPER'),
   }
 
@@ -868,6 +869,7 @@ export function buildMorphTargets(count: number): MorphTargets {
     proj_3: defaultCol,
     proj_4: defaultCol,
     proj_5: defaultCol,
+    proj_6: defaultCol,
     textMass: defaultCol,
   }
 
