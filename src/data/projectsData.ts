@@ -394,8 +394,87 @@ export function useDemoMode() {
     ],
   },
   {
+    slug: 'seleste',
+    index: '08',
+    title: 'Seleste',
+    categoryLabel: 'SaaS / 3D Printing',
+    description:
+      'Instant 3D-printing quotes and order tracking. Upload an STL, inspect it in 3D, compare live prices across seven materials, and follow the print from engineer review to your door.',
+    backgroundImage: new URL('@/assets/projects/seleste-landing.jpg', import.meta.url).href,
+    role: 'Solo Developer',
+    stack: 'React 19, TypeScript, three.js, TanStack Query, Tailwind v4, GSAP, Zod, Supabase',
+    timeline: '2023 — 2026',
+    repoUrl: 'https://github.com/Araragee/Seleste',
+    introStatement:
+      'Seleste started as a static HTML site for a 3D-printing service and has been rebuilt twice: first in Vue, then as a React and TypeScript SaaS. Customers upload a model and get an exact price in under a second, with no account needed. Operators run the queue from a production board.',
+    heroImage: new URL('@/assets/projects/seleste-landing.jpg', import.meta.url).href,
+    sections: [
+      {
+        heading: 'Pricing a part from the file itself',
+        body: 'Quotes come from the model, not from a form. The STL is parsed in the browser (binary and ASCII, no dependencies), and its exact volume comes from the divergence theorem, along with surface area and bounding box. The file never leaves the device until an order is placed. The pricing engine accounts for infill and shell thickness, machine time, finishing labour, minimum charges, volume breaks and plan discounts. All money is kept in integer cents, and every quote shows its breakdown.',
+      },
+      {
+        heading: 'Catching bad files before an engineer does',
+        body: 'Printability checks reject parts that do not fit the build volume in any orientation, warn on features below a material\'s minimum, and catch models exported in the wrong unit (millimetres, centimetres or inches). A three.js viewer previews the part with material-aware colour and metal shading for DMLS and cast parts.',
+      },
+      {
+        heading: 'Two backends, one interface',
+        body: 'The app runs entirely in the browser in demo mode (localStorage and IndexedDB), or against Supabase with Postgres, Auth, Storage and row-level security. Each backend is code-split, so a demo build ships no Supabase code. Order status can only change through database functions that enforce valid transitions and write the timeline event, so the production board and the customer tracker can never disagree.',
+      },
+    ],
+    gallery: [
+      {
+        src: new URL('@/assets/projects/seleste-quote.jpg', import.meta.url).href,
+        alt: 'Quote builder with 3D preview and price breakdown',
+      },
+      {
+        src: new URL('@/assets/projects/seleste-order.jpg', import.meta.url).href,
+        alt: 'Order detail with progress tracker and timeline',
+      },
+      {
+        src: new URL('@/assets/projects/seleste-dashboard.jpg', import.meta.url).href,
+        alt: 'Customer dashboard',
+      },
+      {
+        src: new URL('@/assets/projects/seleste-production.jpg', import.meta.url).href,
+        alt: 'Admin production board',
+      },
+    ],
+  },
+  {
+    slug: 'g-rides',
+    index: '09',
+    title: 'G!',
+    categoryLabel: 'Mobile / Maps & Pricing',
+    description:
+      'Find what is worth going to near you in Metro Manila, then compare the ride there across Grab, Angkas, JoyRide and MoveIt, cheapest first. Start the ride and it tracks you live with the fare frozen at booking.',
+    backgroundImage: new URL('@/assets/projects/g-hero.svg', import.meta.url).href,
+    role: 'Solo Developer',
+    stack: 'Expo, React Native, TypeScript, NativeWind, Zustand, Flask, SQLite, OpenStreetMap',
+    timeline: '2026',
+    repoUrl: 'https://github.com/Araragee/G-',
+    introStatement:
+      'G! answers two questions in one place: where should I go, and what will it cost to get there? It lists cafes, museums, beaches, hiking routes and events within a chosen radius, then prices the trip across every ride-hailing app. It began as a Vite PWA and was rebuilt as a native Expo app backed by a Flask API.',
+    heroImage: new URL('@/assets/projects/g-hero.svg', import.meta.url).href,
+    sections: [
+      {
+        heading: 'One fare model for every operator',
+        body: 'Every operator is priced with the same shared model: a base fare, per-kilometre and per-minute rates, a minimum fare, a booking fee and a time-of-day surge for rush hour, late night and rain. Distance and time come from OSRM road routing, falling back to straight-line distance with a Metro Manila average speed. The maths lives in a pure TypeScript package with no DOM or native imports, so the app and the tests run the same code.',
+      },
+      {
+        heading: 'Built to keep working when the server is down',
+        body: 'The Flask backend is the pricing authority, map proxy and trip ledger, but the app never depends on it. Rate cards fall back to bundled defaults, quotes run on-device, and geocoding falls back from the backend proxy to public OSM endpoints, then to the device cache. Discovery uses OpenStreetMap through Overpass, so it needs no API key and no billing.',
+      },
+      {
+        heading: 'Live tracking',
+        body: 'Once a ride starts, live GPS fixes snap onto the route line. The ETA uses the device\'s speed while moving and the route average while stopped. Three fixes in a row more than 80 m off the route trigger a reroute, and the fare stays locked at its booking price throughout.',
+      },
+    ],
+    gallery: [],
+  },
+  {
     slug: 'araragi',
-    index: '07',
+    index: '10',
     title: 'Araragi',
     categoryLabel: 'Identity / Particle Model',
     description:

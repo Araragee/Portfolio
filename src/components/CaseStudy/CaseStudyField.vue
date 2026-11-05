@@ -45,17 +45,14 @@ const uniforms = {
   uInteractPos: { value: new Vector3() },
   uOffsetFrom: { value: new Vector2() },
   uOffsetTo: { value: new Vector2() },
-  uOffsetScale: { value: 0 },
+  uOffsetScale: { value: new Vector2(0, 0) }, // vec2 in the shared shader
   uFormationScale: { value: 0.85 },
   uExclusionCount: { value: 0 },
+  // Must match the GLSL array size (8) in shaders/particles.ts — a shorter
+  // array makes three.js throw on every frame.
   uExclusionZones: {
-    value: [
-      new Vector4(),
-      new Vector4(),
-      new Vector4(),
-      new Vector4(),
-    ]
-  }
+    value: Array.from({ length: 8 }, () => new Vector4()),
+  },
 }
 
 const material = new ShaderMaterial({

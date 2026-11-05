@@ -36,6 +36,14 @@ uniform int uDriftMode;
 uniform int uHoverMode;
 uniform float uPulse;
 uniform float uFaceCrispProgress;
+// Morph choreography (0 = plain crossfade-style mix).
+// uStagger: share of the morph spent waiting — each particle gets its own
+//   start window, swept left→right across the TARGET formation so the next
+//   shape "draws itself in" instead of every particle moving in lockstep.
+// uArc: mid-flight lift — particles bow sideways and toward the camera at
+//   the midpoint of their own trip, zero at both ends (formations stay exact).
+uniform float uStagger;
+uniform float uArc;
 
 varying float vAlpha;
 varying vec3 vColor;
@@ -53,14 +61,28 @@ float hash(vec2 p) {
 
 void main() {
   float h = hash(position.xy);
-  float stagger = 0.0;
-  float rawT = clamp((uProgress - stagger) / 0.95, 0.0, 1.0);
+  float h2 = hash(aPositionTo.xy + 17.0);
+
+  // Per-particle window inside [0, 1]: delay in [0, uStagger], every window the
+  // same length, so uProgress 0 → all at FROM and 1 → all at TO (reduced
+  // motion snaps uProgress to 0|1, so it still lands exactly).
+  float sweep = clamp((aPositionTo.x + 4.5) / 9.0, 0.0, 1.0);
+  float delay = uStagger * mix(h2, sweep, 0.6);
+  float rawT = clamp((uProgress - delay) / max(1.0 - uStagger, 0.001), 0.0, 1.0);
   float t = easeInOutCubic(rawT);
-  
-  vec3 pos;
-  // Standard linear mix for all chapters
-  pos = mix(position, aPositionTo, t);
+
+  vec3 pos = mix(position, aPositionTo, t);
   vColor = mix(aColorFrom, aColorTo, t);
+
+  // Mid-flight arc: perpendicular to the trip (alternating side per particle)
+  // and toward the camera. Scales with trip length so short hops barely bow.
+  // sin(PI*t) is 0 at both ends → formations are untouched at rest.
+  vec2 travel = aPositionTo.xy - position.xy;
+  float tripLen = length(travel);
+  vec2 side = tripLen > 0.0001 ? vec2(-travel.y, travel.x) / tripLen : vec2(0.0);
+  float bow = sin(3.14159265 * t) * uArc * uDriftAmp;
+  pos.xy += side * (h2 > 0.5 ? 1.0 : -1.0) * min(tripLen, 4.0) * 0.18 * bow;
+  pos.z += (0.4 + 0.8 * h) * bow;
 
   // Hero (face) particles break apart into a diffuse cloud as the crisp portrait
   // PNG resolves over them, gathering back as it releases — "shatter / reform"

@@ -115,6 +115,10 @@ const uniforms = {
   uPulse:      { value: 0 },
   uSoftCircle: { value: 0 },
   uFaceCrispProgress: { value: 0 },
+  // Morph choreography; seeded from the active preset (the preset watch below
+  // only fires on change).
+  uStagger: { value: particlePreset.value.stagger },
+  uArc:     { value: particlePreset.value.arc },
 }
 
 watch(() => props.repelRadius, (val) => {
@@ -132,6 +136,8 @@ watch(particlePreset, (preset) => {
   uniforms.uHoverMode.value  = preset.hoverMode
   uniforms.uPulse.value      = preset.pulse
   uniforms.uSoftCircle.value = preset.softCircle
+  uniforms.uStagger.value    = preset.stagger
+  uniforms.uArc.value        = preset.arc
   material.blending    = preset.additive ? AdditiveBlending : NormalBlending
   material.needsUpdate = true
 })
@@ -520,7 +526,11 @@ onBeforeRender(({ elapsed, delta }) => {
   const t = morphT.value
   uniforms.uProgress.value = prefersReducedMotion.value ? (t > 0.5 ? 1 : 0) : t
   uniforms.uDriftAmp.value = prefersReducedMotion.value ? 0 : 1
-  uniforms.uMouse.value.lerp(mouseTarget, 0.08)
+  // Frame-rate independent smoothing: 1 - e^(-k·dt) gives the same feel at
+  // 60/120/144 Hz (a fixed per-frame factor runs 2× faster on 120 Hz screens).
+  // k values match the old per-frame factors at 60 fps (0.08, 0.1, 0.15).
+  const ease = (k: number) => 1 - Math.exp(-k * delta)
+  uniforms.uMouse.value.lerp(mouseTarget, ease(5))
   
   uniforms.uChapterIndex.value = store.activeChapterIndex
   if (isExploding) {
@@ -535,7 +545,7 @@ onBeforeRender(({ elapsed, delta }) => {
       uniforms.uInteractState.value = Math.sin(Math.pow(t, 0.4) * Math.PI)
     }
   } else {
-    uniforms.uInteractState.value += (targetInteractState - uniforms.uInteractState.value) * 0.1
+    uniforms.uInteractState.value += (targetInteractState - uniforms.uInteractState.value) * ease(6.3)
   }
 
   const [fromX, fromY] = store.fieldOffsetFrom
@@ -588,7 +598,7 @@ onBeforeRender(({ elapsed, delta }) => {
   const targetOpacity = store.particleFieldOpacity
   uniforms.uOpacity.value = prefersReducedMotion.value
     ? targetOpacity
-    : uniforms.uOpacity.value + (targetOpacity - uniforms.uOpacity.value) * 0.15
+    : uniforms.uOpacity.value + (targetOpacity - uniforms.uOpacity.value) * ease(9.75)
 })
 
 onMounted(() => {

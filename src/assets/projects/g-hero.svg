@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+  <!-- Title card for G! (no app screenshots in the repo yet). Monochrome, Monolith palette. -->
+  <rect width="1600" height="1000" fill="#F9F9F8"/>
+  <g stroke="#111" stroke-opacity="0.08" stroke-width="1">
+    <path d="M0 100H1600M0 200H1600M0 300H1600M0 400H1600M0 500H1600M0 600H1600M0 700H1600M0 800H1600M0 900H1600"/>
+    <path d="M100 0V1000M200 0V1000M300 0V1000M400 0V1000M500 0V1000M600 0V1000M700 0V1000M800 0V1000M900 0V1000M1000 0V1000M1100 0V1000M1200 0V1000M1300 0V1000M1400 0V1000M1500 0V1000"/>
+  </g>
+  <!-- route -->
+  <path d="M180 820 L320 700 L330 560 L520 470 L640 520 L780 380 L900 400 L1010 250" fill="none" stroke="#111" stroke-width="6" stroke-linejoin="miter"/>
+  <circle cx="180" cy="820" r="14" fill="#F9F9F8" stroke="#111" stroke-width="6"/>
+  <g transform="translate(1010 250) scale(3.2) translate(-32 -50)">
+    <path d="M32 14c-8.8 0-16 7.2-16 16 0 11.4 14.3 21.2 14.9 21.6a2 2 0 0 0 2.2 0C33.7 51.2 48 41.4 48 30c0-8.8-7.2-16-16-16Zm0 22a6 6 0 1 1 0-12 6 6 0 0 1 0 12Z" fill="#111"/>
+  </g>
+  <!-- wordmark -->
+  <text x="120" y="210" font-family="Space Grotesk, Helvetica, Arial, sans-serif" font-size="200" font-weight="700" fill="#111" letter-spacing="-8">G!</text>
+  <text x="128" y="270" font-family="IBM Plex Mono, Menlo, monospace" font-size="26" fill="#111" letter-spacing="4">SPOTS NEARBY · RIDE FARES COMPARED</text>
+  <!-- fare list -->
+  <g font-family="IBM Plex Mono, Menlo, monospace" font-size="26" fill="#111">
+    <rect x="1060" y="560" width="420" height="300" fill="#F9F9F8" stroke="#111" stroke-width="3"/>
+    <text x="1090" y="610" letter-spacing="3" font-size="20">CHEAPEST FIRST</text>
+    <path d="M1060 630H1480" stroke="#111" stroke-width="2"/>
+    <text x="1090" y="680">Moto</text>
+    <text x="1090" y="740">Bike</text>
+    <text x="1090" y="800">Car</text>
+    <text x="1090" y="840" font-size="16" fill-opacity="0.6">metered = base + km + min</text>
+    <text x="1450" y="680" text-anchor="end">₱ ··</text>
+    <text x="1450" y="740" text-anchor="end">₱ ···</text>
+    <text x="1450" y="800" text-anchor="end">₱ ····</text>
+  </g>
+</svg>
