@@ -45,17 +45,11 @@ const uniforms = {
   uInteractPos: { value: new Vector3() },
   uOffsetFrom: { value: new Vector2() },
   uOffsetTo: { value: new Vector2() },
-  uOffsetScale: { value: 0 },
+  uOffsetScale: { value: new Vector2() },
   uFormationScale: { value: 0.85 },
   uExclusionCount: { value: 0 },
-  uExclusionZones: {
-    value: [
-      new Vector4(),
-      new Vector4(),
-      new Vector4(),
-      new Vector4(),
-    ]
-  }
+  // must match `uniform vec4 uExclusionZones[8]` in shaders/particles.ts or three crashes on upload
+  uExclusionZones: { value: Array.from({ length: 8 }, () => new Vector4()) },
 }
 
 const material = new ShaderMaterial({

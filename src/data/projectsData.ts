@@ -154,14 +154,14 @@ export const useRiskStore = defineStore('risk', () => {
     title: 'Nutrisipe',
     categoryLabel: 'Social / Recipe Platform',
     description:
-      'A food-first social recipe platform with recipe forking, automatic macro calculations, meal planning, and a real-time social feed. Live on Cloudflare Pages.',
+      'A food-first social recipe platform with recipe forking, automatic macro calculations, meal planning, stories, and real-time messaging. Rebuilt from React and Sanity into a typed Vue 3 and Express stack.',
     backgroundImage: new URL('@/assets/projects/nutrisipe-hero.png', import.meta.url).href,
     role: 'Solo Developer',
-    stack: 'React 17, Sanity CMS, Socket.io, Google OAuth, Tailwind',
-    timeline: '2023',
-    liveUrl: 'https://officialnutrisipe.pages.dev/',
+    stack: 'Vue 3, TypeScript, Pinia, Tailwind, HeadlessUI, Express, Prisma, PostgreSQL, Socket.IO',
+    timeline: '2023 — 2026',
+    liveUrl: 'https://nutrisipe-frontend.onrender.com/',
     introStatement:
-      'Nutrisipe answers one question — what to cook tonight — with a visual, social-first feed instead of text-heavy blog posts. Recipes are treated as social objects: saveable, remixable, and nutritionally transparent. Users can fork existing recipes into their own variations, plan weekly meals on a drag-and-drop calendar, and generate grocery lists automatically.',
+      'Nutrisipe answers one question — what to cook tonight — with a visual, social-first feed instead of text-heavy blog posts. Recipes are treated as social objects: saveable, remixable, and nutritionally transparent. Users can fork existing recipes into their own variations, plan weekly meals on a drag-and-drop calendar, and generate grocery lists from the plan.',
     heroImage: new URL('@/assets/projects/nutrisipe-hero.png', import.meta.url).href,
     sections: [
       {
@@ -170,11 +170,19 @@ export const useRiskStore = defineStore('risk', () => {
       },
       {
         heading: 'Recipe forking and nutrition math',
-        body: "The platform's signature mechanic is recipe forking: users take an existing recipe, swap ingredients, and save a derivative with a credit trail back to the original. Every fork inherits and recalculates the nutrition profile automatically. Macros — calories, protein, fats, carbs — are computed per serving from a managed ingredient database, so no manual entry is required. Users can drag saved recipes into a weekly meal planner and generate a grocery list from it.",
+        body: "The platform's signature mechanic is recipe forking: users take an existing recipe, swap ingredients, and save a variation with a credit trail back to the original. Every fork recalculates its nutrition profile automatically. Macros — calories, protein, fats, carbs — are computed per serving from a managed ingredient database, so no manual entry is required. Saved recipes drag into a weekly meal planner, which feeds the grocery list.",
       },
       {
-        heading: 'Admin and content layer',
-        body: 'An admin suite provides real-time platform analytics, user management, and a database editor for the global ingredient records that power macro calculations. Authentication is federated through Google OAuth. The content layer is managed through Sanity CMS with image assets served from its CDN, absorbing content-model changes without migrations on the client.',
+        heading: 'From React and Sanity to a typed full stack',
+        body: 'The first version ran on React 17 with Sanity CMS as the backend. The revamp rebuilds it as a Vue 3 + TypeScript client over an Express API with Prisma and PostgreSQL, so the data model lives in versioned migrations instead of a hosted CMS. Sessions use httpOnly cookies, and Socket.IO drives real-time direct messages and notifications. Stories, ratings, comments, and collections round out the social layer, with an admin suite for moderation, reports, and the ingredient records behind the macro math.',
+      },
+      {
+        heading: 'A design system, not a pile of screens',
+        body: 'Seventeen views were brought onto one token set — color, radius, shadow, and easing as CSS variables consumed by Tailwind — and onto shared primitives. A single button component covers every variant, size, and router link. Every modal now runs through one HeadlessUI-based dialog with focus trapping, Escape handling, scroll lock, and a bottom-sheet layout on phones. Native browser confirm() calls were replaced with a promise-based confirmation dialog, and unsaved recipe drafts prompt before they are discarded.',
+      },
+      {
+        heading: 'Hardening the front door',
+        body: 'The landing page was rewritten with honest copy in place of placeholder stats and testimonials, a hero image cut from JPEG to a 150 KB WebP, and accessible form labels and error announcements. Dev-only test accounts are compiled out of the production bundle. An audit also caught a sign-in route that trusted a client-supplied email without verifying a Google token; it is now restricted to development until server-side verification lands.',
       },
     ],
     gallery: [
