@@ -1,4 +1,14 @@
 import type { Project } from '@/types/caseStudy'
+import type { WorldTheme } from '@/types/journey'
+
+interface DeckEntry {
+  slug: string
+  icon: string
+  hero?: string
+  world: WorldTheme
+  /** Big headline + one-line pitch shown while this project is the hero. */
+  story: { headline: string; line: string }
+}
 
 export const projects: Project[] = [
   {
@@ -39,14 +49,14 @@ export const projects: Project[] = [
     categoryLabel: 'Government / Data Visualization',
     description:
       'Data-visualization portal for the Community-Based Monitoring System at the Philippine Statistics Authority — featuring 17 SDG tables, custom dashboard makers, and interactive dashboards for data visualization.',
-    backgroundImage: new URL('@/assets/projects/cbms-hero.png', import.meta.url).href,
+    backgroundImage: import.meta.env.BASE_URL + 'assets/cbms-hero.svg',
     role: 'Lead Front-end Developer — PSA Central Office',
     stack: 'Vue 3, TypeScript, Pinia, Vuetify, ECharts, D3, Babylon.js, Laravel',
     timeline: '2023 — 2026',
     liveUrl: 'https://cbmsportal.psa.gov.ph',
     introStatement:
       'A public-sector analytics portal surfacing CBMS indicators for policymakers and researchers. Built inside the PSA Central Office, the frontend is a typed Vue 3 application that surfaces 17 SDG tables and custom dashboard makers through interactive dashboards, geographic layers, and exportable reports.',
-    heroImage: new URL('@/assets/projects/cbms-hero.png', import.meta.url).href,
+    heroImage: import.meta.env.BASE_URL + 'assets/cbms-hero.svg',
     sections: [
       {
         heading: 'The problem with static PDFs',
@@ -95,14 +105,14 @@ export function useIndicator(code: string) {
     categoryLabel: 'EdTech / AI Integration',
     description:
       'Adaptive learning management system with real-time AI risk scoring, instructor intervention workflows, and student analytics dashboards.',
-    backgroundImage: new URL('@/assets/projects/lms-hero.png', import.meta.url).href,
+    backgroundImage: import.meta.env.BASE_URL + 'assets/lms-hero.svg',
     role: 'Full-stack Developer',
     stack: 'Vue 3, Pinia, TypeScript, FastAPI, PostgreSQL, Docker',
     timeline: '2025 — Present',
     liveUrl: 'https://lms-ai-frontend.onrender.com/',
     introStatement:
       'A full-stack LMS platform where AI risk models surface at-risk students in real time, enabling instructors to intervene before dropout occurs. Built with a strict TypeScript architecture and Vue 3 Composition API.',
-    heroImage: new URL('@/assets/projects/lms-hero.png', import.meta.url).href,
+    heroImage: import.meta.env.BASE_URL + 'assets/lms-hero.svg',
     sections: [
       {
         heading: 'Why risk scores arrive too late',
@@ -434,19 +444,117 @@ export function useDemoMode() {
  *
  * Accomplisher is intentionally absent: it has no logo asset, so it can't be a
  * particle hero. It still lives in `projects` for its case-study page.
- * Each `icon` must exist under public/assets.
+ * Each `icon` (small floating token) and `hero` (big centered formation) must
+ * exist under public/assets. `world` = page tint + particle style while that
+ * project is the hero — the monochrome site takes on each project's colour.
  */
 export const journeyDeckProjects = (
   [
-    { slug: 'e-permits', icon: '/assets/dhsud-logo.png' },
-    { slug: 'cbms-portal', icon: '/assets/cbmsportal-favicon.svg' },
-    { slug: 'lms-ai-platform', icon: '/assets/lms-ai-icon.svg' },
-    { slug: 'nutrisipe', icon: '/assets/nutrisipe-logo.svg' },
-    { slug: 'tango', icon: '/assets/tango-icon.png' },
-    { slug: 'smc', icon: '/assets/smc-logo.png' },
-    { slug: 'araragi', icon: '/assets/araragi.png' },
-  ] as const
-).map((d) => ({ ...projects.find((p) => p.slug === d.slug)!, icon: d.icon }))
+    // blueprint: dithered squares on DHSUD blue
+    {
+      slug: 'e-permits',
+      icon: '/assets/dhsud-logo.png',
+      world: { bg: '#D9E4FB' },
+      story: {
+        headline: 'Permits, minus paper',
+        line: 'Every DHSUD desk on one live case file. No more folders walking the hallway.',
+      },
+    },
+    {
+      slug: 'cbms-portal',
+      icon: '/assets/cbmsportal-favicon.svg',
+      hero: '/assets/cbms-hero.svg',
+      world: { bg: '#D3ECE6' },
+      story: {
+        headline: 'Census, made clickable',
+        line: 'A country of survey tables, turned into dashboards anyone can drill.',
+      },
+    },
+    // soft round dots
+    {
+      slug: 'lms-ai-platform',
+      icon: '/assets/lms-ai-icon.svg',
+      hero: '/assets/lms-hero.svg',
+      world: { bg: '#E2DAFA', softCircle: true, dither: false },
+      story: {
+        headline: 'Grades that warn early',
+        line: 'AI flags the student about to slip, before the exam does.',
+      },
+    },
+    {
+      slug: 'nutrisipe',
+      icon: '/assets/nutrisipe-logo.svg',
+      hero: '/assets/nutrisipe-scene.svg',
+      world: { bg: '#FCE0C2', softCircle: true, dither: false },
+      story: {
+        headline: 'Dinner, decided',
+        line: 'Recipes you can fork like code, with the macros done for you.',
+      },
+    },
+    // halftone: dithered round dots
+    {
+      slug: 'tango',
+      icon: '/assets/tango-icon.png',
+      hero: '/assets/tango-scene.svg',
+      world: { bg: '#FBD5DE', softCircle: true },
+      story: {
+        headline: 'Budgets for two',
+        line: 'One shared surface for a couple\u2019s money, todos and calendar.',
+      },
+    },
+    // the one dark world: solid brass squares
+    {
+      slug: 'smc',
+      icon: '/assets/smc-logo.png',
+      hero: '/assets/smc-scene.svg',
+      world: { bg: '#1E1A14', dither: false, dark: true },
+      story: {
+        headline: 'Lessons, in tune',
+        line: 'A music school off spreadsheets, with booking that negotiates itself.',
+      },
+    },
+    {
+      slug: 'araragi',
+      icon: '/assets/araragi.png',
+      world: { bg: '#F9F9F8' },
+      story: {
+        headline: 'Just for fun',
+        line: 'A particle portrait, because not everything needs a reason.',
+      },
+    },
+  ] satisfies DeckEntry[]
+).map((d) => ({
+  ...projects.find((p) => p.slug === d.slug)!,
+  icon: d.icon,
+  hero: d.hero ?? d.icon,
+  world: d.world,
+  story: d.story,
+}))
+
+const DEFAULT_WORLD: WorldTheme = { bg: '#F9F9F8' }
+
+/** Projects outside the journey deck still get a world on their case study. */
+const offDeck: Record<string, Pick<DeckEntry, 'world' | 'story'>> = {
+  accomplisher: {
+    world: { bg: '#DDE8D6' },
+    story: {
+      headline: 'Payroll reports, on time',
+      line: 'Two weeks of work, logged as it happens instead of rebuilt from memory.',
+    },
+  },
+}
+
+/** World (page tint + style) for a project's case study. */
+export function getProjectWorld(slug: string): WorldTheme {
+  return (
+    journeyDeckProjects.find((p) => p.slug === slug)?.world ?? offDeck[slug]?.world ?? DEFAULT_WORLD
+  )
+}
+
+/** Story headline + one-liner for a project, if it has one. */
+export function getProjectStory(slug: string): DeckEntry['story'] | undefined {
+  return journeyDeckProjects.find((p) => p.slug === slug)?.story ?? offDeck[slug]?.story
+}
 
 export function getProjectBySlug(slug: string): Project | undefined {
   return projects.find(p => p.slug === slug)

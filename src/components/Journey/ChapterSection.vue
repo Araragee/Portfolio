@@ -13,6 +13,7 @@ import {
 } from '@/data/journeyData'
 import { formationScaleForViewport } from '@/utils/morphTargets'
 import ProjectDeck from '@/components/Journey/ProjectDeck.vue'
+import { journeyDeckProjects } from '@/data/projectsData'
 
 // Camera frustum (fov 45°, z 8) → 1 world unit in vh. Lets the crisp face PNG
 // track the WebGL field's scale/offset instead of hand-tuned magic numbers.
@@ -123,6 +124,12 @@ const activeStat = computed(() => {
 })
 
 const activeTitle = computed(() => {
+  // Projects: the headline is the active project's story, not the chapter name.
+  if (props.chapter.showProjects) {
+    // Clamp: progress runs to N as the last card scrolls out — keep its headline
+    const k = Math.min(Math.round(store.projectDeckProgress), journeyDeckProjects.length - 1)
+    return journeyDeckProjects[k]?.story.headline ?? props.chapter.title
+  }
   const st = props.chapter.stageTitles
   if (st?.length) return st[textStageIndex.value] ?? props.chapter.title
   return props.chapter.title
@@ -140,7 +147,7 @@ const textStageIndex = computed(() => {
       // morphs through, so text and formation change together. Show the
       // from-stage card, swap to the next at the morph midpoint (where
       // deckContainerOpacity dips). Same source ⇒ uniform per-stage scroll.
-      if (props.chapter.id === 'psa') {
+      if (!props.chapter.showProjects) {
         const next = store.morphT >= 0.5 ? store.activeStageIndex + 1 : store.activeStageIndex
         return Math.min(N - 1, Math.max(0, next))
       }
@@ -188,7 +195,7 @@ const deckContainerOpacity = computed(() => {
   // psa: tie text fade to the particle morph. Full on holds (morphT 0), dips to
   // ~0.15 at the morph midpoint to mask the card swap — text and formation move
   // as one. Reduced motion: no dip, the card just swaps.
-  if (props.chapter.id === 'psa') {
+  if (!props.chapter.showProjects) {
     if (prefersReducedMotion.value) return 1
     return 1 - Math.sin(store.morphT * Math.PI) * 0.85
   }

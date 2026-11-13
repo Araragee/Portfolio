@@ -36,6 +36,20 @@ uniform int uDriftMode;
 uniform int uHoverMode;
 uniform float uPulse;
 uniform float uFaceCrispProgress;
+// Sprung, normalised scroll velocity (~-1..1) and smoothed pointer velocity
+// (world units/s) — see ParticleField.vue. Both are 0 at rest.
+uniform float uScrollVel;
+uniform vec2 uMouseVel;
+uniform vec3 uInk;
+
+// Live-tunable (customizer panel): hover reach/strength, apply-everywhere flag,
+// turbulence, scroll drag, and the share of a morph spent on staggered starts.
+uniform float uHoverRadius;
+uniform float uHoverStrength;
+uniform float uHoverAll;
+uniform float uStir;
+uniform float uDrag;
+uniform float uStagger;
 
 varying float vAlpha;
 varying vec3 vColor;
@@ -51,16 +65,45 @@ float hash(vec2 p) {
   return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
+// Divergence-free flow: curl of an analytic sin/cos potential (two octaves).
+// Neighbours share a current, so mid-morph reads as dust in wind, not jitter.
+vec2 flowField(vec2 p, float time) {
+  vec2 a = p * 0.9 + vec2(time * 0.21, -time * 0.17);
+  vec2 b = p * 2.3 + vec2(-time * 0.13, time * 0.29);
+  return vec2(
+    sin(a.x) * cos(a.y) + 0.5 * sin(b.x) * cos(b.y) * 2.3 / 0.9,
+    -cos(a.x) * sin(a.y) - 0.5 * cos(b.x) * sin(b.y) * 2.3 / 0.9
+  ) * 0.5;
+}
+
 void main() {
   float h = hash(position.xy);
-  float stagger = 0.0;
-  float rawT = clamp((uProgress - stagger) / 0.95, 0.0, 1.0);
-  float t = easeInOutCubic(rawT);
-  
-  vec3 pos;
-  // Standard linear mix for all chapters
-  pos = mix(position, aPositionTo, t);
-  vColor = mix(aColorFrom, aColorTo, t);
+  float mass = hash(position.yx + 17.0); // 0 = light, 1 = heavy
+
+  // Whole-field eased progress: offsets slide rigidly on this.
+  // /0.95 keeps the old slack: some store windows top out just short of 1.
+  float p = clamp(uProgress / 0.95, 0.0, 1.0);
+  float t = easeInOutCubic(p);
+
+  // Per-particle progress: staggered start (random + left-to-right sweep), all
+  // arrive by uProgress = 1, so formations assemble in waves. Exact at 0 and 1.
+  float delay = (0.6 * h + 0.4 * clamp(position.x / 9.0 + 0.5, 0.0, 1.0)) * uStagger;
+  float ti = easeInOutCubic(clamp((p - delay) / (1.0 - uStagger), 0.0, 1.0));
+  // 0 at rest, 1 mid-flight — gates everything that must vanish once formed.
+  // travel = 0 for a particle whose target equals its start (same formation on
+  // both ends, e.g. the deck's last stretch) — it must not scatter or re-grey.
+  float travel = smoothstep(0.0, 0.05, distance(position, aPositionTo));
+  float flight = sin(ti * 3.14159265) * travel;
+
+  vec3 pos = mix(position, aPositionTo, ti);
+  // Boring → interesting: every formation lands in grey, then its colour
+  // floods in over the last stretch of the flight.
+  float greyTo = dot(aColorTo, vec3(0.299, 0.587, 0.114));
+  vec3 colorTo = mix(vec3(greyTo), aColorTo, max(smoothstep(0.6, 1.0, ti), 1.0 - travel));
+  vColor = mix(aColorFrom, colorTo, ti);
+  // Near-black "ink" particles take the world's ink colour (light on dark worlds).
+  float lum = dot(vColor, vec3(0.299, 0.587, 0.114));
+  vColor = mix(uInk, vColor, smoothstep(0.08, 0.2, lum));
 
   // Hero (face) particles break apart into a diffuse cloud as the crisp portrait
   // PNG resolves over them, gathering back as it releases — "shatter / reform"
@@ -89,6 +132,16 @@ void main() {
   pos.xy *= uFormationScale;
   pos.xy += mix(uOffsetFrom, uOffsetTo, t) * uOffsetScale;
 
+  // In-flight turbulence: particles ride the flow field between formations and
+  // burst in depth (size follows via perspective). Fast scroll stirs it harder.
+  float stir = flight * (0.35 + 0.5 * h) * (1.0 + abs(uScrollVel)) * uStir * uDriftAmp;
+  pos.xy += flowField(pos.xy + h * 0.6, uTime) * stir;
+  pos.z += (mass - 0.5) * 1.4 * flight * uStir * uDriftAmp;
+
+  // Scroll inertia, in flight only: particles leaving a formation are dragged
+  // with the page (heavy ones trail further). Held formations stay rock still.
+  pos.y += uScrollVel * (0.12 + 0.3 * mass) * flight * uDrag * uDriftAmp;
+
   // Idle drift
   if (uDriftMode == 0) {
     pos.x += sin(uTime * 0.30 + position.y * 2.0) * 0.02 * uDriftAmp;
@@ -109,31 +162,57 @@ void main() {
 
   // Interactions (switch by chapter)
   float force = 0.0;
+  float sizeBoost = 1.0;
   
-  if (uChapterIndex == 0) {
+  if (uChapterIndex == 0 || uHoverAll > 0.5) {
+    // Hover styles (customizer picks uHoverMode; reach/strength are live too)
     vec2 away = pos.xy - uMouse.xy;
     float dist = length(away);
+    vec2 dir = normalize(away + vec2(0.0001));
+    float R = max(uHoverRadius, 0.001);
+    float S = uHoverStrength * uDriftAmp;
+    float fall = smoothstep(R, 0.0, dist);
     if (uHoverMode == 0) {
-      // scatter (original)
-      force = smoothstep(2.0, 0.0, dist);
+      // scatter (original): blast outward plus per-particle noise
+      force = fall;
       float angle = h * 6.28318 + uTime * 2.0;
       vec2 scatterNoise = vec2(cos(angle), sin(angle)) * 0.5;
-      pos.xy += (normalize(away + vec2(0.0001)) * 1.2 + scatterNoise) * force * uDriftAmp;
+      pos.xy += (dir * 1.2 + scatterNoise) * fall * S;
     } else if (uHoverMode == 1) {
-      // vortex
-      force = smoothstep(2.0, 0.0, dist);
-      vec2 tangent = vec2(-away.y, away.x) / max(dist, 0.001);
-      pos.xy += tangent * force * 0.5 * uDriftAmp;
+      // vortex: swirl around the cursor
+      force = fall;
+      pos.xy += vec2(-dir.y, dir.x) * fall * 0.5 * S;
     } else if (uHoverMode == 2) {
-      // radial ripple
-      force = smoothstep(3.0, 0.0, dist) * 0.5;
-      float wave = sin(dist * 4.0 - uTime * 6.0) * smoothstep(3.0, 0.0, dist) * 0.4;
-      pos.xy += normalize(away + vec2(0.0001)) * wave * uDriftAmp;
+      // ripple: rings travel outward through the formation
+      float reach = smoothstep(R * 1.5, 0.0, dist);
+      force = reach * 0.5;
+      pos.xy += dir * sin(dist * 4.0 - uTime * 6.0) * reach * 0.4 * S;
     } else if (uHoverMode == 3) {
-      // attract
-      force = smoothstep(2.0, 0.0, dist);
-      pos.xy -= normalize(away + vec2(0.0001)) * force * 0.8 * uDriftAmp;
+      // attract: pulled toward the cursor, never past it
+      force = fall;
+      pos.xy -= dir * min(dist, fall * 0.8 * S);
+    } else if (uHoverMode == 4) {
+      // lens: magnify under the cursor, shape stays legible
+      pos.xy = uMouse.xy + away * (1.0 + fall * 0.8 * S);
+      sizeBoost = 1.0 + fall * 0.6 * S;
+    } else if (uHoverMode == 5) {
+      // dent: pressed back in depth — smaller and dimmer where touched
+      pos.z -= fall * 1.6 * S;
+      force = fall * 1.5;
+    } else if (uHoverMode == 7) {
+      // comb: dragged into streaks along the cursor's travel
+      pos.xy += uMouseVel * fall * (0.1 + 0.3 * h) * S;
+    } else if (uHoverMode == 8) {
+      // ink reveal: nothing moves; colour blooms under the cursor
+      vec3 bloom = 0.5 + 0.5 * cos(6.28318 * (pos.x * 0.12 + pos.y * 0.07 + vec3(0.0, 0.33, 0.67)) + uTime * 0.4);
+      vColor = mix(vColor, bloom * 0.85, clamp(fall * 1.4 * S, 0.0, 1.0));
+      sizeBoost = 1.0 + fall * 0.25 * S;
+    } else if (uHoverMode == 9) {
+      // soft scatter: outward push only, no noise
+      force = fall * 0.5;
+      pos.xy += dir * fall * 0.9 * S;
     }
+    // mode 6 (wake only): no hover force — just the cursor wake below
   }
   else if (uChapterIndex == 1) {
     // Bonsai: Hover extend
@@ -166,6 +245,11 @@ void main() {
     pos.xy += normalize(away + vec2(0.0001)) * force * uInteractState * 1.8 * uDriftAmp;
   }
 
+  // Cursor wake (every chapter): a moving pointer shoves nearby particles along
+  // its velocity; light ones go further. Zero when the pointer is still.
+  float wake = smoothstep(1.6, 0.0, length(pos.xy - uMouse.xy));
+  pos.xy += uMouseVel * wake * (0.9 - 0.5 * mass) * 0.1 * uDriftAmp;
+
   // Dynamic Text Avoidance — every chapter, last so nothing re-enters a zone
   for (int j = 0; j < 8; j++) {
     if (j >= uExclusionCount) break;
@@ -191,7 +275,7 @@ void main() {
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mvPosition;
   float pulseFactor = 1.0 + uPulse * 0.3 * sin(uTime * 1.4 + h * 6.28318);
-  gl_PointSize = uPointSize * pulseFactor * (8.0 / -mvPosition.z);
+  gl_PointSize = uPointSize * pulseFactor * sizeBoost * (8.0 / -mvPosition.z);
 
   vAlpha = 1.0 - force * 0.3;
   vIsHero = aIsHero;

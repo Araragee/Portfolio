@@ -13,6 +13,29 @@
     --primary: #111111;
     --inverse-surface: #111111;
     --inverse-on-surface: #f9f9f8;
+
+    /* Tailwind tokens as RGB channels so a world can re-ink the page. */
+    --c-surface: 249 249 248;
+    --c-on-surface: 17 17 17;
+    --c-primary: 17 17 17;
+    --c-secondary: 136 136 136;
+    --c-outline-variant: 136 136 136;
+    --c-outline: 229 229 229;
+  }
+
+  /* Dark project world — toggled by JourneyPage and useWorldTheme. */
+  html.world-dark {
+    --c-surface: 30 26 20;
+    --c-on-surface: 243 230 196;
+    --c-primary: 243 230 196;
+    --c-secondary: 191 168 120;
+    --c-outline-variant: 191 168 120;
+    --c-outline: 74 64 46;
+    /* hex twins: body colour + legacy var() users */
+    --on-surface: #f3e6c4;
+    --primary: #f3e6c4;
+    --secondary: #bfa878;
+    --outline: #4a402e;
   }
 
   * {

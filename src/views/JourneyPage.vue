@@ -3,7 +3,7 @@ import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vu
 import { useRoute, useRouter } from 'vue-router'
 import ChapterSection from '@/components/Journey/ChapterSection.vue'
 import JourneyLoader from '@/components/Journey/JourneyLoader.vue'
-// import TestParticlePanel from '@/components/Journey/TestParticlePanel.vue'
+import TestParticlePanel from '@/components/Journey/TestParticlePanel.vue'
 import SEOHead from '@/components/Shared/SEOHead.vue'
 import { useLenis } from '@/composables/useLenis'
 import { useReducedMotion } from '@/composables/useReducedMotion'
@@ -113,8 +113,16 @@ watch(
   },
 )
 
+// Dark worlds re-ink the page type via html.world-dark (tokens in main.css)
+watch(
+  () => store.activeWorld.dark === true,
+  (dark) => document.documentElement.classList.toggle('world-dark', dark),
+  { immediate: true },
+)
+
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onWindowResize)
+  document.documentElement.classList.remove('world-dark')
 })
 </script>
 
@@ -137,6 +145,7 @@ onBeforeUnmount(() => {
         :chapter="chapter"
       />
     </div>
-    <!-- <TestParticlePanel /> -->
+    <!-- Testing aid: remove (or gate behind import.meta.env.DEV) before launch -->
+    <TestParticlePanel />
   </main>
 </template>

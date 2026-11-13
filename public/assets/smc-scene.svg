@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" fill="none">
+  <!-- Sernan's Music Clinic: beamed notes over a keyboard. Brass on dark — no near-black fills. -->
+  <!-- notes -->
+  <g fill="#D9A441">
+    <ellipse cx="170" cy="230" rx="38" ry="28" transform="rotate(-20 170 230)"/>
+    <ellipse cx="330" cy="200" rx="38" ry="28" transform="rotate(-20 330 200)"/>
+    <rect x="196" y="70" width="14" height="160"/>
+    <rect x="356" y="40" width="14" height="160"/>
+    <path d="M196 70l174-30v40l-174 30z"/>
+  </g>
+  <g fill="#C8553D">
+    <ellipse cx="470" cy="215" rx="30" ry="22" transform="rotate(-20 470 215)"/>
+    <rect x="490" y="90" width="12" height="125"/>
+    <path d="M490 90c40 10 56 40 44 78c-6-26-22-38-44-40z"/>
+  </g>
+  <!-- keyboard -->
+  <rect x="50" y="310" width="500" height="220" rx="14" fill="#F3E6C4" stroke="#D9A441" stroke-width="8"/>
+  <g stroke="#D9A441" stroke-width="5">
+    <path d="M121 314v212M193 314v212M264 314v212M336 314v212M407 314v212M479 314v212"/>
+  </g>
+  <g fill="#B5802A">
+    <rect x="99" y="314" width="44" height="128" rx="4"/>
+    <rect x="171" y="314" width="44" height="128" rx="4"/>
+    <rect x="314" y="314" width="44" height="128" rx="4"/>
+    <rect x="385" y="314" width="44" height="128" rx="4"/>
+    <rect x="457" y="314" width="44" height="128" rx="4"/>
+  </g>
+</svg>

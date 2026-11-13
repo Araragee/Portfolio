@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { onMounted, ref, watch } from 'vue'
+import anime from 'animejs'
 import { useSeoMeta } from '@unhead/vue'
+import { useEventListener } from '@/composables/useEventListener'
+import { useIntersectionObserver } from '@/composables/useIntersectionObserver'
+import { useReducedMotion } from '@/composables/useReducedMotion'
 import { useStaggerAnimation } from '@/composables/useScrollAnimation'
 import MacbookStory from '@/components/Manifesto/MacbookStory.vue'
 
@@ -9,6 +14,92 @@ useSeoMeta({
 })
 
 const { containerRef: timelineRef } = useStaggerAnimation({ staggerDelay: 120 })
+const { prefersReducedMotion } = useReducedMotion()
+
+// ─── The kit: a stagger grid. Tiles wave in from the centre; click one and the
+// ripple spreads from it across the grid (anime.stagger grid mode).
+const kit = [
+  { name: 'Vue 3', role: 'Interface' },
+  { name: 'TypeScript', role: 'Contracts' },
+  { name: 'Pinia', role: 'State' },
+  { name: 'Tailwind', role: 'Styling' },
+  { name: 'ECharts', role: 'Data viz' },
+  { name: 'Three.js', role: 'WebGL' },
+  { name: 'Vite', role: 'Tooling' },
+  { name: 'Laravel', role: 'API' },
+  { name: 'FastAPI', role: 'API' },
+  { name: 'PostgreSQL', role: 'Database' },
+  { name: 'Supabase', role: 'Realtime' },
+  { name: 'Docker', role: 'Shipping' },
+]
+const { elementRef: kitRef, isVisible: kitVisible } = useIntersectionObserver({
+  threshold: 0.2,
+  once: true,
+})
+
+function kitTiles(): NodeListOf<Element> | [] {
+  return kitRef.value?.querySelectorAll('[data-tile]') ?? []
+}
+
+/** Columns the grid is showing right now (must match grid-cols-2 / md:grid-cols-4). */
+function kitGrid(): [number, number] {
+  const cols = window.innerWidth >= 768 ? 4 : 2
+  return [cols, Math.ceil(kit.length / cols)]
+}
+
+function ripple(from: number): void {
+  if (prefersReducedMotion.value) return
+  const tiles = kitTiles()
+  anime.remove(tiles)
+  anime({
+    targets: tiles,
+    scale: [
+      { value: 0.84, duration: 110, easing: 'easeOutQuad' },
+      { value: 1, easing: 'spring(1, 90, 9, 0)' },
+    ],
+    delay: anime.stagger(55, { grid: kitGrid(), from }),
+  })
+}
+
+watch(kitVisible, (visible) => {
+  if (!visible || prefersReducedMotion.value) return
+  anime({
+    targets: kitTiles(),
+    opacity: [0, 1],
+    translateY: [20, 0],
+    duration: 300,
+    easing: 'easeOutCubic',
+    delay: anime.stagger(40, { grid: kitGrid(), from: 'center' }),
+  })
+})
+
+// ─── Chronology rail: clock ticks that light up as the scroll passes them
+const TICKS = 44
+const railRef = ref<HTMLElement | null>(null)
+const railProgress = ref(0)
+
+function onRailScroll(): void {
+  const el = railRef.value
+  if (!el) return
+  if (prefersReducedMotion.value) {
+    railProgress.value = 1
+    return
+  }
+  const rect = el.getBoundingClientRect()
+  railProgress.value = Math.min(1, Math.max(0, (window.innerHeight * 0.6 - rect.top) / rect.height))
+}
+
+function tickStyle(i: number): string {
+  return i / (TICKS - 1) <= railProgress.value ? 'w-4 bg-primary' : 'w-2 bg-outline'
+}
+
+useEventListener(window, 'scroll', onRailScroll, { passive: true })
+
+onMounted(() => {
+  onRailScroll()
+  // Hidden until the grid scrolls in (reduced motion: shown straight away)
+  if (!prefersReducedMotion.value) anime.set(kitTiles(), { opacity: 0 })
+})
 
 const timeline = [
   {
@@ -59,6 +150,30 @@ const timeline = [
 
     <div class="max-w-[800px] mx-auto px-5 sm:px-6 pt-12 pb-24">
 
+      <!-- The kit: stagger grid -->
+      <section class="mb-20 md:mb-24" aria-labelledby="kit-heading">
+        <div class="mb-10 flex items-center justify-between md:mb-12">
+          <h2 id="kit-heading" class="font-headline text-heading font-semibold uppercase tracking-tight">
+            The kit
+          </h2>
+          <span class="font-mono text-label uppercase text-secondary">Tap a tile</span>
+        </div>
+        <ul ref="kitRef" class="grid grid-cols-2 gap-px border border-outline bg-outline md:grid-cols-4">
+          <li v-for="(tool, i) in kit" :key="tool.name" data-tile class="bg-surface will-change-transform">
+            <button
+              type="button"
+              class="flex h-full w-full flex-col items-start gap-6 p-5 text-left transition-colors hover:bg-primary hover:text-surface md:p-6"
+              @click="ripple(i)"
+            >
+              <span class="font-mono text-caption uppercase opacity-60">
+                {{ String(i + 1).padStart(2, '0') }} / {{ tool.role }}
+              </span>
+              <span class="font-headline text-lg font-semibold md:text-xl">{{ tool.name }}</span>
+            </button>
+          </li>
+        </ul>
+      </section>
+
       <!-- Chronology -->
       <section class="mb-20 md:mb-24" aria-labelledby="chronology-heading">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-10 md:mb-12">
@@ -78,6 +193,16 @@ const timeline = [
           </span>
         </div>
 
+        <div ref="railRef" class="relative pl-8 md:pl-12">
+          <!-- Clockwork rail: ticks light up as you scroll past -->
+          <div class="absolute bottom-0 left-0 top-0 flex flex-col justify-between" aria-hidden="true">
+            <span
+              v-for="i in TICKS"
+              :key="i"
+              class="block h-px transition-all duration-200"
+              :class="tickStyle(i - 1)"
+            />
+          </div>
         <div ref="timelineRef" class="border-t border-outline">
           <div
             v-for="entry in timeline"
@@ -104,6 +229,7 @@ const timeline = [
               </ul>
             </div>
           </div>
+        </div>
         </div>
       </section>
 

@@ -16,6 +16,8 @@ import { particleFragmentShader, particleVertexShader } from '@/shaders/particle
 import { useReducedMotion } from '@/composables/useReducedMotion'
 import { useEventListener } from '@/composables/useEventListener'
 
+const props = withDefaults(defineProps<{ dark?: boolean }>(), { dark: false })
+
 const { prefersReducedMotion } = useReducedMotion()
 
 // Cap at 1500 — this is a decorative echo, not the main field
@@ -36,6 +38,14 @@ const uniforms = {
   uPointSize: { value: 2.5 },
   uDriftAmp: { value: 0.4 },
   uColor: { value: new Color('#111111') },
+  // shared shader's live-tunable knobs, at their defaults
+  uHoverRadius: { value: 2 },
+  uHoverStrength: { value: 1 },
+  uStir: { value: 1 },
+  uDrag: { value: 1 },
+  uStagger: { value: 0.35 },
+  // world ink: cream dust on the dark world, near-black elsewhere
+  uInk: { value: new Color(props.dark ? '#F3E6C4' : '#111111') },
   uOpacity: { value: 0.35 },
   uDither: { value: 1.0 },
   uRepelRadius: { value: 0.6 },

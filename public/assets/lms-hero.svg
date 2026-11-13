@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" fill="none">
+  <!-- LMS-AI hero: student nodes feed a risk dashboard; the amber node is the flagged at-risk student. -->
+  <!-- Edges: students -> model layer -> dashboard -->
+  <g stroke="#9C90EA" stroke-width="6" stroke-linecap="round">
+    <path d="M80 90 140 190M190 60 140 190M190 60 300 200M300 95 300 200M410 60 300 200M410 60 460 190M520 90 460 190"/>
+    <path d="M140 190 300 300M300 200 300 300"/>
+  </g>
+  <path d="M460 190 300 300" stroke="#F2A33A" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- Student nodes -->
+  <g fill="#7C6CE0">
+    <circle cx="80" cy="90" r="22"/>
+    <circle cx="190" cy="60" r="18"/>
+    <circle cx="300" cy="95" r="26"/>
+    <circle cx="410" cy="60" r="18"/>
+    <circle cx="520" cy="90" r="22"/>
+  </g>
+  <g fill="#4C3BAF">
+    <circle cx="140" cy="190" r="22"/>
+    <circle cx="300" cy="200" r="20"/>
+  </g>
+  <!-- Flagged student -->
+  <circle cx="460" cy="190" r="22" fill="#F2A33A"/>
+  <circle cx="460" cy="190" r="36" stroke="#F2A33A" stroke-width="5"/>
+
+  <!-- Dashboard card -->
+  <rect x="70" y="300" width="460" height="250" rx="24" fill="#D9D3F7" stroke="#4C3BAF" stroke-width="8"/>
+  <rect x="100" y="328" width="130" height="14" rx="7" fill="#4C3BAF"/>
+  <rect x="100" y="352" width="80" height="10" rx="5" fill="#9C90EA"/>
+
+  <!-- Risk gauge -->
+  <path d="M130 490A70 70 0 0 1 235 429" stroke="#4C3BAF" stroke-width="22" stroke-linecap="round"/>
+  <path d="M235 429A70 70 0 0 1 270 490" stroke="#F2A33A" stroke-width="22" stroke-linecap="round"/>
+  <path d="M200 490 243 447" stroke="#4C3BAF" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="200" cy="490" r="12" fill="#4C3BAF"/>
+
+  <!-- Score bars -->
+  <g fill="#7C6CE0">
+    <rect x="320" y="450" width="26" height="60" rx="4"/>
+    <rect x="358" y="425" width="26" height="85" rx="4"/>
+    <rect x="396" y="465" width="26" height="45" rx="4"/>
+    <rect x="472" y="440" width="26" height="70" rx="4"/>
+  </g>
+  <rect x="434" y="400" width="26" height="110" rx="4" fill="#F2A33A"/>
+  <rect x="310" y="516" width="198" height="6" rx="3" fill="#4C3BAF"/>
+</svg>

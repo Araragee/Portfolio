@@ -10,7 +10,8 @@ export const personalContent: PersonalContent = {
     "School gave me structure. Recursion at 2 AM gave me humility. The real education happened when I started breaking things on purpose — cloning UIs, rebuilding them badly, rebuilding them less badly, asking why.",
     "My first internship at iPhitech in Clark (March–May 2023) was three months of wireframes, layout corrections, and finally getting paid to care about pixels. It felt like being let into a room I had been trying to pick the lock of for two years.",
     "By October 2023 I was at the Philippine Statistics Authority. The CBMS Portal was the first system I built at a scale where real decisions — about real communities — depended on whether the data visualized correctly. That kind of weight changes how you read a design review.",
-    "I am still there. Still learning. Still occasionally breaking things on purpose, but now I know what I am looking for when I do — with a cup of coffee, and the occasional orchestration of AI agents.",
+    "In July 2026 I moved to the Department of Human Settlements and Urban Development to build e-Permits, full-stack this time. Statistics, then permits: I seem to keep picking the subjects nobody calls exciting, and then trying to make them worth looking at.",
+    "Still learning. Still occasionally breaking things on purpose, but now I know what I am looking for when I do — with a cup of coffee, and the occasional orchestration of AI agents.",
   ],
   values: [
     {

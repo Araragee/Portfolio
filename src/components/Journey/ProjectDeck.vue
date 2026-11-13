@@ -7,7 +7,11 @@ import { useJourneyStore } from '@/stores/journey'
 const store = useJourneyStore()
 const { prefersReducedMotion } = useReducedMotion()
 
-const cardPos = computed(() => store.projectDeckProgress)
+// Clamped: the last card stays put through the deck's final stretch instead of
+// sliding off and leaving its headline alone on screen.
+const cardPos = computed(() =>
+  Math.min(store.projectDeckProgress, journeyDeckProjects.length - 1),
+)
 
 /** One card pushes up and fades as the next pulls in from below — one motion. */
 function cardStyle(k: number): Record<string, string> {
@@ -42,8 +46,8 @@ function cardStyle(k: number): Record<string, string> {
       <p class="mt-1 font-mono text-xs uppercase tracking-widest text-secondary">
         {{ project.role }}
       </p>
-      <p class="mt-1 md:mt-2 font-body text-xs md:text-sm text-outline-variant">
-        {{ project.stack }}
+      <p class="mt-1 md:mt-2 max-w-md font-body text-sm md:text-base text-on-surface">
+        {{ project.story.line }}
       </p>
     </RouterLink>
   </div>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" fill="none">
+  <!-- CBMS Portal: a dashboard window — indicator bars, a donut, stat tiles. -->
+  <rect x="50" y="90" width="500" height="430" rx="22" fill="#BFE3DC" stroke="#1A6E69" stroke-width="8"/>
+  <path d="M50 112a22 22 0 0 1 22-22h456a22 22 0 0 1 22 22v40H50z" fill="#1A6E69"/>
+  <circle cx="86" cy="121" r="8" fill="#DE786A"/>
+  <circle cx="112" cy="121" r="8" fill="#DFC27D"/>
+  <circle cx="138" cy="121" r="8" fill="#BFE3DC"/>
+  <!-- stat tiles -->
+  <rect x="80" y="176" width="130" height="56" rx="8" fill="#35978F"/>
+  <rect x="226" y="176" width="130" height="56" rx="8" fill="#DFC27D"/>
+  <rect x="372" y="176" width="148" height="56" rx="8" fill="#DE786A"/>
+  <!-- bars -->
+  <g fill="#35978F">
+    <rect x="86" y="330" width="30" height="150" rx="4"/>
+    <rect x="170" y="300" width="30" height="180" rx="4"/>
+    <rect x="254" y="356" width="30" height="124" rx="4"/>
+  </g>
+  <g fill="#DFC27D">
+    <rect x="128" y="380" width="30" height="100" rx="4"/>
+    <rect x="212" y="410" width="30" height="70" rx="4"/>
+    <rect x="296" y="320" width="30" height="160" rx="4"/>
+  </g>
+  <rect x="76" y="486" width="262" height="6" rx="3" fill="#1A6E69"/>
+  <!-- donut -->
+  <circle cx="440" cy="380" r="62" stroke="#35978F" stroke-width="30"/>
+  <path d="M440 318a62 62 0 0 1 62 62" stroke="#DFC27D" stroke-width="30"/>
+  <path d="M502 380a62 62 0 0 1-31 53.7" stroke="#DE786A" stroke-width="30"/>
+</svg>

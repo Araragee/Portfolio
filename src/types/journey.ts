@@ -1,5 +1,5 @@
 /**
- * Types for "The Long Way Around" — scrollytelling journey.
+ * Types for "Boring, made interesting" — scrollytelling journey.
  * See docs/CONCEPT.md for the full design rationale.
  */
 
@@ -15,6 +15,9 @@ export type MorphStateId =
   | 'sdgStackedBars'
   | 'phMap'
   | 'cbmsLogo'
+  | 'rawTable'
+  | 'paperStack'
+  | 'epermits'
   | 'portrait'
   | 'proj_0'
   | 'proj_1'
@@ -24,6 +27,21 @@ export type MorphStateId =
   | 'proj_5'
   | 'proj_6'
   | 'textMass'
+
+/**
+ * A project's or chapter's "world": page tint + particle render style.
+ * Tints stay light so the dark type keeps its contrast everywhere.
+ */
+export interface WorldTheme {
+  /** Page background, 6-digit hex. */
+  bg: string
+  /** Round soft dots instead of square pixels. */
+  softCircle?: boolean
+  /** Set false for solid (un-dithered) particles. Default: dithered. */
+  dither?: boolean
+  /** Dark page: type, rail and ink particles flip to light (html.world-dark). */
+  dark?: boolean
+}
 
 /** Allowed scroll-runway heights. Constrained so Tailwind classes stay static. */
 export type ChapterHeightVh = number
@@ -81,6 +99,13 @@ export interface JourneyChapter {
   stageStat?: ({ value: string; label: string } | null)[]
   /** Per-stage title — overrides chapter title when non-null. */
   stageTitles?: (string | null)[]
+  /**
+   * Chapter opens on the dull "before" (its first formation stays monochrome);
+   * the world only arrives with the stages after it.
+   */
+  boringFirst?: boolean
+  /** World applied while any of this chapter's formations is held. */
+  world?: WorldTheme
   /** Override ENTRANCE_VH for this chapter's incoming morph (vh). */
   entranceVh?: number
 }

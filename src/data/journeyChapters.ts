@@ -1,7 +1,9 @@
 import type { JourneyChapter } from '@/types/journey'
 
 /**
- * Chapter content for "The Long Way Around".
+ * Chapter content for "Boring, made interesting".
+ * Thesis: permits, statistics, paperwork — dull subjects, made worth looking at.
+ * Copy rule: one or two short lines per stage; long-form lives in case studies.
  * Source of truth for the story: src/data/personalData.ts.
  *
  * Pacing: each section LOCKS (holds its formation + text) for most of the
@@ -18,13 +20,13 @@ export const journeyChapters: JourneyChapter[] = [
   {
     id: 'prologue',
     index: '000',
-    title: 'The long way around',
+    title: 'Boring, made interesting',
     era: 'Prologue',
     heightVh: 150,
     morphState: 'daveGonzales',
     paragraphs: [
-      'I came into software the long way around.',
-      'Dave Gonzales. Frontend developer. I build interfaces to turn uninteresting  things interesting.',
+      'Permits. Statistics. Paperwork. Nobody queues up to look at those.',
+      'Dave Gonzales. Frontend developer. I turn uninteresting things into interfaces people want to use.',
     ],
     interactionHint: 'move cursor — the name scatters',
     morphStart: 0.55,
@@ -42,8 +44,8 @@ export const journeyChapters: JourneyChapter[] = [
     heightVh: 200,
     morphState: 'bonsai',
     paragraphs: [
-      'School gave me the vocabulary, but not the fluency. Lectures, theory, late-night study groups trying to make sense of recursion at 2 AM.',
-      'Fluency came from building. Small projects, broken projects, projects that never shipped — static pages, then jQuery, then Vue.',
+      'School gave me the vocabulary, not the fluency.',
+      'Fluency came from building — static pages, then jQuery, then Vue. Most of it never shipped.',
     ],
     interactionHint: 'hover the branches — watch them sway and extend',
     morphStart: 0.55,
@@ -59,8 +61,8 @@ export const journeyChapters: JourneyChapter[] = [
     heightVh: 200,
     morphState: 'peso',
     paragraphs: [
-      'A 3-month web-design internship was the first time I got paid to care about pixels.',
-      'Wireframes, layouts, the discipline of shipping something a client actually sees.',
+      'Three months of web design: the first time I got paid to care about pixels.',
+      'Wireframes, layouts, and shipping something a client actually sees.',
     ],
     interactionHint: 'drag the bill — particles ripple and wave',
     morphStart: 0.55,
@@ -71,54 +73,28 @@ export const journeyChapters: JourneyChapter[] = [
   {
     id: 'psa',
     index: '003',
-    title: 'The portal',
+    title: 'Statistics, made readable',
     era: 'Philippine Statistics Authority, Oct 2023 — Jul 2026',
-    heightVh: 700,
-    morphState: 'cbmsLogo',
-    extraStages: ['archipelago', 'sdgBars', 'sdgGroupedBars', 'sdgStackedBars', 'phMap'],
-    paragraphs: [
-      'By October 2023 I landed at the Philippine Statistics Authority, building the CBMS Portal — community-based monitoring data for the whole country.',
-    ],
+    heightVh: 300,
+    // Opens on the boring "before" (grey spreadsheet), then becomes the portal.
+    morphState: 'rawTable',
+    extraStages: ['sdgBars', 'phMap'],
+    boringFirst: true,
+    world: { bg: '#D3ECE6' },
+    paragraphs: ['Survey tables. Thousands of rows, read by almost nobody.'],
     stageParagraphs: [
-      // Stage 0 — cbmsLogo
-      [
-        'Vue 3, TypeScript, ECharts. Real-scale government systems.',
-        'I built the thing, and became the developer I wanted to be along the way.',
-      ],
-      // Stage 1 — archipelago
-      [
-        'By October 2023 I landed at the Philippine Statistics Authority, building the CBMS Portal — community-based monitoring data for the whole country.',
-      ],
-      // Stage 2 — sdgBars
-      [
-        'Coming from vanilla HTML, CSS, and JavaScript, adopting Vue 3 and TypeScript demanded more than learning syntax — it meant rethinking how UI is structured.',
-        'Components, reactivity, typed contracts. Each pattern had to be earned through use, not just read.',
-      ],
-      // Stage 3 — sdgGroupedBars
-      [
-        'Best practices in web development are not abstract rules. They are solutions to problems you eventually encounter anyway — and it is better to know them before the problem arrives.',
-        'ECharts, Pinia, composables — building the Portal meant learning when each tool earns its place, and when it does not.',
-      ],
-      // Stage 4 — sdgStackedBars
-      [
-        'The CBMS data pipeline runs deep: field surveys, collection protocols, tabulation, encoding — before I could visualize anything, I had to understand the whole chain.',
-        'I sat with data scientists. I read documentation I was not supposed to need. I shipped visualizations that had to be analytically correct, not just visually clean.',
-      ],
-      // Stage 5 — phMap
-      [
-        'The end users are local government units, researchers, data analysts — people making decisions that affect communities. The interface had to be intuitive without being shallow.',
-        'Data at this scale, made legible to non-technical audiences without sacrificing the rigor underneath — that is the hardest design problem I have solved.',
-      ],
+      // Stage 0 — rawTable (before)
+      ['Survey tables. Thousands of rows, read by almost nobody.'],
+      // Stage 1 — sdgBars
+      ['Lead front-end on the CBMS Portal: the same numbers, as live charts anyone can read.'],
+      // Stage 2 — phMap
+      ['Region to barangay in a click, for the people deciding what communities get.'],
     ],
     stageStat: [
-      { value: 'Philippine Statistics Authority', label: 'Solid. Responsive. World-Class.' }, // cbmsLogo
-      null,                                                    // archipelago
-      { value: '17', label: 'SDG tables' },                    // sdgBars
-      { value: 'Custom', label: 'Dashboard Makers' },          // sdgGroupedBars
-      null,                                                    // sdgStackedBars
-      { value: 'Interactive', label: 'dashboards for data visualization' }, // phMap
+      { value: 'Before', label: 'static PDFs and spreadsheets' }, // rawTable
+      { value: '17', label: 'SDG tables, charted' }, // sdgBars
+      { value: 'Nationwide', label: 'interactive dashboards' }, // phMap
     ],
-    stageTitles: [null, 'CBMS Portal', null, 'Lead\nFront-end\nDeveloper', null, null],
     entranceVh: 100,
     interactionHint: 'hover to ripple — scroll to reshape the data',
     morphStart: 0.55,
@@ -127,17 +103,45 @@ export const journeyChapters: JourneyChapter[] = [
     textSide: 'right',
   },
   {
-    id: 'projects',
+    id: 'dhsud',
     index: '004',
+    title: 'Paperwork, rebuilt',
+    era: 'DHSUD, Jul 2026 — now',
+    heightVh: 300,
+    // Opens on the boring "before" (paper strewn on a desk), then becomes e-Permits.
+    morphState: 'paperStack',
+    extraStages: ['epermits'],
+    boringFirst: true,
+    world: { bg: '#D9E4FB' },
+    paragraphs: ['Permit applications travelled desk to desk as paper.'],
+    stageParagraphs: [
+      // Stage 0 — paperStack (before)
+      ['Permit applications travelled desk to desk as paper. Nobody could say where a case sat.'],
+      // Stage 1 — epermits
+      ['Now full-stack on e-Permits: every DHSUD desk on one live case file.'],
+    ],
+    stageStat: [
+      { value: 'Before', label: 'folders walking the hallway' }, // paperStack
+      { value: '15 days', label: 'service clock, kept honest' }, // epermits
+    ],
+    interactionHint: 'hover — the office lifts off the page',
+    morphStart: 0.55,
+    morphEnd: 0.95,
+    cameraZ: 8,
+    textSide: 'left',
+  },
+  {
+    id: 'projects',
+    index: '005',
     title: 'Side quests',
-    era: 'Current work, freelance + personal projects',
+    era: 'Freelance + personal projects',
     heightVh: 500,
     showProjects: true,
     morphState: 'portrait',
     extraStages: ['proj_6'],
     paragraphs: [
-      'Off the clock the building continues — freelance Vue work, experiments, this site.',
-      'Each project is a station on the road. Step into one to see the case study.',
+      'Off the clock the building continues.',
+      'Each project is a station. Step into one for the case study.',
     ],
     interactionHint: 'scroll to advance — click to enter',
     // Late window keeps DAVXLOPER from forming over this chapter's text
@@ -149,14 +153,14 @@ export const journeyChapters: JourneyChapter[] = [
   },
   {
     id: 'epilogue',
-    index: '005',
-    title: 'End of the road',
+    index: '006',
+    title: 'Bring the boring',
     era: 'Epilogue',
     heightVh: 200,
     morphState: 'textMass',
     paragraphs: [
       'Everything you scrolled past collapses into one word.',
-      'Have a project, a role, or an argument about who\'\s best girl? I read every message.',
+      'Have a project, a role, or an argument about who\'s best girl? I read every message.',
     ],
     interactionHint: 'click the name — it explodes, then reforms',
     morphStart: 0.3,

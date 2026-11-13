@@ -2,7 +2,13 @@
 import { computed, defineAsyncComponent } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSeoMeta } from '@unhead/vue'
-import { getProjectBySlug, getNextProject } from '@/data/projectsData'
+import {
+  getProjectBySlug,
+  getNextProject,
+  getProjectStory,
+  getProjectWorld,
+} from '@/data/projectsData'
+import { useWorldTheme } from '@/composables/useWorldTheme'
 import GrayscaleImage from '@/components/CaseStudy/GrayscaleImage.vue'
 import NextProjectFooter from '@/components/CaseStudy/NextProjectFooter.vue'
 import ProjectBrowser from '@/components/CaseStudy/ProjectBrowser.vue'
@@ -20,6 +26,11 @@ const route = useRoute()
 const slug = computed(() => route.params.slug as string)
 const project = computed(() => getProjectBySlug(slug.value))
 const nextProject = computed(() => getNextProject(slug.value))
+const world = computed(() => getProjectWorld(slug.value))
+const story = computed(() => getProjectStory(slug.value))
+
+// The case study lives in its project's world: page tint, dark flip for SMC
+useWorldTheme(world)
 
 const { elementRef: introRef } = useScrollAnimation({ threshold: 0.1 })
 
@@ -49,7 +60,7 @@ useSeoMeta({
     <!-- Case study content -->
     <template v-else>
       <!-- Particle echo: fixed behind hero panel (one context per page) -->
-      <CaseStudyCanvas v-if="webglSupported" />
+      <CaseStudyCanvas v-if="webglSupported" :bg="world.bg" :dark="world.dark === true" />
       <div class="flex flex-col lg:flex-row min-h-screen relative">
         <!-- Left Panel: Sticky Metadata (30%) -->
         <aside
@@ -128,6 +139,14 @@ useSeoMeta({
 
         <!-- Right Panel: Scrolling Narrative (70%) -->
         <article class="w-full lg:w-[70%] p-5 sm:p-6 md:p-12 lg:p-[60px] pt-8 md:pt-12 lg:pt-[180px]">
+          <!-- Story headline: same line the journey deck uses for this project -->
+          <p
+            v-if="story"
+            class="mb-8 md:mb-12 max-w-4xl font-headline text-display font-medium uppercase leading-[0.95] tracking-tight text-primary"
+          >
+            {{ story.headline }}
+          </p>
+
           <!-- Intro statement -->
           <p
             ref="introRef"

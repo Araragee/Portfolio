@@ -358,6 +358,73 @@ function fillBarSet(
   return { positions, colors }
 }
 
+/** The "before" of the PSA chapter: a grey spreadsheet — header row, then rows of cell text. */
+function createRawTable(count: number): { positions: Float32Array; colors: Float32Array } {
+  const rng = createRng(782)
+  const head = hexToRgb('#4A4A4A')
+  const cell = hexToRgb('#9A9A9A')
+  const cols = [-1.55, -0.85, -0.2, 0.45, 1.05, 1.6]
+  const colW = [0.6, 0.6, 0.5, 0.6, 0.45, 0.45]
+  const bars: BarSpec[] = []
+  for (let r = 0; r < 12; r++) {
+    const cy = 1.3 - r * 0.235
+    for (let c = 0; c < cols.length; c++) {
+      // Header cells span the column; data cells are ragged "text" of varying length.
+      const w = r === 0 ? colW[c] : colW[c] * (0.35 + rng() * 0.6)
+      bars.push({
+        cx: cols[c] - (colW[c] - w) / 2,
+        cy,
+        w,
+        h: r === 0 ? 0.13 : 0.07,
+        color: r === 0 ? head : cell,
+      })
+    }
+  }
+  return fillBarSet(rng, bars, count, 0, 0, 0.01)
+}
+
+/** The "before" of the DHSUD chapter: grey paper sheets strewn across a desk. */
+function createPaperStack(count: number): { positions: Float32Array; colors: Float32Array } {
+  const rng = createRng(783)
+  const positions = new Float32Array(count * 3)
+  const colors = new Float32Array(count * 3)
+  const SHEETS = 9
+  const W = 1.0
+  const H = 1.35
+  const sheets = Array.from({ length: SHEETS }, (_, s) => ({
+    x: (rng() * 2 - 1) * 1.7,
+    y: (rng() * 2 - 1) * 0.9,
+    rot: (rng() * 2 - 1) * 0.6,
+    z: -0.4 + (s / SHEETS) * 0.8,
+    grey: 0.35 + rng() * 0.3,
+  }))
+  for (let i = 0; i < count; i++) {
+    const sh = sheets[i % SHEETS]
+    let lx: number
+    let ly: number
+    if (rng() < 0.4) {
+      // sheet outline
+      const p = rng() * 2 * (W + H)
+      if (p < W) [lx, ly] = [p - W / 2, H / 2]
+      else if (p < W + H) [lx, ly] = [W / 2, p - W - H / 2]
+      else if (p < 2 * W + H) [lx, ly] = [p - W - H - W / 2, -H / 2]
+      else [lx, ly] = [-W / 2, p - 2 * W - H - H / 2]
+    } else {
+      // lines of "text"
+      const line = Math.floor(rng() * 7)
+      lx = -W * 0.38 + rng() * W * (line % 3 === 2 ? 0.45 : 0.76)
+      ly = H * 0.34 - line * H * 0.11 + (rng() - 0.5) * 0.025
+    }
+    const c = Math.cos(sh.rot)
+    const sn = Math.sin(sh.rot)
+    positions[i * 3] = sh.x + lx * c - ly * sn
+    positions[i * 3 + 1] = sh.y + lx * sn + ly * c
+    positions[i * 3 + 2] = sh.z + (rng() - 0.5) * 0.04
+    colors[i * 3] = colors[i * 3 + 1] = colors[i * 3 + 2] = sh.grey
+  }
+  return { positions, colors }
+}
+
 /** Plain teal bar chart — 10 bars, echoes the portal's indicator charts. */
 function createSdgBarChart(count: number): { positions: Float32Array; colors: Float32Array } {
   const rng = createRng(778)
@@ -558,6 +625,8 @@ export interface ImageSampleOptions {
   colorScale?: boolean
   /** Drop pixels whose luminance is >= this (0–255). */
   maxBrightness?: number
+  /** Drop pixels whose max−min RGB channel spread is below this (0–255): keys out greys/whites. */
+  minChroma?: number
   /** Drop pixels within RGB distance `tolerance` of the averaged corner color. */
   keyBackground?: { tolerance: number }
   /** Darker pixels get a higher pick probability (legible faces/ink). */
@@ -711,6 +780,11 @@ export function loadImageAndSample(
           if (a <= 40) continue
           const lum = (r * 299 + g * 587 + b * 114) / 1000
           if (options.maxBrightness !== undefined && lum >= options.maxBrightness) continue
+          if (
+            options.minChroma !== undefined &&
+            Math.max(r, g, b) - Math.min(r, g, b) < options.minChroma
+          )
+            continue
           if (options.keyBackground) {
             const dr = r - bgR
             const dg = g - bgG
@@ -826,6 +900,8 @@ export function buildMorphTargets(count: number): MorphTargets {
   const { positions: sdgGroupPos, colors: sdgGroupCol } = createSdgGroupedBar(count)
   const { positions: sdgStackPos, colors: sdgStackCol } = createSdgStackedBar(count)
   const { positions: phMapPos, colors: phMapCol } = createPhMap(count)
+  const rawTable = createRawTable(count)
+  const paperStack = createPaperStack(count)
 
   const positions: MorphTargetMap = {
     scatter: createScatter(count),
@@ -840,6 +916,9 @@ export function buildMorphTargets(count: number): MorphTargets {
     sdgStackedBars: sdgStackPos,
     phMap: phMapPos,
     cbmsLogo: createGridFallback(count), // Temp grid before image load
+    epermits: createGridFallback(count), // Temp grid before image load
+    rawTable: rawTable.positions,
+    paperStack: paperStack.positions,
     portrait: createArtifactFallback(count), // Temp artifact before image load
     proj_0: createArtifactFallback(count), // Built per-project in ParticleField
     proj_1: createArtifactFallback(count),
@@ -862,6 +941,9 @@ export function buildMorphTargets(count: number): MorphTargets {
     sdgStackedBars: sdgStackCol,
     phMap: phMapCol,
     cbmsLogo: defaultCol,
+    epermits: defaultCol,
+    rawTable: rawTable.colors,
+    paperStack: paperStack.colors,
     portrait: defaultCol,
     proj_0: defaultCol,
     proj_1: defaultCol,

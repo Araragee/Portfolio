@@ -10,12 +10,20 @@ import {
   TRANSITION_VH,
 } from '@/data/journeyData'
 import { journeyDeckProjects } from '@/data/projectsData'
-import type { JourneyChapter, MorphStateId } from '@/types/journey'
+import type { JourneyChapter, MorphStateId, WorldTheme } from '@/types/journey'
 
 /** Smoothstep — gentle ease in/out of holds, even though it's scroll-scrubbed. */
 function smoothstep(t: number): number {
   const x = Math.min(1, Math.max(0, t))
   return x * x * (3 - 2 * x)
+}
+
+const DEFAULT_WORLD: WorldTheme = { bg: '#F9F9F8' }
+
+/** '#RRGGBB' → [r, g, b] 0–255. */
+function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16)
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
 }
 
 /** Entrance window of a chapter as a fraction of its runway. */
@@ -369,6 +377,36 @@ export const useJourneyStore = defineStore('journey', () => {
     }
   })
 
+  // ─── Worlds: formation → page tint + particle style
+  const worldByState = new Map<MorphStateId, WorldTheme>()
+  for (const chapter of journeyChapters) {
+    if (!chapter.world) continue
+    // boringFirst: the opening "before" formation stays monochrome
+    const stages = stagesFor(chapter).slice(chapter.boringFirst ? 1 : 0)
+    stages.forEach((s) => worldByState.set(s, chapter.world!))
+  }
+  journeyDeckProjects.forEach((p, k) => worldByState.set(`proj_${k}` as MorphStateId, p.world))
+
+  const worldFor = (state: MorphStateId): WorldTheme => worldByState.get(state) ?? DEFAULT_WORLD
+
+  /** World of the formation the field is closer to (style flips mid-flight, where it's hidden). */
+  const activeWorld = computed<WorldTheme>(() =>
+    worldFor(morphInfo.value.t >= 0.5 ? morphInfo.value.to : morphInfo.value.from),
+  )
+
+  /** Page tint, scroll-scrubbed between the two formations' worlds. */
+  const worldBgRgb = computed<[number, number, number]>(() => {
+    const { from, to, t } = morphInfo.value
+    const a = hexToRgb(worldFor(from).bg)
+    const b = hexToRgb(worldFor(to).bg)
+    // t² — the tint arrives late, as the new formation lands and colours in
+    const m = (i: number) => Math.round(a[i] + (b[i] - a[i]) * t * t)
+    return [m(0), m(1), m(2)]
+  })
+  const worldBg = computed(() => `rgb(${worldBgRgb.value.join(', ')})`)
+  /** Snapped (un-scrubbed) tint of the active world, for reduced motion. */
+  const activeWorldRgb = computed(() => hexToRgb(activeWorld.value.bg))
+
   const activeStageIndex = computed(() => morphInfo.value.stageIndex)
   const morphFrom = computed<MorphStateId>(() => morphInfo.value.from)
   const morphTo = computed<MorphStateId>(() => morphInfo.value.to)
@@ -462,5 +500,9 @@ export const useJourneyStore = defineStore('journey', () => {
     projectDeckProgress,
     faceCrispProgress,
     particleFieldOpacity,
+    activeWorld,
+    worldBg,
+    worldBgRgb,
+    activeWorldRgb,
   }
 })

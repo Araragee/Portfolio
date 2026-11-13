@@ -62,7 +62,7 @@ onBeforeUnmount(unlock)
   >
     <span class="font-mono text-xs uppercase tracking-widest text-secondary">DG—25</span>
     <p class="font-headline text-2xl font-medium uppercase tracking-tight text-primary md:text-4xl">
-      The long way around
+      Boring, made interesting
     </p>
     <p class="font-mono text-sm tabular-nums text-on-surface">{{ store.loaderProgress }}%</p>
   </div>

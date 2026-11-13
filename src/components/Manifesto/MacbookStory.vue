@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import anime from 'animejs'
 import { useEventListener } from '@/composables/useEventListener'
 import { useReducedMotion } from '@/composables/useReducedMotion'
 
@@ -44,6 +45,10 @@ const beats: Beat[] = [
 ]
 
 const runwayRef = ref<HTMLElement | null>(null)
+const headingRef = ref<HTMLElement | null>(null)
+// Split so the letters can stagger in (screen readers get the aria-label)
+const HEADING = 'How I work'
+const headingChars = HEADING.split('')
 const progress = ref(0)
 const { prefersReducedMotion } = useReducedMotion()
 
@@ -156,6 +161,17 @@ useEventListener(window, 'resize', () => {
 onMounted(() => {
   measure()
   onScroll()
+  // Letters drop in one after another and settle on a spring
+  if (!prefersReducedMotion.value && headingRef.value) {
+    anime({
+      targets: headingRef.value.querySelectorAll('[data-char]'),
+      translateY: [48, 0],
+      rotate: [10, 0],
+      opacity: [0, 1],
+      delay: anime.stagger(40, { start: 150 }),
+      easing: 'spring(1, 90, 11, 0)',
+    })
+  }
 })
 </script>
 
@@ -261,8 +277,19 @@ onMounted(() => {
           ]"
         >
           <span class="mb-4 block font-mono text-caption uppercase text-secondary">About the work</span>
-          <h1 id="manifesto-heading" class="mb-6 font-headline text-heading-xl font-semibold text-primary">
-            How I work
+          <h1
+            id="manifesto-heading"
+            ref="headingRef"
+            class="mb-6 font-headline text-heading-xl font-semibold text-primary"
+            :aria-label="HEADING"
+          >
+            <span
+              v-for="(ch, i) in headingChars"
+              :key="i"
+              data-char
+              aria-hidden="true"
+              class="inline-block whitespace-pre will-change-transform"
+            >{{ ch }}</span>
           </h1>
           <p class="max-w-md font-body text-body leading-relaxed text-secondary">
             Good software is like a laptop: layers someone else will open one day. Scroll to take mine apart.

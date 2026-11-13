@@ -2,6 +2,7 @@
 import { storeToRefs } from 'pinia'
 import {
   AdditiveBlending,
+  Color,
   BufferAttribute,
   BufferGeometry,
   NormalBlending,
@@ -29,6 +30,7 @@ import { journeyChapters } from '@/data/journeyData'
 import { useParticleTestMode } from '@/composables/useParticleTestMode'
 import { journeyDeckProjects } from '@/data/projectsData'
 import { particleFragmentShader, particleVertexShader } from '@/shaders/particles'
+import epermitsHeroUrl from '@/assets/projects/epermits-hero.png'
 
 const props = withDefaults(
   defineProps<{
@@ -43,7 +45,7 @@ const props = withDefaults(
 
 const store = useJourneyStore()
 const { morphFrom, morphTo, morphT, ditherEnabled, isMobile } = storeToRefs(store)
-const { current: particlePreset } = useParticleTestMode()
+const { tuning } = useParticleTestMode()
 const { prefersReducedMotion } = useReducedMotion()
 
 // Must match the GLSL array size in particles.ts — a mismatch fails silently.
@@ -115,7 +117,27 @@ const uniforms = {
   uPulse:      { value: 0 },
   uSoftCircle: { value: 0 },
   uFaceCrispProgress: { value: 0 },
+  uScrollVel: { value: 0 },
+  uMouseVel: { value: new Vector2() },
+  uInk: { value: new Color('#111111').convertLinearToSRGB() },
+  uHoverRadius: { value: 2 },
+  uHoverStrength: { value: 1 },
+  uHoverAll: { value: 0 },
+  uStir: { value: 1 },
+  uDrag: { value: 1 },
+  uStagger: { value: 0.35 },
 }
+
+// Scroll-inertia spring: uScrollVel chases the normalised scroll speed,
+// underdamped so the field overshoots and settles when the page stops.
+const SCROLLABLE_VH = journeyChapters.reduce((acc, c) => acc + c.heightVh, 0) - 100
+const SCROLL_VEL_FULL = 250 // vh/s that maps to uScrollVel = 1
+const SPRING_OMEGA = 9 // stiffness (rad/s)
+const SPRING_ZETA = 0.8 // <1 = overshoot; 0.8 = one soft settle, no bounce
+let scrollSpringV = 0
+let lastScrollProgress = -1
+const lastMouse = new Vector2(999, 999)
+const inkTarget = new Color('#111111')
 
 watch(() => props.repelRadius, (val) => {
   uniforms.uRepelRadius.value = val
@@ -125,15 +147,6 @@ watch(() => props.repelStrength, (val) => {
 })
 watch(() => store.faceCrispProgress, (val) => {
   uniforms.uFaceCrispProgress.value = val
-})
-
-watch(particlePreset, (preset) => {
-  uniforms.uDriftMode.value  = preset.driftMode
-  uniforms.uHoverMode.value  = preset.hoverMode
-  uniforms.uPulse.value      = preset.pulse
-  uniforms.uSoftCircle.value = preset.softCircle
-  material.blending    = preset.additive ? AdditiveBlending : NormalBlending
-  material.needsUpdate = true
 })
 
 const material = new ShaderMaterial({
@@ -175,6 +188,20 @@ function loadImages(): void {
     targets.colors.cbmsLogo = colors
     updateActiveBuffers('cbmsLogo')
   })
+  // e-Permits landing illustration. The PNG has a grey/white checkerboard baked
+  // in (fake transparency) — minChroma keeps only the blue artwork.
+  loadImageAndSample(epermitsHeroUrl, activeCount, 3.0, {
+    colorScale: true,
+    minChroma: 16,
+    weightByDarkness: true,
+    maxDim: 256,
+    zRelief: 0.2,
+  }).then(({ positions, colors }) => {
+    if (activeCount !== currentCount) return
+    targets.positions.epermits = positions
+    targets.colors.epermits = colors
+    updateActiveBuffers('epermits')
+  })
   // Density follows the hero: the centered formation (face in `portrait`, a
   // project in `proj_N`) always owns the dense 65% block at the SAME particle
   // indices. The center morph is therefore always dense→dense (face⇄project),
@@ -196,6 +223,7 @@ function loadImages(): void {
   const lastSlotCount = activeCount - heroCount - (iconSlots.length - 1) * slotCount
   // proj_N hero ↔ deck card N (same order, single source of truth).
   const projectFiles = journeyDeckProjects.map((p) => p.icon)
+  const heroFiles = journeyDeckProjects.map((p) => p.hero)
   const FACE_FILE = '/assets/daveno-bg.png'
   const centerInst = { offset: [0, 0] as [number, number], scale: 1, rotation: 0, z: 0 }
 
@@ -236,7 +264,7 @@ function loadImages(): void {
     const heroIsFace = activeIndex === -1
     const heroPromise = heroIsFace
       ? sampleFaceHero(heroCount)
-      : sampleProjHero(projectFiles[activeIndex], heroCount)
+      : sampleProjHero(heroFiles[activeIndex], heroCount)
 
     const slotPromises = iconSlots.map((slot, j) => {
       const c = j === iconSlots.length - 1 ? lastSlotCount : slotCount
@@ -521,7 +549,37 @@ onBeforeRender(({ elapsed, delta }) => {
   uniforms.uProgress.value = prefersReducedMotion.value ? (t > 0.5 ? 1 : 0) : t
   uniforms.uDriftAmp.value = prefersReducedMotion.value ? 0 : 1
   uniforms.uMouse.value.lerp(mouseTarget, 0.08)
-  
+
+  // Tier A physics. dt clamped so a dropped frame can't blow the spring up.
+  const dt = Math.min(delta, 1 / 30)
+  if (prefersReducedMotion.value || dt <= 0) {
+    uniforms.uScrollVel.value = 0
+    uniforms.uMouseVel.value.set(0, 0)
+    scrollSpringV = 0
+  } else {
+    if (lastScrollProgress < 0) lastScrollProgress = store.scrollProgress
+    const vhPerSec = ((store.scrollProgress - lastScrollProgress) * SCROLLABLE_VH) / dt
+    const target = Math.max(-1, Math.min(1, vhPerSec / SCROLL_VEL_FULL))
+    const x = uniforms.uScrollVel.value
+    scrollSpringV +=
+      (SPRING_OMEGA * SPRING_OMEGA * (target - x) - 2 * SPRING_ZETA * SPRING_OMEGA * scrollSpringV) * dt
+    uniforms.uScrollVel.value = x + scrollSpringV * dt
+
+    // Pointer velocity from the already-smoothed uMouse; ignored until the
+    // pointer has entered (it parks at 999 off-screen).
+    const m = uniforms.uMouse.value
+    const mv = uniforms.uMouseVel.value
+    if (Math.abs(m.x) < 50 && Math.abs(lastMouse.x) < 50) {
+      mv.x += ((m.x - lastMouse.x) / dt - mv.x) * 0.2
+      mv.y += ((m.y - lastMouse.y) / dt - mv.y) * 0.2
+      mv.clampLength(0, 8)
+    } else {
+      mv.set(0, 0)
+    }
+    lastMouse.set(m.x, m.y)
+  }
+  lastScrollProgress = store.scrollProgress
+
   uniforms.uChapterIndex.value = store.activeChapterIndex
   if (isExploding) {
     explodeProgress += delta / explodeDuration
@@ -581,7 +639,32 @@ onBeforeRender(({ elapsed, delta }) => {
       slowFrameCount = Math.max(0, slowFrameCount - 1)
     }
   }
-  uniforms.uDither.value = ditherEnabled.value ? 1.0 : 0.0
+  // World style: flips at the morph midpoint, while particles are in flight.
+  const world = store.activeWorld
+  const wantDither = tuning.dither === 'world' ? world.dither !== false : tuning.dither === 'on'
+  const wantSoft = tuning.shape === 'world' ? world.softCircle === true : tuning.shape === 'soft'
+  uniforms.uDither.value = ditherEnabled.value && wantDither ? 1.0 : 0.0
+  uniforms.uSoftCircle.value = wantSoft ? 1.0 : 0.0
+
+  // Customizer panel (useParticleTestMode) — read live each frame
+  uniforms.uHoverMode.value = tuning.hoverMode
+  uniforms.uHoverRadius.value = tuning.hoverRadius
+  uniforms.uHoverStrength.value = tuning.hoverStrength
+  uniforms.uHoverAll.value = tuning.hoverAll ? 1 : 0
+  uniforms.uDriftMode.value = tuning.driftMode
+  uniforms.uPointSize.value = tuning.pointSize
+  uniforms.uPulse.value = tuning.pulse ? 1 : 0
+  uniforms.uStir.value = tuning.stir
+  uniforms.uDrag.value = tuning.drag
+  uniforms.uStagger.value = tuning.stagger
+  const blending = tuning.glow ? AdditiveBlending : NormalBlending
+  if (material.blending !== blending) {
+    material.blending = blending
+    material.needsUpdate = true
+  }
+  // raw sRGB numbers, like the vertex colours it mixes with (no linearising)
+  inkTarget.set(world.dark ? '#F3E6C4' : '#111111').convertLinearToSRGB()
+  uniforms.uInk.value.lerp(inkTarget, prefersReducedMotion.value ? 1 : 0.1)
 
   // Dim the field to 0 while the crisp face PNG resolves over the portrait hold
   // (projects chapter), then bring it back as the face breaks into particles.

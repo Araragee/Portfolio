@@ -7,7 +7,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     name: 'Journey',
     component: () => import('@/views/JourneyPage.vue'),
-    meta: { title: "The Long Way Around — Dave Gonzales" }
+    meta: { title: "Boring, made interesting — Dave Gonzales" }
   },
   {
     path: '/journey',
